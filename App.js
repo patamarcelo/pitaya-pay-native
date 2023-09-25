@@ -26,6 +26,8 @@ import PixComponent from "./components/pix/Pix";
 import CreditCardComponent from "./components/credit-card/CreditCard";
 import { useNavigation } from "@react-navigation/native";
 
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -61,9 +63,24 @@ function AuthStack() {
 	);
 }
 
-function PaymentStack() {
+function PaymentStack({ route, navigation }) {
+	const routeName = getFocusedRouteNameFromRoute(route);
+	navigation.setOptions({
+		tabBarStyle: { display: "block" }
+	});
+
+	if (routeName === "PIX" || routeName === "CARTAO") {
+		console.log("setOptions");
+		navigation.setOptions({
+			tabBarStyle: { display: "none" }
+		});
+	}
 	return (
-		<Stack.Navigator>
+		<Stack.Navigator
+			screenOptions={{
+				headerStyle: { backgroundColor: Colors.primary500 }
+			}}
+		>
 			<Stack.Screen
 				name="Pagamentos"
 				component={PaymentScreen}
@@ -76,7 +93,10 @@ function PaymentStack() {
 				name="PIX"
 				component={PixComponent}
 				options={{
-					headerShown: false,
+					title: "Pix",
+					headerTintColor: "whitesmoke",
+					headerShown: true,
+					tabBarStyle: { display: "none" },
 					contentStyle: { backgroundColor: Colors.primary500 }
 				}}
 			/>
@@ -84,7 +104,9 @@ function PaymentStack() {
 				name="CARTAO"
 				component={CreditCardComponent}
 				options={{
-					headerShown: false,
+					title: "Cartão de Crédito",
+					headerTintColor: "whitesmoke",
+					headerShown: true,
 					contentStyle: { backgroundColor: Colors.primary500 }
 				}}
 			/>
@@ -158,7 +180,11 @@ function AuthenticatedStack(props) {
 					// 	/>
 					// ),
 					tabBarIcon: ({ color, size }) => (
-						<FontAwesome5 name="user-alt" size={size} color={color} />
+						<FontAwesome5
+							name="user-alt"
+							size={size}
+							color={color}
+						/>
 					)
 				}}
 			/>
