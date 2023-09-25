@@ -24,6 +24,7 @@ import AppLoading from "expo-app-loading";
 
 import PixComponent from "./components/pix/Pix";
 import CreditCardComponent from "./components/credit-card/CreditCard";
+import { useNavigation } from "@react-navigation/native";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -93,6 +94,7 @@ function PaymentStack() {
 
 function AuthenticatedStack(props) {
 	const { context } = props;
+	const navigation = useNavigation();
 	return (
 		<Tab.Navigator
 			screenOptions={{
@@ -123,15 +125,17 @@ function AuthenticatedStack(props) {
 				component={PaymentStack}
 				options={{
 					title: "Pagamentos",
+					headerShown: false,
 					tabBarLabel: "Pagamentos",
-					// headerRight: ({ tintColor }) => (
-					// 	<IconButton
-					// 		icon="exit"
-					// 		color={tintColor}
-					// 		size={24}
-					// 		onPress={context.logout}
-					// 	/>
-					// ),
+					// tabBarStyle: { display: "none" },
+					headerRight: ({ tintColor }) => (
+						<IconButton
+							icon="exit"
+							color={tintColor}
+							size={24}
+							onPress={() => navigation.navigate("Welcome")}
+						/>
+					),
 					tabBarIcon: ({ color, size }) => (
 						<FontAwesome5
 							name="money-check"
@@ -154,7 +158,7 @@ function AuthenticatedStack(props) {
 					// 	/>
 					// ),
 					tabBarIcon: ({ color, size }) => (
-						<FontAwesome5 name="user" size={size} color={color} />
+						<FontAwesome5 name="user-alt" size={size} color={color} />
 					)
 				}}
 			/>

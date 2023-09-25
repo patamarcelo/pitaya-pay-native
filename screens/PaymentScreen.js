@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import CardButton from "../components/ui/CardButton";
 import { Colors } from "../constants/styles";
+import { useLayoutEffect } from "react";
 
 const PaymentScreen = () => {
 	return (

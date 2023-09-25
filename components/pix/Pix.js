@@ -1,6 +1,8 @@
 import { StyleSheet, View, Text } from "react-native";
+import { useLayoutEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
 
-const PixComponent = () => {
+const PixComponent = ({ route }) => {
 	return (
 		<View style={styles.mainContainer}>
 			<Text style={styles.text}>PIX COMPONENT</Text>
