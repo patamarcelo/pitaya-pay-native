@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, StyleSheet, View, Text } from "react-native";
+import { Alert, StyleSheet, View, Text, Image } from "react-native";
 
 import FlatButton from "../ui/FlatButton";
 import AuthForm from "./AuthForm";
@@ -70,7 +70,10 @@ function AuthContent({ isLogin, onAuthenticate }) {
 	return (
 		<View style={styles.mainContainer}>
 			<View style={styles.titleContainer}>
-				<Text style={styles.title}>PitayaPay</Text>
+				<Image
+					source={require("../../assets/Logo.png")}
+					style={styles.logo}
+				/>
 			</View>
 			<View style={styles.authContent}>
 				<AuthForm
@@ -91,6 +94,17 @@ function AuthContent({ isLogin, onAuthenticate }) {
 export default AuthContent;
 
 const styles = StyleSheet.create({
+	logo: {
+		width: 280,
+		height: 130,
+
+		shadowColor: Colors.primary800,
+		shadowOffset: { width: 8, height: 8 },
+		shadowOpacity: 1,
+		shadowRadius: 1,
+
+		elevation: 5
+	},
 	title: {
 		fontSize: 50,
 		color: "whitesmoke",
@@ -98,8 +112,7 @@ const styles = StyleSheet.create({
 		fontWeight: "bold"
 	},
 	titleContainer: {
-		marginTop: -50,
-		marginBottom: 30
+		marginTop: -80
 	},
 	mainContainer: {
 		flex: 1,
@@ -109,13 +122,13 @@ const styles = StyleSheet.create({
 	},
 	authContent: {
 		// marginTop: 64,
-		width: "90%",
+		width: "100%",
 		// flex: 1,
 		// justifyContent: 'center',
 		// alignItems: 'center',
 		padding: 16,
 		borderRadius: 8,
-		backgroundColor: Colors.primary800,
+		// backgroundColor: Colors.primary800,
 		elevation: 2,
 		shadowColor: "black",
 		shadowOffset: { width: 5, height: 10 },

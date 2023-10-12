@@ -65,15 +65,15 @@ function AuthStack() {
 
 function PaymentStack({ route, navigation }) {
 	const routeName = getFocusedRouteNameFromRoute(route);
-	navigation.setOptions({
-		tabBarStyle: { display: "block" }
-	});
+	// navigation.setOptions({
+	// 	tabBarStyle: { display: "block" }
+	// });
 
 	if (routeName === "PIX" || routeName === "CARTAO") {
 		console.log("setOptions");
-		navigation.setOptions({
-			tabBarStyle: { display: "none" }
-		});
+		// navigation.setOptions({
+		// 	tabBarStyle: { display: "none" }
+		// });
 	}
 	return (
 		<Stack.Navigator
@@ -93,6 +93,7 @@ function PaymentStack({ route, navigation }) {
 				name="PIX"
 				component={PixComponent}
 				options={{
+					presentation: "modal",
 					title: "Pix",
 					headerTintColor: "whitesmoke",
 					headerShown: true,
@@ -104,6 +105,7 @@ function PaymentStack({ route, navigation }) {
 				name="CARTAO"
 				component={CreditCardComponent}
 				options={{
+					presentation: "modal",
 					title: "Cartão de Crédito",
 					headerTintColor: "whitesmoke",
 					headerShown: true,
