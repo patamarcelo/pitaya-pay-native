@@ -8,21 +8,69 @@ function Input({
 	secure,
 	onUpdateValue,
 	value,
-	isInvalid
+	isInvalid,
+	inputStyles,
+	onBlur,
+	placeholder,
+	styleInput,
+	disabled,
+	multilne = false,
+	numberOfLines = 2,
+	inputContainerProps,
+	maxLength,
+	register,
+	nameRegister
 }) {
 	return (
-		<View style={styles.inputContainer}>
+		<View style={[styles.inputContainer, inputContainerProps]}>
 			<Text style={[styles.label, isInvalid && styles.labelInvalid]}>
 				{label}
 			</Text>
-			<TextInput
-				style={[styles.input, isInvalid && styles.inputInvalid]}
-				// autoCapitalize={false}
-				keyboardType={keyboardType}
-				secureTextEntry={secure}
-				onChangeText={onUpdateValue}
-				value={value}
-			/>
+			{register && (
+				<TextInput
+					{...register(nameRegister)}
+					style={[
+						styles.input,
+						inputStyles,
+						isInvalid && styles.inputInvalid,
+						styleInput
+					]}
+					// autoCapitalize={false}
+					keyboardType={keyboardType}
+					secureTextEntry={secure}
+					onChangeText={onUpdateValue}
+					value={value}
+					onBlur={onBlur}
+					placeholder={placeholder}
+					editable={!disabled}
+					selectTextOnFocus={!disabled}
+					multiline={multilne}
+					numberOfLines={numberOfLines}
+					maxLength={maxLength}
+				/>
+			)}
+			{!register && (
+				<TextInput
+					style={[
+						styles.input,
+						inputStyles,
+						isInvalid && styles.inputInvalid,
+						styleInput
+					]}
+					// autoCapitalize={false}
+					keyboardType={keyboardType}
+					secureTextEntry={secure}
+					onChangeText={onUpdateValue}
+					value={value}
+					onBlur={onBlur}
+					placeholder={placeholder}
+					editable={!disabled}
+					selectTextOnFocus={!disabled}
+					multiline={multilne}
+					numberOfLines={numberOfLines}
+					maxLength={maxLength}
+				/>
+			)}
 		</View>
 	);
 }

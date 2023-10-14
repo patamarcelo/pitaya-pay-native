@@ -23,10 +23,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AppLoading from "expo-app-loading";
 
 import PixComponent from "./components/pix/Pix";
+import PixMailComponent from "./components/pix/PixMail";
 import CreditCardComponent from "./components/credit-card/CreditCard";
 import { useNavigation } from "@react-navigation/native";
 
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+import ConfirmationPix from "./components/pix/PixConfirmation";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -63,18 +65,32 @@ function AuthStack() {
 	);
 }
 
-function PaymentStack({ route, navigation }) {
-	const routeName = getFocusedRouteNameFromRoute(route);
-	// navigation.setOptions({
-	// 	tabBarStyle: { display: "block" }
-	// });
+function PixStack({ navigation }) {
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerStyle: { backgroundColor: Colors.primary500 }
+			}}
+		>
+			<Stack.Screen name="PIX" component={PixComponent} />
+			<Stack.Screen name="PIXMAIL" component={PixMailComponent} />
+			<Stack.Screen name="PIXCONFIRMATION" component={ConfirmationPix} />
+		</Stack.Navigator>
+	);
+}
 
-	if (routeName === "PIX" || routeName === "CARTAO") {
-		console.log("setOptions");
-		// navigation.setOptions({
-		// 	tabBarStyle: { display: "none" }
-		// });
-	}
+function CartaoStack({ navigation }) {
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerStyle: { backgroundColor: Colors.primary500 }
+			}}
+		>
+			<Stack.Screen name="CARTAO" component={CreditCardComponent} />
+		</Stack.Navigator>
+	);
+}
+function PaymentStack({ route, navigation }) {
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -89,36 +105,12 @@ function PaymentStack({ route, navigation }) {
 					contentStyle: { backgroundColor: Colors.primary500 }
 				}}
 			/>
-			<Stack.Screen
-				name="PIX"
-				component={PixComponent}
-				options={{
-					presentation: "modal",
-					title: "Pix",
-					headerTintColor: "whitesmoke",
-					headerShown: true,
-					tabBarStyle: { display: "none" },
-					contentStyle: { backgroundColor: Colors.primary500 }
-				}}
-			/>
-			<Stack.Screen
-				name="CARTAO"
-				component={CreditCardComponent}
-				options={{
-					presentation: "modal",
-					title: "Cartão de Crédito",
-					headerTintColor: "whitesmoke",
-					headerShown: true,
-					contentStyle: { backgroundColor: Colors.primary500 }
-				}}
-			/>
 		</Stack.Navigator>
 	);
 }
 
-function AuthenticatedStack(props) {
-	const { context } = props;
-	const navigation = useNavigation();
+function HomeStack() {
+	const context = useContext(AuthContext);
 	return (
 		<Tab.Navigator
 			screenOptions={{
@@ -128,7 +120,7 @@ function AuthenticatedStack(props) {
 			}}
 		>
 			<Tab.Screen
-				name="Welcome"
+				name="Home"
 				component={WelcomeScreen}
 				options={{
 					headerRight: ({ tintColor }) => (
@@ -191,6 +183,89 @@ function AuthenticatedStack(props) {
 				}}
 			/>
 		</Tab.Navigator>
+	);
+}
+
+function AuthenticatedStack(props) {
+	const { context } = props;
+	const navigation = useNavigation();
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerShown: false,
+				headerStyle: { backgroundColor: Colors.primary500 },
+				headerTintColor: "white",
+				contentStyle: { backgroundColor: Colors.primary100 }
+			}}
+		>
+			<Stack.Screen
+				name="Welcome"
+				component={HomeStack}
+				options={{
+					headerRight: ({ tintColor }) => (
+						<IconButton
+							icon="exit"
+							color={tintColor}
+							size={24}
+							onPress={context.logout}
+						/>
+					),
+					tabBarIcon: ({ color, size }) => (
+						<Ionicons name="home" color={color} size={size} />
+					)
+				}}
+			/>
+			<Stack.Screen
+				name="pixStack"
+				component={PixStack}
+				options={{
+					title: "Pagamentos",
+					headerShown: false,
+					tabBarLabel: "Pagamentos",
+					// tabBarStyle: { display: "none" },
+					headerRight: ({ tintColor }) => (
+						<IconButton
+							icon="exit"
+							color={tintColor}
+							size={24}
+							onPress={() => navigation.navigate("Welcome")}
+						/>
+					),
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome5
+							name="money-check"
+							size={size}
+							color={color}
+						/>
+					)
+				}}
+			/>
+			<Stack.Screen
+				name="cartaoStack"
+				component={CartaoStack}
+				options={{
+					title: "cartao",
+					headerShown: false,
+					// tabBarLabel: "Cartão",
+					// tabBarStyle: { display: "none" },
+					headerRight: ({ tintColor }) => (
+						<IconButton
+							icon="exit"
+							color={tintColor}
+							size={24}
+							onPress={() => navigation.navigate("Welcome")}
+						/>
+					),
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome5
+							name="money-check"
+							size={size}
+							color={color}
+						/>
+					)
+				}}
+			/>
+		</Stack.Navigator>
 	);
 }
 
