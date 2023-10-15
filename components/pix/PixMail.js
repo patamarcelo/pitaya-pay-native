@@ -48,8 +48,9 @@ const MailForm = () => {
 
 	useEffect(() => {
 		setPaymentParams({
-			valor: route.params.data,
-			email: ""
+			valor: route.params.data.valor,
+			email: "",
+			produtos: route.params.data.produtos
 		});
 	}, []);
 
@@ -97,6 +98,10 @@ const MailForm = () => {
 		}
 	});
 
+	useEffect(() => {
+		setFocus("email");
+	}, [setFocus]);
+
 	const handlerChange = (e, name) => {
 		setPaymentParams((prev) => ({
 			...prev,
@@ -110,30 +115,31 @@ const MailForm = () => {
 		setShowAlert(true);
 		setProgress(true);
 		setShowContent(false);
+		try {
+			const newTrans = await addTransaction(
+				user.displayName
+					? user.displayName
+					: "Vendedor sem nome cadastrado",
+				user.email,
+				user.uid,
+				"pix",
+				paymentParams.valor,
+				"1",
+				paymentParams.email,
+				paymentParams.produtos
+			);
 
-		const newTrans = await addTransaction(
-			user.displayName,
-			user.email,
-			user.uid,
-			"pix",
-			paymentParams.valor,
-			"1",
-			paymentParams.email,
-			["a", "b"]
-		);
+			console.log(newTrans);
 
-		console.log(newTrans);
-
-		setTimeout(() => {
-			setShowAlert(false);
-			setProgress(false);
-			navigation.navigate("PIXCONFIRMATION", { data: paymentParams });
-		}, 750);
+			setTimeout(() => {
+				setShowAlert(false);
+				setProgress(false);
+				navigation.navigate("PIXCONFIRMATION", { data: paymentParams });
+			}, 750);
+		} catch (err) {
+			console.log("erro ao gerar a transação", err);
+		}
 	};
-
-	useEffect(() => {
-		setFocus("email");
-	}, [setFocus]);
 
 	if (progress) {
 		return <LoadingOverlay message={"Trabalhando na sua solicitação..."} />;

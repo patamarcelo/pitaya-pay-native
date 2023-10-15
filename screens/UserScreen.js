@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
 		textDecorationLine: "underline"
 	},
 	btnStyles: {
-		backgroundColor: "whitesmoke",
+		backgroundColor: "white",
 		elevation: 0,
 		// shadowColor: "transparent",
 		shadowOffset: { width: 0, height: 0 },
