@@ -13,7 +13,7 @@ import UserScreen from "./screens/UserScreen";
 import { Colors } from "./constants/styles";
 import AuthContextprovider, { AuthContext } from "./store/auth-context";
 import AuthContent from "./components/Auth/AuthContent";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 
 import IconButton from "./components/ui/IconButton";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -29,6 +29,18 @@ import { useNavigation } from "@react-navigation/native";
 
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import ConfirmationPix from "./components/pix/PixConfirmation";
+import ServiceTerms from "./components/terms/ServiceTerms";
+
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "./store/redux/store";
+import { Text } from "react-native";
+
+import { useSelector, useDispatch } from "react-redux";
+import { termsSelector, userSelector } from "./store/redux/selector";
+import { userActions } from "./store/redux/usuario";
+
+import { getContractsSign } from "./utils/firebase/firebase.datatable";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -189,83 +201,162 @@ function HomeStack() {
 function AuthenticatedStack(props) {
 	const { context } = props;
 	const navigation = useNavigation();
+	const user = useSelector(userSelector);
+	const [agree, setAgree] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const dispatch = useDispatch();
+	const agreedTerms = useSelector(termsSelector);
+
+	const getAllusers = async () => {
+		setIsLoading(true);
+		try {
+			const allUsers = await getContractsSign();
+			console.log(user);
+			const confirmArr = allUsers.filter(
+				(allUser) => allUser.id === user.uid
+			);
+			if (confirmArr.length > 0) {
+				setAgree(true);
+				dispatch(userActions.registerTerms());
+			} else {
+				setAgree(false);
+				dispatch(userActions.unregisterTerms());
+			}
+			setIsLoading(false);
+		} catch (error) {
+			console.log("erro em gerar os dados", error);
+			// signOutUser();
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useLayoutEffect(() => {
+		getAllusers();
+	}, []);
+
 	return (
-		<Stack.Navigator
-			screenOptions={{
-				headerShown: false,
-				headerStyle: { backgroundColor: Colors.primary500 },
-				headerTintColor: "white",
-				contentStyle: { backgroundColor: Colors.primary100 }
-			}}
-		>
-			<Stack.Screen
-				name="Welcome"
-				component={HomeStack}
-				options={{
-					headerRight: ({ tintColor }) => (
-						<IconButton
-							icon="exit"
-							color={tintColor}
-							size={24}
-							onPress={context.logout}
-						/>
-					),
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons name="home" color={color} size={size} />
-					)
-				}}
-			/>
-			<Stack.Screen
-				name="pixStack"
-				component={PixStack}
-				options={{
-					title: "Pagamentos",
-					headerShown: false,
-					tabBarLabel: "Pagamentos",
-					// tabBarStyle: { display: "none" },
-					headerRight: ({ tintColor }) => (
-						<IconButton
-							icon="exit"
-							color={tintColor}
-							size={24}
-							onPress={() => navigation.navigate("Welcome")}
-						/>
-					),
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome5
-							name="money-check"
-							size={size}
-							color={color}
-						/>
-					)
-				}}
-			/>
-			<Stack.Screen
-				name="cartaoStack"
-				component={CartaoStack}
-				options={{
-					title: "cartao",
-					headerShown: false,
-					// tabBarLabel: "Cartão",
-					// tabBarStyle: { display: "none" },
-					headerRight: ({ tintColor }) => (
-						<IconButton
-							icon="exit"
-							color={tintColor}
-							size={24}
-							onPress={() => navigation.navigate("Welcome")}
-						/>
-					),
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome5
-							name="money-check"
-							size={size}
-							color={color}
-						/>
-					)
-				}}
-			/>
-		</Stack.Navigator>
+		<>
+			{agreedTerms ? (
+				<Stack.Navigator
+					screenOptions={{
+						headerShown: false,
+						headerStyle: { backgroundColor: Colors.primary500 },
+						headerTintColor: "white",
+						contentStyle: { backgroundColor: Colors.secondary[100] }
+					}}
+				>
+					<Stack.Screen
+						name="Welcome"
+						component={HomeStack}
+						options={{
+							headerRight: ({ tintColor }) => (
+								<IconButton
+									icon="exit"
+									color={tintColor}
+									size={24}
+									onPress={context.logout}
+								/>
+							),
+							tabBarIcon: ({ color, size }) => (
+								<Ionicons
+									name="home"
+									color={color}
+									size={size}
+								/>
+							)
+						}}
+					/>
+					<Stack.Screen
+						name="pixStack"
+						component={PixStack}
+						options={{
+							title: "Pagamentos",
+							headerShown: false,
+							tabBarLabel: "Pagamentos",
+							// tabBarStyle: { display: "none" },
+							headerRight: ({ tintColor }) => (
+								<IconButton
+									icon="exit"
+									color={tintColor}
+									size={24}
+									onPress={() =>
+										navigation.navigate("Welcome")
+									}
+								/>
+							),
+							tabBarIcon: ({ color, size }) => (
+								<FontAwesome5
+									name="money-check"
+									size={size}
+									color={color}
+								/>
+							)
+						}}
+					/>
+					<Stack.Screen
+						name="cartaoStack"
+						component={CartaoStack}
+						options={{
+							title: "cartao",
+							headerShown: false,
+							// tabBarLabel: "Cartão",
+							// tabBarStyle: { display: "none" },
+							headerRight: ({ tintColor }) => (
+								<IconButton
+									icon="exit"
+									color={tintColor}
+									size={24}
+									onPress={() =>
+										navigation.navigate("Welcome")
+									}
+								/>
+							),
+							tabBarIcon: ({ color, size }) => (
+								<FontAwesome5
+									name="money-check"
+									size={size}
+									color={color}
+								/>
+							)
+						}}
+					/>
+					<Stack.Screen
+						name="ServiceTerms"
+						component={ServiceTerms}
+						options={{
+							title: "Termos de Serviço",
+							headerShown: true
+						}}
+					/>
+				</Stack.Navigator>
+			) : (
+				<Stack.Navigator
+					screenOptions={{
+						headerStyle: { backgroundColor: Colors.primary500 },
+						headerTintColor: "white",
+						contentStyle: { backgroundColor: Colors.primary100 },
+						backgroundColor: "whitesmoke"
+					}}
+				>
+					<Stack.Screen
+						name="registerTerms"
+						component={ServiceTerms}
+						options={{
+							title: "Termos de Serviço",
+							headerRight: ({ tintColor }) => (
+								<IconButton
+									icon="exit"
+									color={tintColor}
+									size={24}
+									onPress={() => context.logout()}
+								/>
+							)
+						}}
+					/>
+				</Stack.Navigator>
+			)}
+		</>
 	);
 }
 
@@ -311,7 +402,14 @@ export default function App() {
 		<>
 			<StatusBar style="light" />
 			<AuthContextprovider>
-				<Root />
+				<Provider store={store}>
+					<PersistGate
+						loading={<Text>Loading...</Text>}
+						persistor={persistor}
+					>
+						<Root />
+					</PersistGate>
+				</Provider>
 			</AuthContextprovider>
 		</>
 	);

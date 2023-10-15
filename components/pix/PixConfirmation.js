@@ -17,7 +17,7 @@ const ConfirmationPix = () => {
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			title: "Confirmação",
+			title: "",
 			headerTintColor: "whitesmoke",
 			headerShadowVisible: false,
 			// headerShown: true,
@@ -36,7 +36,7 @@ const ConfirmationPix = () => {
 				style={styles.img}
 			/>
 			<View style={styles.dataValues}>
-				<Text style={styles.email}>{data.email}</Text>
+				<Text style={styles.email}>{data.email.toLowerCase()}</Text>
 				<Text style={styles.valor}>
 					R${" "}
 					{data.valor.toLocaleString("pt-br", {

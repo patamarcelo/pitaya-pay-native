@@ -5,6 +5,7 @@ import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Alert, StyleSheet } from "react-native";
 import { AuthContext } from "../store/auth-context";
 import { useNavigation } from "@react-navigation/native";
+import { triggerResetEmail } from "../utils/firebase/firebase";
 
 function NewPassword() {
 	const [isAuth, setIsAuth] = useState(false);
@@ -15,16 +16,15 @@ function NewPassword() {
 	const signupHandler = async ({ email, password }) => {
 		setIsAuth(true);
 		try {
-			const status = await newPassword(email);
-			if (status === 200) {
-				Alert.alert(
-					"Senha resetada!!",
-					`Um e-mail foi enviado para ${email} com as intstruções para redefinição!!`
-				);
-				navigation.navigate("Login");
-			}
+			const status = await triggerResetEmail(email);
+
+			Alert.alert(
+				"Senha resetada!!",
+				`Um e-mail foi enviado para ${email} com as intstruções para redefinição!!`
+			);
+			navigation.navigate("Login");
 		} catch (err) {
-			console.log("erro ao criar email ,", err);
+			console.log("erro ao resetar email ,", err);
 			Alert.alert(
 				"Erro ao resetar!!",
 				`Confira se o email ${email} está correto e tente novamente!!`

@@ -1,8 +1,9 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { Colors } from "../../constants/styles";
 
-function LoadingOverlay({ message, style }) {
+function LoadingOverlay({ message, style, cntStyles }) {
 	return (
-		<View style={styles.rootContainer}>
+		<View style={[styles.rootContainer, cntStyles]}>
 			<Text style={[styles.message, style]}>{message}</Text>
 			<ActivityIndicator size="large" />
 		</View>

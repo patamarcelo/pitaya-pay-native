@@ -13,6 +13,9 @@ import Button from "../ui/Button";
 import IconButton from "../ui/IconButton";
 import { useHeaderHeight } from "@react-navigation/elements";
 
+import { useSelector } from "react-redux";
+import { userSelector } from "../../store/redux/selector";
+
 const schema = yup.object({
 	email: yup
 		.string()
@@ -23,9 +26,12 @@ const schema = yup.object({
 import { useNavigation, useRoute } from "@react-navigation/native";
 import LoadingOverlay from "../ui/LoadingOverlay";
 
+import { addTransaction } from "../../utils/firebase/firebase.datatable";
+
 // import AwesomeAlert from "react-native-awesome-alerts";
 
 const MailForm = () => {
+	const user = useSelector(userSelector);
 	const [paymentValue, setPaymentValue] = useState(0);
 	const headerHeight = useHeaderHeight();
 	const navigation = useNavigation();
@@ -98,12 +104,26 @@ const MailForm = () => {
 		}));
 	};
 
-	const handlerConfirm = (e) => {
+	const handlerConfirm = async (e) => {
 		console.log("avançar", e);
 		console.log(paymentParams);
 		setShowAlert(true);
 		setProgress(true);
 		setShowContent(false);
+
+		const newTrans = await addTransaction(
+			user.displayName,
+			user.email,
+			user.uid,
+			"pix",
+			paymentParams.valor,
+			"1",
+			paymentParams.email,
+			["a", "b"]
+		);
+
+		console.log(newTrans);
+
 		setTimeout(() => {
 			setShowAlert(false);
 			setProgress(false);

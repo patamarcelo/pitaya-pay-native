@@ -5,18 +5,25 @@ import { useNavigation } from "@react-navigation/native";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { Alert } from "react-native";
 import { AuthContext } from "../store/auth-context";
+import { authUser } from "../utils/firebase/firebase";
+import { useDispatch } from "react-redux";
+import { userActions } from "../store/redux/usuario";
 
 function LoginScreen() {
 	const [isLoading, setIsLoading] = useState(false);
 	const navigation = useNavigation();
+	const dispatch = useDispatch();
+	const { setUser } = userActions;
 
 	const context = useContext(AuthContext);
 
 	const loginUserhandler = async ({ email, password }) => {
 		setIsLoading(true);
 		try {
-			const token = await loginUser(email, password);
-			context.authenticate(token);
+			const user = await authUser(email, password);
+			console.log(user.user.accessToken);
+			context.authenticate(user.user.accessToken);
+			dispatch(setUser(user.user));
 		} catch (error) {
 			console.log("erro ao logar usuário", error);
 			Alert.alert("Authentication Failed!!", "Try again later!!");
