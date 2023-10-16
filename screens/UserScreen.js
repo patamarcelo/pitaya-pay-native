@@ -32,15 +32,16 @@ const styles = StyleSheet.create({
 	textStyles: {
 		color: "blue",
 		fontWeight: "500",
+		fontSize: 12,
 		textDecorationLine: "underline"
 	},
 	btnStyles: {
-		backgroundColor: "white",
-		elevation: 0,
+		backgroundColor: "whitesmoke"
+		// elevation: 0
 		// shadowColor: "transparent",
-		shadowOffset: { width: 0, height: 0 },
-		shadowOpacity: 0,
-		shadowRadius: 0
+		// shadowOffset: { width: 0, height: 0 },
+		// shadowOpacity: 0,
+		// shadowRadius: 0
 	},
 	rootContainer: {
 		flex: 1,

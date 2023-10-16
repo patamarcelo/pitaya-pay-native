@@ -41,6 +41,12 @@ import { termsSelector, userSelector } from "./store/redux/selector";
 import { userActions } from "./store/redux/usuario";
 
 import { getContractsSign } from "./utils/firebase/firebase.datatable";
+import { FontAwesome } from "@expo/vector-icons";
+
+import {
+	onAuthStateChangedListener,
+	signOutUser
+} from "./utils/firebase/firebase";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -123,6 +129,11 @@ function PaymentStack({ route, navigation }) {
 
 function HomeStack() {
 	const context = useContext(AuthContext);
+
+	const handlerLogout = () => {
+		signOutUser();
+		context.logout();
+	};
 	return (
 		<Tab.Navigator
 			screenOptions={{
@@ -137,10 +148,11 @@ function HomeStack() {
 				options={{
 					headerRight: ({ tintColor }) => (
 						<IconButton
-							icon="exit"
+							type={"awesome"}
+							icon="power-off"
 							color={tintColor}
-							size={24}
-							onPress={context.logout}
+							size={22}
+							onPress={handlerLogout}
 						/>
 					),
 					tabBarIcon: ({ color, size }) => (
@@ -207,6 +219,11 @@ function AuthenticatedStack(props) {
 	const dispatch = useDispatch();
 	const agreedTerms = useSelector(termsSelector);
 
+	const handlerLogout = () => {
+		signOutUser();
+		context.logout();
+	};
+
 	const getAllusers = async () => {
 		setIsLoading(true);
 		try {
@@ -255,7 +272,7 @@ function AuthenticatedStack(props) {
 									icon="exit"
 									color={tintColor}
 									size={24}
-									onPress={context.logout}
+									onPress={handlerLogout}
 								/>
 							),
 							tabBarIcon: ({ color, size }) => (
@@ -349,7 +366,7 @@ function AuthenticatedStack(props) {
 									icon="exit"
 									color={tintColor}
 									size={24}
-									onPress={() => context.logout()}
+									onPress={handlerLogout}
 								/>
 							)
 						}}
@@ -362,6 +379,21 @@ function AuthenticatedStack(props) {
 
 function Navigation() {
 	const context = useContext(AuthContext);
+	const user = useSelector(userSelector);
+	const dispatch = useDispatch();
+	const { setUser } = userActions;
+
+	useEffect(() => {
+		const unsubscribe = onAuthStateChangedListener((user) => {
+			if (user) {
+				context.authenticate(user.accessToken);
+				console.log("userDispatch", user);
+				dispatch(setUser(user));
+			}
+		});
+		return unsubscribe;
+	}, [dispatch]);
+
 	return (
 		<NavigationContainer>
 			{!context.isAuth ? (
