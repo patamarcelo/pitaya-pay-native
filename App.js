@@ -34,7 +34,7 @@ import ServiceTerms from "./components/terms/ServiceTerms";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./store/redux/store";
-import { Text } from "react-native";
+import { Text, StyleSheet, View } from "react-native";
 
 import { useSelector, useDispatch } from "react-redux";
 import { termsSelector, userSelector } from "./store/redux/selector";
@@ -42,6 +42,8 @@ import { userActions } from "./store/redux/usuario";
 
 import { getContractsSign } from "./utils/firebase/firebase.datatable";
 import { FontAwesome } from "@expo/vector-icons";
+
+import LoadingOverlay from "./components/ui/LoadingOverlay";
 
 import {
 	onAuthStateChangedListener,
@@ -232,6 +234,7 @@ function AuthenticatedStack(props) {
 			const confirmArr = allUsers.filter(
 				(allUser) => allUser.id === user.uid
 			);
+			console.log("afred Terms: ", confirmArr);
 			if (confirmArr.length > 0) {
 				setAgree(true);
 				dispatch(userActions.registerTerms());
@@ -251,6 +254,14 @@ function AuthenticatedStack(props) {
 	useLayoutEffect(() => {
 		getAllusers();
 	}, []);
+
+	if (isLoading) {
+		return (
+			<View style={styles.loadingContainer}>
+				<LoadingOverlay message={"Conectando você..."} />
+			</View>
+		);
+	}
 
 	return (
 		<>
@@ -446,3 +457,10 @@ export default function App() {
 		</>
 	);
 }
+
+const styles = StyleSheet.create({
+	loadingContainer: {
+		flex: 1,
+		backgroundColor: Colors.primary[800]
+	}
+});
