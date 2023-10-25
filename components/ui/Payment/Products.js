@@ -33,7 +33,9 @@ const ProductsComp = (props) => {
 		parcelasSelected,
 		setParcelasSelected,
 		handlerChangeParcelas,
-		handleDeleteProduct
+		handleDeleteProduct,
+		paymentValue,
+		quantityProd
 	} = props;
 	const getW = width - (width * 0, 10);
 	useEffect(() => {
@@ -66,12 +68,13 @@ const ProductsComp = (props) => {
 			const formatedArr = data.map((data) => {
 				return {
 					id: data.codigo,
-					name: `${data.codigo} - ${
-						data.tipo
-					} - R$ ${data?.valor?.toLocaleString("pt-br", {
-						minimumFractionDigits: 2,
-						maximumFractionDigits: 2
-					})}`
+					name: `${data.codigo} - R$ ${data?.valor?.toLocaleString(
+						"pt-br",
+						{
+							minimumFractionDigits: 2,
+							maximumFractionDigits: 2
+						}
+					)}`
 				};
 			});
 			setProductsComp(formatedArr);
@@ -113,7 +116,9 @@ const ProductsComp = (props) => {
 					selectedItems={parcelasSelected}
 					selectText="Selecione os Produtos"
 					searchInputPlaceholderText="Procure os produtos"
-					onChangeInput={(text) => console.log(text)}
+					onChangeInput={(text) => {
+						console.log(text);
+					}}
 					// altFontFamily="ProximaNova-Light"
 					tagRemoveIconColor="#CCC"
 					tagBorderColor="white"
@@ -190,9 +195,17 @@ const ProductsComp = (props) => {
 					<>
 						<Divider />
 						<View style={styles.resumContainer}>
-							<Text style={styles.itemText}>Item: 1</Text>
+							<Text style={styles.itemText}>
+								{quantityProd > 1
+									? `Items: ${quantityProd}`
+									: `Item: ${quantityProd}`}
+							</Text>
 							<Text style={styles.valueText}>
-								Subtotal: R$ 20,00
+								Subtotal: R${" "}
+								{paymentValue.toLocaleString("pt-br", {
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 2
+								})}
 							</Text>
 						</View>
 					</>

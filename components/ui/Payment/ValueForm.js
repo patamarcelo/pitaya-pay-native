@@ -22,6 +22,7 @@ import { useNavigation } from "@react-navigation/native";
 
 const PaymentForm = () => {
 	const [paymentValue, setPaymentValue] = useState(0);
+	const [quantityProd, setQuantityProd] = useState(0);
 	const headerHeight = useHeaderHeight();
 	const navigation = useNavigation();
 
@@ -57,13 +58,18 @@ const PaymentForm = () => {
 	};
 
 	useEffect(() => {
+		const totalQuantity = products.filter((data) =>
+			parcelasSelected.includes(data.codigo)
+		);
 		const total = products
 			.filter((data) => parcelasSelected.includes(data.codigo))
 			.reduce((acc, curr) => (acc += curr.valor), 0);
 		if (total > 0) {
 			setPaymentValue(total);
+			setQuantityProd(totalQuantity.length);
 		} else {
 			setPaymentValue(0);
+			setQuantityProd(0);
 		}
 	}, [productsComp, parcelasSelected]);
 
@@ -93,6 +99,8 @@ const PaymentForm = () => {
 				setParcelasSelected={setParcelasSelected}
 				handlerChangeParcelas={handlerChangeParcelas}
 				handleDeleteProduct={handleDeleteProduct}
+				paymentValue={paymentValue}
+				quantityProd={quantityProd}
 			/>
 			<View>
 				<Text style={styles.title}>Valor a Pagar</Text>
