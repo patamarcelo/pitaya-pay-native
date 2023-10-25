@@ -228,25 +228,30 @@ function AuthenticatedStack(props) {
 
 	const getAllusers = async () => {
 		setIsLoading(true);
-		try {
-			const allUsers = await getContractsSign();
-			console.log(user);
-			const confirmArr = allUsers.filter(
-				(allUser) => allUser.id === user.uid
-			);
-			console.log("afred Terms: ", confirmArr);
-			if (confirmArr.length > 0) {
-				setAgree(true);
-				dispatch(userActions.registerTerms());
-			} else {
-				setAgree(false);
-				dispatch(userActions.unregisterTerms());
+		if (!agreedTerms) {
+			try {
+				const allUsers = await getContractsSign();
+				console.log(user);
+				const confirmArr = allUsers.filter(
+					(allUser) => allUser.id === user.uid
+				);
+				console.log("afred Terms: ", confirmArr);
+				if (confirmArr.length > 0) {
+					setAgree(true);
+					dispatch(userActions.registerTerms());
+				} else {
+					setAgree(false);
+					dispatch(userActions.unregisterTerms());
+				}
+				setIsLoading(false);
+			} catch (error) {
+				console.log("erro em gerar os dados", error);
+				// signOutUser();
+			} finally {
+				setIsLoading(false);
 			}
-			setIsLoading(false);
-		} catch (error) {
-			console.log("erro em gerar os dados", error);
-			// signOutUser();
-		} finally {
+		} else {
+			setAgree(true);
 			setIsLoading(false);
 		}
 	};

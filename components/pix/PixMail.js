@@ -16,6 +16,8 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useSelector } from "react-redux";
 import { userSelector } from "../../store/redux/selector";
 
+import { createClient } from "../../utils/axios/axios.utils";
+
 const schema = yup.object({
 	email: yup
 		.string()
@@ -116,26 +118,47 @@ const MailForm = () => {
 		setProgress(true);
 		setShowContent(false);
 		try {
-			const newTrans = await addTransaction(
-				user.displayName
-					? user.displayName
-					: "Vendedor sem nome cadastrado",
-				user.email,
-				user.uid,
-				"pix",
-				paymentParams.valor,
-				"1",
-				paymentParams.email,
-				paymentParams.produtos
-			);
+			const newPaymentMethod = {
+				addressKey: "pitayajoias@gmail.com",
+				description: `${paymentParams.produtos} - ${
+					user.displayName
+						? user.displayName
+						: "Vendedor sem nome cadastrado"
+				}`,
+				value: paymentParams.valor,
+				format: "IMAGE"
+			};
 
-			console.log(newTrans);
+			const respPay = await createClient.post("createpixpay", null, {
+				params: {
+					newPaymentMethod
+				}
+			});
+			const { data, status } = respPay;
 
-			setTimeout(() => {
-				setShowAlert(false);
-				setProgress(false);
-				navigation.navigate("PIXCONFIRMATION", { data: paymentParams });
-			}, 750);
+			if (status === 200) {
+				const newTrans = await addTransaction(
+					user.displayName
+						? user.displayName
+						: "Vendedor sem nome cadastrado",
+					user.email,
+					user.uid,
+					"pix",
+					paymentParams.valor,
+					"1",
+					paymentParams.email,
+					paymentParams.produtos,
+					data.id
+				);
+
+				setTimeout(() => {
+					setShowAlert(false);
+					setProgress(false);
+					navigation.navigate("PIXCONFIRMATION", {
+						data: { ...paymentParams, pixUri: data.encodedImage }
+					});
+				}, 750);
+			}
 		} catch (err) {
 			console.log("erro ao gerar a transação", err);
 		}

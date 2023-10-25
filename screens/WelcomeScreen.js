@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 import { useSelector } from "react-redux";
 import { userSelector } from "../store/redux/selector";
 
@@ -11,8 +11,10 @@ function WelcomeScreen() {
 
 	return (
 		<View style={styles.rootContainer}>
-			<Text style={styles.title}>Welcome! {user.email}</Text>
-			<Text>You authenticated successfully!</Text>
+			<Image
+				source={require("../assets/teste.jpg")}
+				style={styles.imgContainer}
+			/>
 		</View>
 	);
 }
@@ -20,15 +22,19 @@ function WelcomeScreen() {
 export default WelcomeScreen;
 
 const styles = StyleSheet.create({
+	imgContainer: {
+		width: "100%",
+		height: "100%"
+	},
 	rootContainer: {
 		flex: 1,
 		justifyContent: "center",
-		alignItems: "center",
-		padding: 32
+		alignItems: "center"
+		// padding: 32
 	},
 	title: {
 		fontSize: 20,
-		fontWeight: "bold",
-		marginBottom: 8
+		fontWeight: "bold"
+		// marginBottom: 8
 	}
 });

@@ -1,7 +1,7 @@
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { View, Text, StyleSheet, Image, Pressable, Alert } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState, useEffect } from "react";
 import { Colors } from "../../constants/styles";
 import Button from "../ui/Button";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -19,7 +19,14 @@ const ConfirmationPix = () => {
 	const headerHeight = useHeaderHeight();
 	const navigation = useNavigation();
 	const route = useRoute();
+	const [imgUri, setImgUri] = useState(null);
 	const { data } = route.params;
+
+	useEffect(() => {
+		if (data) {
+			setImgUri(data.pixUri);
+		}
+	}, []);
 
 	const handlerBackHome = () => {
 		navigation.navigate("Welcome");
@@ -78,10 +85,15 @@ const ConfirmationPix = () => {
 						/>
 					</Pressable>
 				</View>
-				<Image
-					source={require("../../assets/payment/pix-pitaya.jpeg")}
-					style={styles.img}
-				/>
+				{imgUri && (
+					<Image
+						source={{
+							uri: `data:image/png;base64,${imgUri}`
+						}}
+						style={styles.img}
+					/>
+				)}
+
 				<View style={styles.dataValues}>
 					<Text style={styles.valor}>
 						R${" "}

@@ -9,6 +9,9 @@ const PaymentScreen = () => {
 
 	return (
 		<View style={styles.mainContainer}>
+			<Text style={styles.titleLayout}>
+				Selecione sua forma de pagamento:
+			</Text>
 			<CardButton type="pix" nextUrl="pixStack" />
 			<CardButton type="creditCard" nextUrl="cartaoStack" />
 		</View>
@@ -18,6 +21,11 @@ const PaymentScreen = () => {
 export default PaymentScreen;
 
 const styles = StyleSheet.create({
+	titleLayout: {
+		color: "whitesmoke",
+		fontSize: 18,
+		fontWeight: "bold"
+	},
 	mainContainer: {
 		flex: 1,
 		justifyContent: "center",

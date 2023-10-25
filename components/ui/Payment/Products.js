@@ -41,8 +41,8 @@ const ProductsComp = (props) => {
 			Animated.sequence([
 				Animated.timing(largura, {
 					toValue: getW,
-					duration: 200
-					// useNativeDriver: true
+					duration: 200,
+					useNativeDriver: false
 				})
 				// Animated.timing(altura, {
 				// 	toValue: 150,
@@ -63,7 +63,6 @@ const ProductsComp = (props) => {
 			const {
 				data: { data }
 			} = await createClient("pitaya-products", null, {});
-			console.log(data);
 			const formatedArr = data.map((data) => {
 				return {
 					id: data.codigo,
