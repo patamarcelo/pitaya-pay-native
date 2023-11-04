@@ -148,6 +148,7 @@ function HomeStack() {
 				name="Home"
 				component={WelcomeScreen}
 				options={{
+					title: "Seja Bem Vindo",
 					headerRight: ({ tintColor }) => (
 						<IconButton
 							type={"awesome"}
@@ -155,6 +156,7 @@ function HomeStack() {
 							color={tintColor}
 							size={22}
 							onPress={handlerLogout}
+							btnStyles={{ marginRight: 15 }}
 						/>
 					),
 					tabBarIcon: ({ color, size }) => (

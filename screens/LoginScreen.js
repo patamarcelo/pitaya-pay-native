@@ -21,7 +21,7 @@ function LoginScreen() {
 		setIsLoading(true);
 		try {
 			const user = await authUser(email, password);
-			console.log(user.user.accessToken);
+			console.log(user);
 			context.authenticate(user.user.accessToken);
 			dispatch(setUser(user.user));
 		} catch (error) {
