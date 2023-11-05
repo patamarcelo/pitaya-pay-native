@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
 	user: "",
-	termsAccepted: false
+	termsAccepted: false,
+	createdUser: ""
 };
 const UserSlice = createSlice({
 	name: "usuario",
@@ -19,6 +20,9 @@ const UserSlice = createSlice({
 		},
 		unregisterTerms: (state) => {
 			state.termsAccepted = false;
+		},
+		setCreatedUser: (state, action) => {
+			state.createdUser = action.payload;
 		}
 	}
 });

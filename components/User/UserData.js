@@ -29,9 +29,9 @@ const UserData = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [userFilteredData, setUserFilteredData] = useState([]);
 
-	useEffect(() => {
-		console.log(userFilteredData);
-	}, [userFilteredData]);
+	// useEffect(() => {
+	// 	console.log(userFilteredData);
+	// }, [userFilteredData]);
 
 	const getData = async () => {
 		setIsLoading(true);

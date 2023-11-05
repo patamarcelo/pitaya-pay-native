@@ -24,7 +24,10 @@ import AppLoading from "expo-app-loading";
 
 import PixComponent from "./components/pix/Pix";
 import PixMailComponent from "./components/pix/PixMail";
+
 import CreditCardComponent from "./components/credit-card/CreditCard";
+import CreditCardUserForm from "./components/credit-card/UserForm";
+
 import { useNavigation } from "@react-navigation/native";
 
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
@@ -49,6 +52,8 @@ import {
 	onAuthStateChangedListener,
 	signOutUser
 } from "./utils/firebase/firebase";
+
+import CreditCardFormPage from "./components/credit-card/CreditCardForm";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -107,6 +112,8 @@ function CartaoStack({ navigation }) {
 			}}
 		>
 			<Stack.Screen name="CARTAO" component={CreditCardComponent} />
+			<Stack.Screen name="USERORM" component={CreditCardUserForm} />
+			<Stack.Screen name="CARTAOFORM" component={CreditCardFormPage} />
 		</Stack.Navigator>
 	);
 }

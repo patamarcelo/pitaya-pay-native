@@ -2,6 +2,8 @@ import { StyleSheet, View, Text } from "react-native";
 import { useLayoutEffect } from "react";
 import { Colors } from "../../constants/styles";
 import IconButton from "../ui/IconButton";
+import CreditCardUserForm from "./UserForm";
+import Button from "../ui/Button";
 
 const CreditCardComponent = ({ navigation }) => {
 	const handleBack = () => {
@@ -27,7 +29,10 @@ const CreditCardComponent = ({ navigation }) => {
 	}, []);
 	return (
 		<View style={styles.mainContainer}>
-			<Text style={styles.text}>CREDIT CARD COMPONENT</Text>
+			<CreditCardUserForm />
+			<Button onPress={() => navigation.navigate("CARTAOFORM")}>
+				cardForm
+			</Button>
 		</View>
 	);
 };
@@ -38,7 +43,8 @@ const styles = StyleSheet.create({
 	mainContainer: {
 		flex: 1,
 		justifyContent: "center",
-		alignItems: "center"
+		alignItems: "center",
+		width: "100%"
 	},
 	text: { color: "whitesmoke" }
 });

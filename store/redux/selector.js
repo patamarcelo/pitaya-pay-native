@@ -6,3 +6,5 @@ export const userCustomDataSelector = (state) => {
 	const customData = JSON.parse(data?.reloadUserInfo?.customAttributes);
 	return customData;
 };
+
+export const createdUserSelector = (state) => state.usuario.createdUser;
