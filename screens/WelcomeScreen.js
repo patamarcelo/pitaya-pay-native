@@ -6,15 +6,50 @@ import { getContractsSign } from "../utils/firebase/firebase.datatable";
 import { useState, useEffect } from "react";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 
+import { storage } from "../utils/firebase/firebase";
+import { ref, getDownloadURL } from "firebase/storage";
+
 function WelcomeScreen() {
 	const user = useSelector(userSelector);
+	const storageRef = ref(storage, `img/promo.jpg`);
+	const [pictureUrl, setPictureUrl] = useState();
+	const [isLoading, setIsLoading] = useState(false);
 
+	useEffect(() => {
+		setIsLoading(true);
+		try {
+			getDownloadURL(storageRef).then((downloadURL) => {
+				setPictureUrl(downloadURL);
+			});
+		} catch (err) {
+			console.log("Erro ao gerar a Imagem", err);
+			pictureUrl(null);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [storageRef]);
+
+	if (isLoading) {
+		return (
+			<LoadingOverlay
+				style={{ color: "black" }}
+				message={"Carregando..."}
+			/>
+		);
+	}
 	return (
 		<View style={styles.rootContainer}>
-			<Image
-				source={require("../assets/teste.jpg")}
-				style={styles.imgContainer}
-			/>
+			{pictureUrl ? (
+				<Image
+					source={{ uri: pictureUrl }}
+					style={styles.imgContainer}
+				/>
+			) : (
+				<Image
+					source={require("../assets/teste.jpg")}
+					style={styles.imgContainer}
+				/>
+			)}
 		</View>
 	);
 }

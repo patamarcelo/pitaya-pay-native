@@ -22,6 +22,11 @@ function UserScreen() {
 		console.log("refresgData");
 		setRefreshData(true);
 	};
+
+	const handleRefreshPush = () => {
+		console.log("refresgData");
+		setRefreshData(true);
+	};
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			tabBarLabel: "Vendedora",
@@ -30,26 +35,26 @@ function UserScreen() {
 			headerShadowVisible: false,
 			headerShown: true,
 			contentStyle: { backgroundColor: Colors.primary500 },
-			headerLeft: ({ tintColor }) => (
+			headerRight: ({ tintColor }) => (
 				<IconButton
 					icon="file-text"
 					color={tintColor}
 					size={20}
 					onPress={handleTermsNav}
 					type="awesome"
-					btnStyles={{ marginLeft: 20 }}
-				/>
-			),
-			headerRight: ({ tintColor }) => (
-				<IconButton
-					icon="refresh"
-					color={tintColor}
-					size={22}
-					onPress={handleRefresh}
-					type="awesome"
-					btnStyles={{ marginRight: 20 }}
+					btnStyles={{ marginRight: 15 }}
 				/>
 			)
+			// headerRight: ({ tintColor }) => (
+			// 	<IconButton
+			// 		icon="refresh"
+			// 		color={tintColor}
+			// 		size={22}
+			// 		onPress={handleRefresh}
+			// 		type="awesome"
+			// 		btnStyles={{ marginRight: 20 }}
+			// 	/>
+			// )
 		});
 	}, []);
 
@@ -58,6 +63,7 @@ function UserScreen() {
 			<UserData
 				refreshData={refreshData}
 				setRefreshData={setRefreshData}
+				handleRefresh={handleRefreshPush}
 			/>
 		</View>
 	);

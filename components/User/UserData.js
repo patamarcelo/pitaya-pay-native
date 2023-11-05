@@ -12,12 +12,13 @@ import { useEffect, useState } from "react";
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
 
 import { Divider, Text } from "react-native-paper";
+import { RefreshControl, ActivityIndicator } from "react-native";
 
 const UserData = (props) => {
 	const userCustomData = useSelector(userCustomDataSelector);
 	const { cpf } = userCustomData;
 
-	const { refreshData, setRefreshData } = props;
+	const { refreshData, setRefreshData, handleRefresh } = props;
 
 	const url = "https://docs.google.com/spreadsheets/d/";
 	const ssid = "1D9E-gGvEKmx_pZfeNRUawnQcoNK_mIhuU-FIzqYJbls";
@@ -27,6 +28,7 @@ const UserData = (props) => {
 	const url1 = `${url}${ssid}${query1}&${query2}&${query3}`;
 
 	const [isLoading, setIsLoading] = useState(false);
+	const [pushRefresh, setPushRefresh] = useState(false);
 	const [userFilteredData, setUserFilteredData] = useState([]);
 
 	// useEffect(() => {
@@ -68,6 +70,46 @@ const UserData = (props) => {
 			setIsLoading(false);
 		}
 	};
+
+	const getDataPush = async () => {
+		console.log("get data push");
+		try {
+			await fetch(url1)
+				.then((data) => data.text())
+				.then((data) => {
+					const temp = data.substring(47).slice(0, -2);
+					const json = JSON.parse(temp);
+					const columnsHeader = json.table.cols;
+					let newDict = [];
+					json.table.rows.forEach((row, index) => {
+						let newObj = {};
+						row.c.forEach((cell, index) => {
+							let cellValue = cell === null ? "-" : cell.v;
+							if (index === 0) {
+								cellValue = cell?.f;
+							}
+							if (index === 5 && cellValue.length > 1) {
+								cellValue = cell.f;
+							}
+							newObj[columnsHeader[index]?.label] = cellValue;
+						});
+						newDict.push(newObj);
+					});
+					const filtData = newDict.filter(
+						(data) => data["CPF"] === cpf
+					);
+					setUserFilteredData(filtData);
+				});
+		} catch (err) {
+			console.log("Erro ao pegar os dados ", err);
+		} finally {
+			console.log("doneaaa");
+			setTimeout(() => {
+				setPushRefresh(false);
+			}, 200);
+		}
+	};
+
 	useEffect(() => {
 		if (refreshData) {
 			try {
@@ -81,6 +123,19 @@ const UserData = (props) => {
 	}, [refreshData]);
 
 	useEffect(() => {
+		if (pushRefresh) {
+			try {
+				getDataPush();
+				console.log("get data");
+			} catch (err) {
+				console.log("erro ao atulizar os dados", err);
+			} finally {
+				// setPushRefresh(false);
+			}
+		}
+	}, [pushRefresh]);
+
+	useEffect(() => {
 		getData();
 	}, []);
 
@@ -92,6 +147,10 @@ const UserData = (props) => {
 			/>
 		);
 	}
+
+	const handlePushRefresh = () => {
+		setPushRefresh(true);
+	};
 
 	const renderSellItem = (itemData) => {
 		return (
@@ -127,7 +186,22 @@ const UserData = (props) => {
 
 	return (
 		<View style={styles.mainContainer}>
-			<ScrollView style={styles.mainContainer}>
+			{/* {pushRefresh ? (
+				<View>
+					<ActivityIndicator />
+				</View>
+			) : null} */}
+			<ScrollView
+				style={styles.mainContainer}
+				refreshControl={
+					<RefreshControl
+						refreshing={pushRefresh}
+						onRefresh={handlePushRefresh}
+						colors={["#9Bd35A", "#689F38"]}
+						tintColor={Colors.primary500}
+					/>
+				}
+			>
 				<FlatList
 					// scrollEnabled={false}
 					data={userFilteredData}

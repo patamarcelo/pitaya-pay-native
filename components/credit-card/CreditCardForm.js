@@ -56,6 +56,7 @@ const CreditCardFormPage = ({ navigation }) => {
 
 	const handlerChange = (formData) => {
 		setcardData(formData);
+		console.log(formData);
 	};
 
 	const handleSubmit = () => {
@@ -65,9 +66,8 @@ const CreditCardFormPage = ({ navigation }) => {
 
 	const addtionalInputsProps = {
 		name: {
-			defaultValue: "my name",
-			maxLength: 40,
-			focus: true
+			value: "marcelo pata"
+			// maxLength: 40
 		},
 		postalCode: {
 			returnKeyType: "go"
@@ -86,7 +86,7 @@ const CreditCardFormPage = ({ navigation }) => {
 						expiry: "Validade",
 						cvc: "CVC"
 					}}
-					additionalInputsProps={addtionalInputsProps}
+					// requiresName={true}
 				/>
 			</View>
 			<View style={styles.buttonContainer}>
