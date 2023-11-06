@@ -3,7 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
 	user: "",
 	termsAccepted: false,
-	createdUser: ""
+	createdUser: "",
+	creditCardInfo: ""
 };
 const UserSlice = createSlice({
 	name: "usuario",
@@ -23,6 +24,9 @@ const UserSlice = createSlice({
 		},
 		setCreatedUser: (state, action) => {
 			state.createdUser = action.payload;
+		},
+		setCreditCardInfo: (state, action) => {
+			state.creditCardInfo = action.payload;
 		}
 	}
 });

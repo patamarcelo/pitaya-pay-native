@@ -16,9 +16,14 @@ import {
 
 import Button from "../ui/Button";
 
+import { useDispatch } from "react-redux";
+import { userActions } from "../../store/redux/usuario";
+
 const CreditCardFormPage = ({ navigation }) => {
 	const createdUser = useSelector(createdUserSelector);
 	console.log("userCreatedFomCrediCardForm", createdUser);
+	const dispatch = useDispatch();
+	const { setCreditCardInfo } = userActions;
 
 	const [ip, setIP] = useState("");
 	const [cardData, setcardData] = useState({});
@@ -62,6 +67,7 @@ const CreditCardFormPage = ({ navigation }) => {
 	const handleSubmit = () => {
 		console.log("avançar");
 		console.log("dados: ", cardData.values);
+		dispatch(setCreditCardInfo(cardData.values));
 	};
 
 	const addtionalInputsProps = {
@@ -102,6 +108,9 @@ const CreditCardFormPage = ({ navigation }) => {
 					Avançar
 				</Button>
 			</View>
+			<Button onPress={() => navigation.navigate("PAYCARDFORM")}>
+				cardForm
+			</Button>
 		</View>
 	);
 };

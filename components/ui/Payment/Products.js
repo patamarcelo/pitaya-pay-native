@@ -59,34 +59,32 @@ const ProductsComp = (props) => {
 		return productsComp.filter((data) => data.id === product)[0].name;
 	};
 
-	const getProductsQuery = async () => {
-		setIsLoading(true);
-		try {
-			const {
-				data: { data }
-			} = await createClient("pitaya-products", null, {});
-			const formatedArr = data.map((data) => {
-				return {
-					id: data.codigo,
-					name: `${data.codigo} - R$ ${data?.valor?.toLocaleString(
-						"pt-br",
-						{
+	useEffect(() => {
+		const getProductsQuery = async () => {
+			setIsLoading(true);
+			try {
+				const {
+					data: { data }
+				} = await createClient("pitaya-products", null, {});
+				const formatedArr = data.map((data) => {
+					return {
+						id: data.codigo,
+						name: `${
+							data.codigo
+						} - R$ ${data?.valor?.toLocaleString("pt-br", {
 							minimumFractionDigits: 2,
 							maximumFractionDigits: 2
-						}
-					)}`
-				};
-			});
-			setProductsComp(formatedArr);
-			setProducts(data);
-		} catch (error) {
-			console.log("erro ao pegar os produtos", error);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	useEffect(() => {
+						})}`
+					};
+				});
+				setProductsComp(formatedArr);
+				setProducts(data);
+			} catch (error) {
+				console.log("erro ao pegar os produtos", error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
 		getProductsQuery();
 	}, []);
 
@@ -112,13 +110,18 @@ const ProductsComp = (props) => {
 					ref={(component) => {
 						this.multiSelect = component;
 					}}
-					onSelectedItemsChange={handlerChangeParcelas}
+					onSelectedItemsChange={(e) => {
+						handlerChangeParcelas(e);
+						this.multiSelect._clearSelectorCallback();
+					}}
+					hideSubmitButton={false}
 					selectedItems={parcelasSelected}
 					selectText="Selecione os Produtos"
 					searchInputPlaceholderText="Procure os produtos"
-					onChangeInput={(text) => {
-						console.log(text);
-					}}
+					// onChangeInput={(text) => {
+					// 	console.log("selected: ", text);
+					// 	console.log("selected: ", text);
+					// }}
 					// altFontFamily="ProximaNova-Light"
 					tagRemoveIconColor="#CCC"
 					tagBorderColor="white"

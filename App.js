@@ -54,6 +54,8 @@ import {
 } from "./utils/firebase/firebase";
 
 import CreditCardFormPage from "./components/credit-card/CreditCardForm";
+import CreditCardProductPage from "./components/credit-card/CreditCardProduct";
+import ConfirmCardPage from "./components/credit-card/ConfirmCard";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -114,6 +116,11 @@ function CartaoStack({ navigation }) {
 			<Stack.Screen name="CARTAO" component={CreditCardComponent} />
 			<Stack.Screen name="USERORM" component={CreditCardUserForm} />
 			<Stack.Screen name="CARTAOFORM" component={CreditCardFormPage} />
+			<Stack.Screen
+				name="PAYCARDFORM"
+				component={CreditCardProductPage}
+			/>
+			<Stack.Screen name="CONFIRMCARD" component={ConfirmCardPage} />
 		</Stack.Navigator>
 	);
 }

@@ -20,7 +20,7 @@ const schema = yup.object({
 
 import { useNavigation } from "@react-navigation/native";
 
-const PaymentForm = () => {
+const PaymentForm = ({ prevRouteName }) => {
 	const [paymentValue, setPaymentValue] = useState(0);
 	const [quantityProd, setQuantityProd] = useState(0);
 	const headerHeight = useHeaderHeight();
@@ -83,9 +83,16 @@ const PaymentForm = () => {
 	const handlerConfirm = () => {
 		console.log("avançar");
 		console.log(paymentValue);
-		navigation.navigate("PIXMAIL", {
-			data: { valor: paymentValue, produtos: parcelasSelected }
-		});
+		if (prevRouteName && prevRouteName === "CARTAO") {
+			console.log("navegue para outro lugar");
+			navigation.navigate("CONFIRMCARD", {
+				data: { valor: paymentValue, produtos: parcelasSelected }
+			});
+		} else {
+			navigation.navigate("PIXMAIL", {
+				data: { valor: paymentValue, produtos: parcelasSelected }
+			});
+		}
 	};
 
 	return (
@@ -149,6 +156,11 @@ const PaymentForm = () => {
 					</Text>
 				)}
 			</View>
+			{prevRouteName && prevRouteName === "CARTAO" && (
+				<View>
+					<Text>LOGIC PARCELAMENTO</Text>
+				</View>
+			)}
 			<Button
 				btnStyles={styles.btnStyles}
 				disabled={

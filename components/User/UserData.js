@@ -7,7 +7,7 @@ import {
 } from "../../store/redux/selector";
 import { useSelector } from "react-redux";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 import LoadingOverlay from "../../components/ui/LoadingOverlay";
 
@@ -16,7 +16,15 @@ import { RefreshControl, ActivityIndicator } from "react-native";
 
 const UserData = (props) => {
 	const userCustomData = useSelector(userCustomDataSelector);
-	const { cpf } = userCustomData;
+	const [cpf, setCpf] = useState(null);
+
+	useLayoutEffect(() => {
+		setCpf(userCustomData.cpf);
+	}, [userCustomData]);
+
+	useEffect(() => {
+		console.log("new Cpf");
+	}, [cpf]);
 
 	const { refreshData, setRefreshData, handleRefresh } = props;
 
@@ -59,9 +67,9 @@ const UserData = (props) => {
 						});
 						newDict.push(newObj);
 					});
-					const filtData = newDict.filter(
-						(data) => data["CPF"] === cpf
-					);
+					const filtData = newDict
+						.filter((data) => data["CPF"] === cpf)
+						.sort((a, b) => a["Código"] - b["Código"]);
 					setUserFilteredData(filtData);
 				});
 		} catch (err) {
@@ -95,9 +103,9 @@ const UserData = (props) => {
 						});
 						newDict.push(newObj);
 					});
-					const filtData = newDict.filter(
-						(data) => data["CPF"] === cpf
-					);
+					const filtData = newDict
+						.filter((data) => data["CPF"] === cpf)
+						.sort((a, b) => a["Código"] - b["Código"]);
 					setUserFilteredData(filtData);
 				});
 		} catch (err) {
@@ -136,7 +144,9 @@ const UserData = (props) => {
 	}, [pushRefresh]);
 
 	useEffect(() => {
-		getData();
+		if (cpf) {
+			getData();
+		}
 	}, []);
 
 	if (isLoading) {
@@ -221,10 +231,12 @@ export default UserData;
 const styles = StyleSheet.create({
 	mainListContainer: {
 		justifyContent: "space-around",
-		rowGap: 10
+		rowGap: 10,
+		flex: 1
 	},
 	mainContainer: {
-		width: "100%"
+		width: "100%",
+		flex: 1
 	},
 	valueCard: {
 		textAlign: "center"
@@ -235,6 +247,7 @@ const styles = StyleSheet.create({
 		textAlign: "center"
 	},
 	renderItemContainer: {
+		flex: 1,
 		width: "100%",
 		flexDirection: "row",
 		justifyContent: "space-between"
