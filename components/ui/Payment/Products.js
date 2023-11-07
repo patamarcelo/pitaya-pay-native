@@ -205,10 +205,12 @@ const ProductsComp = (props) => {
 							</Text>
 							<Text style={styles.valueText}>
 								Subtotal: R${" "}
-								{paymentValue.toLocaleString("pt-br", {
-									minimumFractionDigits: 2,
-									maximumFractionDigits: 2
-								})}
+								{paymentValue && paymentValue > 0
+									? paymentValue.toLocaleString("pt-br", {
+											minimumFractionDigits: 2,
+											maximumFractionDigits: 2
+									  })
+									: "0,00"}
 							</Text>
 						</View>
 					</>

@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+	View,
+	Text,
+	StyleSheet,
+	ScrollView,
+	Keyboard,
+	TouchableWithoutFeedback
+} from "react-native";
 import { useState, useEffect } from "react";
 import { Colors } from "../../../constants/styles";
 
@@ -14,17 +21,90 @@ import { useHeaderHeight } from "@react-navigation/elements";
 
 import ProductsComp from "../Payment/Products";
 
+import RNPickerSelect from "react-native-picker-select";
+
 const schema = yup.object({
 	valor: yup.string().required("Informe um valor")
 });
 
 import { useNavigation } from "@react-navigation/native";
 
+import { Ionicons } from "@expo/vector-icons";
+import IconButton from "../IconButton";
 const PaymentForm = ({ prevRouteName }) => {
 	const [paymentValue, setPaymentValue] = useState(0);
 	const [quantityProd, setQuantityProd] = useState(0);
+	const [vista, setVista] = useState(true);
+	const [parcelado, setParcelado] = useState(false);
+	const [arrayTimes, setArrayTimes] = useState([]);
+
+	const [times, setTimes] = useState(1);
 	const headerHeight = useHeaderHeight();
 	const navigation = useNavigation();
+
+	useEffect(() => {
+		if (paymentValue < 60) {
+			setTimes(1);
+		}
+	}, [paymentValue]);
+
+	useEffect(() => {
+		if (prevRouteName && prevRouteName === "CARTAO") {
+			setTimes(1);
+		}
+	}, [parcelado]);
+
+	const handlerVista = () => {
+		setVista(true);
+		setParcelado(false);
+	};
+
+	const handlerParcelado = () => {
+		setVista(false);
+		setParcelado(true);
+	};
+
+	useEffect(() => {
+		if (paymentValue >= 90) {
+			const firstValue = paymentValue.toLocaleString("pt-br", {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			});
+
+			const secValue = (paymentValue / 2).toLocaleString("pt-br", {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			});
+			const thirdValue = (paymentValue / 3).toLocaleString("pt-br", {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			});
+			const newParc = [
+				{ value: "1", label: `1x de ${firstValue}` },
+				{ value: "2", label: `2x de ${secValue}` },
+				{ value: "3", label: `3x de ${thirdValue}` }
+			];
+			setArrayTimes(newParc);
+			return;
+		}
+		if (paymentValue >= 60) {
+			const firstValue = paymentValue.toLocaleString("pt-br", {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			});
+
+			const secValue = (paymentValue / 2).toLocaleString("pt-br", {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			});
+			const newParc = [
+				{ value: "1", label: `1x de ${firstValue}` },
+				{ value: "2", label: `2x de ${secValue}` }
+			];
+			setArrayTimes(newParc);
+			return;
+		}
+	}, [paymentValue]);
 
 	const {
 		control,
@@ -80,6 +160,11 @@ const PaymentForm = ({ prevRouteName }) => {
 		setPaymentValue(e);
 	};
 
+	const handlerChangeSelect = (e, name) => {
+		console.log("ouvindo a mudança", e, name);
+		setTimes(e);
+	};
+
 	const handlerConfirm = () => {
 		console.log("avançar");
 		console.log(paymentValue);
@@ -96,89 +181,188 @@ const PaymentForm = ({ prevRouteName }) => {
 	};
 
 	return (
-		<View style={[styles.mainContainer, { marginBottom: headerHeight }]}>
-			<ProductsComp
-				products={products}
-				setProducts={setProducts}
-				productsComp={productsComp}
-				setProductsComp={setProductsComp}
-				parcelasSelected={parcelasSelected}
-				setParcelasSelected={setParcelasSelected}
-				handlerChangeParcelas={handlerChangeParcelas}
-				handleDeleteProduct={handleDeleteProduct}
-				paymentValue={paymentValue}
-				quantityProd={quantityProd}
-			/>
-			<View>
-				<Text style={styles.title}>Valor a Pagar</Text>
-			</View>
-			<View>
-				<Text style={styles.value}>
-					R${" "}
-					{paymentValue
-						? paymentValue.toLocaleString("pt-br", {
-								minimumFractionDigits: 2,
-								maximumFractionDigits: 2
-						  })
-						: "0,00"}
-				</Text>
-			</View>
-			<View style={styles.form}>
-				<Controller
-					control={control}
-					name="valor"
-					render={({ field: { onChange, onBlur, value } }) => (
-						<CurrencyInputType
-							register={register}
-							nameRegister={"valor"}
-							inputContainerProps={styles.containerProps}
-							styleInput={{
-								borderWidth: errors.placa && 1,
-								borderColor: errors.placa && "#ff375b"
-							}}
-							// label="Valor"
-							onUpdateValue={(e) => {
-								handlerChange(e, "valor");
-								onChange(e);
-							}}
-							value={paymentValue}
-							// keyboardType="email-address"
-							onBlur={onBlur}
-							inputStyles={styles.inputStyles}
-							placeholder="Insira o valor"
-							// maxLength={7}
+		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+			<ScrollView>
+				<View
+					style={[
+						styles.mainContainer,
+						{ marginBottom: headerHeight }
+					]}
+				>
+					<ProductsComp
+						products={products}
+						setProducts={setProducts}
+						productsComp={productsComp}
+						setProductsComp={setProductsComp}
+						parcelasSelected={parcelasSelected}
+						setParcelasSelected={setParcelasSelected}
+						handlerChangeParcelas={handlerChangeParcelas}
+						handleDeleteProduct={handleDeleteProduct}
+						paymentValue={paymentValue}
+						quantityProd={quantityProd}
+					/>
+					<View>
+						<Text style={styles.title}>Valor a Pagar</Text>
+					</View>
+					<View>
+						<Text style={styles.value}>
+							R${" "}
+							{paymentValue && paymentValue > 0
+								? paymentValue?.toLocaleString("pt-br", {
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 2
+								  })
+								: "0,00"}
+						</Text>
+					</View>
+					<View style={styles.form}>
+						<Controller
+							control={control}
+							name="valor"
+							render={({
+								field: { onChange, onBlur, value }
+							}) => (
+								<CurrencyInputType
+									register={register}
+									nameRegister={"valor"}
+									inputContainerProps={styles.containerProps}
+									styleInput={{
+										borderWidth: errors.placa && 1,
+										borderColor: errors.placa && "#ff375b"
+									}}
+									// label="Valor"
+									onUpdateValue={(e) => {
+										handlerChange(e, "valor");
+										onChange(e);
+									}}
+									value={paymentValue}
+									// keyboardType="email-address"
+									onBlur={onBlur}
+									inputStyles={styles.inputStyles}
+									placeholder="Insira o valor"
+									// maxLength={7}
+								/>
+							)}
 						/>
+						{errors.valor && (
+							<Text style={styles.labelError}>
+								{errors.valor?.message}
+							</Text>
+						)}
+					</View>
+
+					{prevRouteName &&
+						prevRouteName === "CARTAO" &&
+						paymentValue >= 60 && (
+							<View style={styles.optionContainer}>
+								<View>
+									<Button
+										btnStyles={[
+											styles.btnOptStyleVista,
+											vista && styles.active,
+											!vista && styles.deactivetaed
+										]}
+										onPress={handlerVista}
+									>
+										À Vista
+									</Button>
+								</View>
+								<View>
+									<Button
+										btnStyles={[
+											styles.btnOptStyleParc,
+											parcelado && styles.active,
+											!parcelado && styles.deactivetaed
+										]}
+										onPress={handlerParcelado}
+									>
+										Parcelado
+									</Button>
+								</View>
+							</View>
+						)}
+					{parcelado && paymentValue >= 60 && (
+						<View style={[styles.input, styles.inputContainer]}>
+							<RNPickerSelect
+								onValueChange={(e) => {
+									handlerChangeSelect(e, "Parcelas");
+								}}
+								placeholder={{ label: "Selecione uma opção" }}
+								items={arrayTimes}
+								value={times}
+								style={pickerSelectStyles}
+								Icon={({ color, size }) => {
+									return (
+										<Ionicons
+											name="arrow-down-circle-outline"
+											size={24}
+											color={color}
+											style={{ marginRight: -10 }}
+										/>
+									);
+								}}
+							/>
+						</View>
 					)}
-				/>
-				{errors.valor && (
-					<Text style={styles.labelError}>
-						{errors.valor?.message}
-					</Text>
-				)}
-			</View>
-			{prevRouteName && prevRouteName === "CARTAO" && (
-				<View>
-					<Text>LOGIC PARCELAMENTO</Text>
+					<Button
+						btnStyles={styles.btnStyles}
+						disabled={
+							(!paymentValue && true) ||
+							parcelasSelected.length === 0
+						}
+						onPress={handlerConfirm}
+					>
+						Avançar
+					</Button>
 				</View>
-			)}
-			<Button
-				btnStyles={styles.btnStyles}
-				disabled={
-					(!paymentValue && true) || parcelasSelected.length === 0
-				}
-				onPress={handlerConfirm}
-			>
-				Avançar
-			</Button>
-		</View>
+			</ScrollView>
+		</TouchableWithoutFeedback>
 	);
 };
 
 export default PaymentForm;
 
 const styles = StyleSheet.create({
+	active: {
+		opacity: 1,
+		borderColor: Colors.succes[200],
+		borderWidth: 1
+	},
+	deactivetaed: {
+		opacity: 0.95
+	},
+	inputContainer: {
+		marginVertical: 8,
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	input: {
+		justifyContent: "center",
+		alignItems: "center",
+		// paddingVertical: 8,
+		// paddingHorizontal: 6,
+		backgroundColor: "white",
+		borderRadius: 4,
+		width: "50%"
+	},
+	optionContainer: {
+		flexDirection: "row",
+		width: "100%",
+		justifyContent: "center",
+		alignItems: "center",
+		gap: 20,
+		marginBottom: 10
+	},
+	btnOptStyleVista: {
+		width: 120
+		// backgroundColor: "yellow"
+	},
+	btnOptStyleParc: {
+		width: 120
+	},
 	btnStyles: {
-		width: "70%"
+		width: "90%",
+		marginTop: 15
 	},
 	form: {
 		width: "70%"
@@ -202,5 +386,31 @@ const styles = StyleSheet.create({
 	value: {
 		fontSize: 24,
 		color: "whitesmoke"
+	}
+});
+
+const pickerSelectStyles = StyleSheet.create({
+	inputIOS: {
+		fontSize: 16,
+		paddingVertical: 8,
+		paddingHorizontal: 6,
+		borderColor: "gray",
+		borderRadius: 4,
+		color: "black",
+		paddingRight: 30 // to ensure the text is never behind the icon
+	},
+	iconContainer: {
+		top: 5,
+		right: 15
+	},
+	inputAndroid: {
+		fontSize: 16,
+		paddingHorizontal: 10,
+		paddingVertical: 8,
+		borderWidth: 0.5,
+		borderColor: "purple",
+		borderRadius: 8,
+		color: "black",
+		paddingRight: 30 // to ensure the text is never behind the icon
 	}
 });
