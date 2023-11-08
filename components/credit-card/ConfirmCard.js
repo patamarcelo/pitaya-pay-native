@@ -7,6 +7,9 @@ import IconButton from "../ui/IconButton";
 import { useSelector } from "react-redux";
 import { Divider } from "react-native-paper";
 
+import { useState } from "react";
+import LoadingOverlay from "../ui/LoadingOverlay";
+
 import {
 	ALERT_TYPE,
 	Dialog,
@@ -18,6 +21,7 @@ import { confirmPaymentSelector } from "../../store/redux/selector";
 const ConfirmCardPage = ({ navigation, route }) => {
 	const { produtos, valor, times } = route.params.data;
 	const dataPay = useSelector(confirmPaymentSelector);
+	const [isLoading, setIsLoading] = useState(false);
 
 	console.log("dataPay: ", dataPay);
 	console.log("produtos: , ", produtos, "valor: ", valor);
@@ -90,16 +94,21 @@ const ConfirmCardPage = ({ navigation, route }) => {
 	};
 
 	const handleSubmit = () => {
-		Dialog.show({
-			type: ALERT_TYPE.SUCCESS,
-			title: <Title text={"Feito!!"} />,
-			textBody: <TrySom email={"patamarcelo@gmail.com"} />,
-			button: "Finalizar",
-			onPressButton: () => {
-				navigation.navigate("PagamentosTab");
-			}
-		});
-		console.log("confirmar");
+		setIsLoading(true);
+		setTimeout(() => {
+			setIsLoading(false);
+			Dialog.show({
+				type: ALERT_TYPE.SUCCESS,
+				title: <Title text={"Feito!!"} />,
+				textBody: (
+					<TrySom email={dataPay.createdUser.email.toLowerCase()} />
+				),
+				button: "Finalizar",
+				onPressButton: () => {
+					navigation.navigate("PagamentosTab");
+				}
+			});
+		}, 1500);
 	};
 
 	useLayoutEffect(() => {
@@ -120,10 +129,21 @@ const ConfirmCardPage = ({ navigation, route }) => {
 		});
 	}, []);
 
-	// const cardNumber = `**** **** **** ${state.creditCard.number.slice(-4)}`
-	// const cvcNumber = `*${state.creditCard.ccv.slice(-2)}`
-	// const dateCard = `${state.creditCard.expiryMonth}/${state.creditCard.expiryYear.slice(-2)}`
-	// const cpfNumber = `${state.creditCardHolderInfo.cpfCnpj.slice(0,3)}.${state.creditCardHolderInfo.cpfCnpj.slice(3,6)}.${state.creditCardHolderInfo.cpfCnpj.slice(6,9)}-${state.creditCardHolderInfo.cpfCnpj.slice(-2)}`
+	const cardNumber = `**** **** **** ${dataPay.creditCardInfo.number
+		.replaceAll(" ", "")
+		.slice(-4)}`;
+	const cvcNumber = `*${dataPay.creditCardInfo.cvc.slice(-2)}`;
+	const dateCard = dataPay.creditCardInfo.expiry;
+	const cpfNumber = `${dataPay.createdUser.cpfCnpj.slice(
+		0,
+		3
+	)}.${dataPay.createdUser.cpfCnpj.slice(
+		3,
+		6
+	)}.${dataPay.createdUser.cpfCnpj.slice(
+		6,
+		9
+	)}-${dataPay.createdUser.cpfCnpj.slice(-2)}`;
 
 	// let newPayment;
 	// 	if (times > 1) {
@@ -205,6 +225,9 @@ const ConfirmCardPage = ({ navigation, route }) => {
 	// 	// setStage(4);
 	// };
 
+	if (isLoading) {
+		return <LoadingOverlay message={"Processando o Pagamento..."} />;
+	}
 	return (
 		<AlertNotificationRoot>
 			<View style={styles.mainContainer}>
@@ -252,9 +275,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 							<Text style={styles.labelText}>Cartão</Text>
 						</View>
 						<View style={styles.valueColumn}>
-							<Text style={styles.valueText}>
-								**** **** **** 1234
-							</Text>
+							<Text style={styles.valueText}>{cardNumber}</Text>
 						</View>
 					</View>
 					<View style={styles.dataContainer}>
@@ -262,7 +283,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 							<Text style={styles.labelText}>CVC</Text>
 						</View>
 						<View style={styles.valueColumn}>
-							<Text style={styles.valueText}>**2</Text>
+							<Text style={styles.valueText}>{cvcNumber}</Text>
 						</View>
 					</View>
 					<View style={styles.dataContainer}>
@@ -270,7 +291,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 							<Text style={styles.labelText}>Validade</Text>
 						</View>
 						<View style={styles.valueColumn}>
-							<Text style={styles.valueText}>01/24</Text>
+							<Text style={styles.valueText}>{dateCard}</Text>
 						</View>
 					</View>
 					<View style={styles.dataContainer}>
@@ -280,7 +301,9 @@ const ConfirmCardPage = ({ navigation, route }) => {
 							</Text>
 						</View>
 						<View style={styles.valueColumn}>
-							<Text style={styles.valueText}>Marcelo Pata</Text>
+							<Text style={styles.valueText}>
+								{dataPay.createdUser.name}
+							</Text>
 						</View>
 					</View>
 					<View style={styles.dataContainer}>
@@ -288,7 +311,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 							<Text style={styles.labelText}>CPF</Text>
 						</View>
 						<View style={styles.valueColumn}>
-							<Text style={styles.valueText}>019.242.88028</Text>
+							<Text style={styles.valueText}>{cpfNumber}</Text>
 						</View>
 					</View>
 					<View style={styles.dataContainer}>
@@ -297,7 +320,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 						</View>
 						<View style={styles.valueColumn}>
 							<Text style={styles.valueText}>
-								patamarcelo@gmail.com
+								{dataPay.createdUser.email.toLowerCase()}
 							</Text>
 						</View>
 					</View>
@@ -346,7 +369,7 @@ const styles = StyleSheet.create({
 		// borderColor: "black",
 		// borderWidth: 1,
 		color: "whitesmoke",
-		width: "100%",
+		width: "120%",
 		textAlign: "center",
 		paddingVertical: 3,
 		fontWeight: "bold"

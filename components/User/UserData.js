@@ -68,7 +68,7 @@ const UserData = (props) => {
 						newDict.push(newObj);
 					});
 					const filtData = newDict
-						.filter((data) => data["CPF"] === cpf)
+						.filter((data) => data["CPF"] === userCustomData.cpf)
 						.sort((a, b) => a["Código"] - b["Código"]);
 					setUserFilteredData(filtData);
 				});
@@ -104,7 +104,7 @@ const UserData = (props) => {
 						newDict.push(newObj);
 					});
 					const filtData = newDict
-						.filter((data) => data["CPF"] === cpf)
+						.filter((data) => data["CPF"] === userCustomData.cpf)
 						.sort((a, b) => a["Código"] - b["Código"]);
 					setUserFilteredData(filtData);
 				});
@@ -144,7 +144,7 @@ const UserData = (props) => {
 	}, [pushRefresh]);
 
 	useEffect(() => {
-		if (cpf) {
+		if (userCustomData.cpf) {
 			getData();
 		}
 	}, []);
