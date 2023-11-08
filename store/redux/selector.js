@@ -8,3 +8,12 @@ export const userCustomDataSelector = (state) => {
 };
 
 export const createdUserSelector = (state) => state.usuario.createdUser;
+
+export const confirmPaymentSelector = (state) => {
+	const objToReturn = {
+		createdUser: state.usuario.createdUser,
+		creditCardInfo: state.usuario.creditCardInfo,
+		clientIp: state.usuario.clientIp
+	};
+	return objToReturn;
+};

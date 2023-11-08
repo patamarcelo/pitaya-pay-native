@@ -43,10 +43,15 @@ const PaymentForm = ({ prevRouteName }) => {
 	const navigation = useNavigation();
 
 	useEffect(() => {
-		if (paymentValue < 60) {
-			setTimes(1);
-		}
+		setTimes(1);
 	}, [paymentValue]);
+
+	useEffect(() => {
+		if (times === 1) {
+			setParcelado(false);
+			setVista(true);
+		}
+	}, [times]);
 
 	useEffect(() => {
 		if (prevRouteName && prevRouteName === "CARTAO") {
@@ -171,7 +176,11 @@ const PaymentForm = ({ prevRouteName }) => {
 		if (prevRouteName && prevRouteName === "CARTAO") {
 			console.log("navegue para outro lugar");
 			navigation.navigate("CONFIRMCARD", {
-				data: { valor: paymentValue, produtos: parcelasSelected }
+				data: {
+					valor: paymentValue,
+					produtos: parcelasSelected,
+					times: times
+				}
 			});
 		} else {
 			navigation.navigate("PIXMAIL", {

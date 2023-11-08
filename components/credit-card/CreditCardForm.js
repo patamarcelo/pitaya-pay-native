@@ -23,9 +23,9 @@ const CreditCardFormPage = ({ navigation }) => {
 	const createdUser = useSelector(createdUserSelector);
 	console.log("userCreatedFomCrediCardForm", createdUser);
 	const dispatch = useDispatch();
-	const { setCreditCardInfo } = userActions;
+	const { setCreditCardInfo, setIp } = userActions;
 
-	const [ip, setIP] = useState("");
+	const [ip, setClientIP] = useState("");
 	const [cardData, setcardData] = useState({});
 	const handleBack = () => {
 		navigation.goBack();
@@ -51,8 +51,8 @@ const CreditCardFormPage = ({ navigation }) => {
 
 	const getData = async () => {
 		const res = await axios.get("https://geolocation-db.com/json/");
-		setIP(res.data.IPv4);
-		console.log(res.data.IPv4);
+		setClientIP(res.data.IPv4);
+		dispatch(setIp(res.data.IPv4));
 	};
 
 	useEffect(() => {
@@ -65,9 +65,8 @@ const CreditCardFormPage = ({ navigation }) => {
 	};
 
 	const handleSubmit = () => {
-		console.log("avançar");
-		console.log("dados: ", cardData.values);
 		dispatch(setCreditCardInfo(cardData.values));
+		navigation.navigate("PAYCARDFORM");
 	};
 
 	const addtionalInputsProps = {

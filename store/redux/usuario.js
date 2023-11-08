@@ -4,7 +4,8 @@ const initialState = {
 	user: "",
 	termsAccepted: false,
 	createdUser: "",
-	creditCardInfo: ""
+	creditCardInfo: "",
+	clientIp: ""
 };
 const UserSlice = createSlice({
 	name: "usuario",
@@ -27,6 +28,9 @@ const UserSlice = createSlice({
 		},
 		setCreditCardInfo: (state, action) => {
 			state.creditCardInfo = action.payload;
+		},
+		setIp: (state, action) => {
+			state.clientIp = action.payload;
 		}
 	}
 });
