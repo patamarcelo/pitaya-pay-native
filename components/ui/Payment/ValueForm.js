@@ -31,12 +31,17 @@ import { useNavigation } from "@react-navigation/native";
 
 import { Ionicons } from "@expo/vector-icons";
 import IconButton from "../IconButton";
+
+import { Picker } from "@react-native-picker/picker";
+
 const PaymentForm = ({ prevRouteName }) => {
 	const [paymentValue, setPaymentValue] = useState(0);
 	const [quantityProd, setQuantityProd] = useState(0);
 	const [vista, setVista] = useState(true);
 	const [parcelado, setParcelado] = useState(false);
 	const [arrayTimes, setArrayTimes] = useState([]);
+
+	const [selectedLanguage, setSelectedLanguage] = useState();
 
 	const [times, setTimes] = useState(1);
 	const headerHeight = useHeaderHeight();
@@ -198,68 +203,78 @@ const PaymentForm = ({ prevRouteName }) => {
 						{ marginBottom: headerHeight }
 					]}
 				>
-					<ProductsComp
-						products={products}
-						setProducts={setProducts}
-						productsComp={productsComp}
-						setProductsComp={setProductsComp}
-						parcelasSelected={parcelasSelected}
-						setParcelasSelected={setParcelasSelected}
-						handlerChangeParcelas={handlerChangeParcelas}
-						handleDeleteProduct={handleDeleteProduct}
-						paymentValue={paymentValue}
-						quantityProd={quantityProd}
-					/>
 					<View>
-						<Text style={styles.title}>Valor a Pagar</Text>
-					</View>
-					<View>
-						<Text style={styles.value}>
-							R${" "}
-							{paymentValue && paymentValue > 0
-								? paymentValue?.toLocaleString("pt-br", {
-										minimumFractionDigits: 2,
-										maximumFractionDigits: 2
-								  })
-								: "0,00"}
-						</Text>
-					</View>
-					<View style={styles.form}>
-						<Controller
-							control={control}
-							name="valor"
-							render={({
-								field: { onChange, onBlur, value }
-							}) => (
-								<CurrencyInputType
-									register={register}
-									nameRegister={"valor"}
-									inputContainerProps={styles.containerProps}
-									styleInput={{
-										borderWidth: errors.placa && 1,
-										borderColor: errors.placa && "#ff375b"
-									}}
-									// label="Valor"
-									onUpdateValue={(e) => {
-										handlerChange(e, "valor");
-										onChange(e);
-									}}
-									value={paymentValue}
-									// keyboardType="email-address"
-									onBlur={onBlur}
-									inputStyles={styles.inputStyles}
-									placeholder="Insira o valor"
-									// maxLength={7}
-								/>
-							)}
-						/>
-						{errors.valor && (
-							<Text style={styles.labelError}>
-								{errors.valor?.message}
+						{paymentValue > 0 && (
+							<Text style={styles.value}>
+								R${" "}
+								{paymentValue && paymentValue > 0
+									? paymentValue?.toLocaleString("pt-br", {
+											minimumFractionDigits: 2,
+											maximumFractionDigits: 2
+									  })
+									: "0,00"}
 							</Text>
 						)}
+						<ProductsComp
+							products={products}
+							setProducts={setProducts}
+							productsComp={productsComp}
+							setProductsComp={setProductsComp}
+							parcelasSelected={parcelasSelected}
+							setParcelasSelected={setParcelasSelected}
+							handlerChangeParcelas={handlerChangeParcelas}
+							handleDeleteProduct={handleDeleteProduct}
+							paymentValue={paymentValue}
+							quantityProd={quantityProd}
+						/>
 					</View>
+					{parcelasSelected?.length > 0 && (
+						<View style={styles.form}>
+							<Controller
+								control={control}
+								name="valor"
+								render={({
+									field: { onChange, onBlur, value }
+								}) => (
+									<CurrencyInputType
+										register={register}
+										nameRegister={"valor"}
+										inputContainerProps={
+											styles.containerProps
+										}
+										styleInput={{
+											textAlign: "center",
+											borderWidth: errors.placa && 1,
+											borderColor:
+												errors.placa && "#ff375b"
+										}}
+										// label="Valor"
+										onUpdateValue={(e) => {
+											handlerChange(e, "valor");
+											onChange(e);
+										}}
+										value={paymentValue}
+										// keyboardType="email-address"
+										onBlur={onBlur}
+										inputStyles={styles.inputStyles}
+										placeholder="Insira o valor"
+										// maxLength={7}
+									/>
+								)}
+							/>
 
+							{errors.valor && (
+								<Text style={styles.labelError}>
+									{errors.valor?.message}
+								</Text>
+							)}
+							<View>
+								<Text style={styles.helperValue}>
+									Altere o valor se precisar
+								</Text>
+							</View>
+						</View>
+					)}
 					{prevRouteName &&
 						prevRouteName === "CARTAO" &&
 						paymentValue >= 60 && (
@@ -291,38 +306,40 @@ const PaymentForm = ({ prevRouteName }) => {
 							</View>
 						)}
 					{parcelado && paymentValue >= 60 && (
-						<View style={[styles.input, styles.inputContainer]}>
-							<RNPickerSelect
+						<View style={styles.pickerView}>
+							<Picker
+								selectionColor={"rgba(255,255,255,0.2)"}
+								itemStyle={{ color: "whitesmoke" }}
+								style={{ height: 100 }}
+								selectedValue={times}
 								onValueChange={(e) => {
 									handlerChangeSelect(e, "Parcelas");
 								}}
-								placeholder={{ label: "Selecione uma opção" }}
-								items={arrayTimes}
-								value={times}
-								style={pickerSelectStyles}
-								Icon={({ color, size }) => {
+							>
+								{arrayTimes.map((data, i) => {
 									return (
-										<Ionicons
-											name="arrow-down-circle-outline"
-											size={24}
-											color={color}
-											style={{ marginRight: -10 }}
+										<Picker.Item
+											key={i}
+											label={data.label}
+											value={data.value}
 										/>
 									);
-								}}
-							/>
+								})}
+							</Picker>
 						</View>
 					)}
-					<Button
-						btnStyles={styles.btnStyles}
-						disabled={
-							(!paymentValue && true) ||
-							parcelasSelected.length === 0
-						}
-						onPress={handlerConfirm}
-					>
-						Avançar
-					</Button>
+					{parcelasSelected?.length > 0 && (
+						<Button
+							btnStyles={styles.btnStyles}
+							disabled={
+								(!paymentValue && true) ||
+								parcelasSelected.length === 0
+							}
+							onPress={handlerConfirm}
+						>
+							Avançar
+						</Button>
+					)}
 				</View>
 			</ScrollView>
 		</TouchableWithoutFeedback>
@@ -332,6 +349,22 @@ const PaymentForm = ({ prevRouteName }) => {
 export default PaymentForm;
 
 const styles = StyleSheet.create({
+	helperValue: {
+		marginBottom: 20,
+		marginTop: -5,
+		color: Colors.gold[100],
+		width: "100%",
+		textAlign: "center"
+	},
+	pickerView: {
+		width: "200%",
+		color: "black",
+		justifyContent: "center",
+		marginBottom: 50,
+		height: 50,
+		top: -20
+		// alignItems: "center"
+	},
 	active: {
 		opacity: 1,
 		borderColor: Colors.succes[200],
@@ -374,7 +407,7 @@ const styles = StyleSheet.create({
 		marginTop: 15
 	},
 	form: {
-		width: "70%"
+		width: "50%"
 	},
 	inputStyles: {
 		width: "100%"
@@ -390,11 +423,13 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 22,
 		color: Colors.secondary[200],
-		marginTop: 40
+		marginTop: 20
 	},
 	value: {
 		fontSize: 24,
-		color: "whitesmoke"
+		color: Colors.succes[200],
+		textAlign: "center",
+		marginBottom: 4
 	}
 });
 
