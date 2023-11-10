@@ -97,6 +97,11 @@ const CreditCardFormPage = ({ navigation }) => {
 						expiry: "Validade",
 						cvc: "CVC"
 					}}
+					// addtionalInputsProps={{
+					// 	name: {
+					// 		defa
+					// 	}
+					// }}
 					// requiresName={true}
 				/>
 			</View>
@@ -113,9 +118,9 @@ const CreditCardFormPage = ({ navigation }) => {
 					Avançar
 				</Button>
 			</View>
-			<Button onPress={() => navigation.navigate("PAYCARDFORM")}>
+			{/* <Button onPress={() => navigation.navigate("PAYCARDFORM")}>
 				cardForm
-			</Button>
+			</Button> */}
 		</View>
 	);
 };

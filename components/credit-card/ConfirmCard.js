@@ -10,6 +10,8 @@ import { Divider } from "react-native-paper";
 import { useState } from "react";
 import LoadingOverlay from "../ui/LoadingOverlay";
 
+import moment from "moment";
+
 import {
 	ALERT_TYPE,
 	Dialog,
@@ -17,13 +19,37 @@ import {
 	Toast
 } from "react-native-alert-notification";
 
-import { confirmPaymentSelector } from "../../store/redux/selector";
+import {
+	confirmPaymentSelectorUser,
+	confirmPaymentSelectorCardInfo,
+	confirmPaymentSelectorIp,
+	userSelector
+} from "../../store/redux/selector";
+
+import { createClient } from "../../utils/axios/axios.utils";
+
+import { userActions } from "../../store/redux/usuario";
+import { useDispatch } from "react-redux";
+
+import { addTransaction } from "./../../utils/firebase/firebase.datatable";
+
 const ConfirmCardPage = ({ navigation, route }) => {
 	const { produtos, valor, times } = route.params.data;
-	const dataPay = useSelector(confirmPaymentSelector);
-	const [isLoading, setIsLoading] = useState(false);
 
-	console.log("dataPay: ", dataPay);
+	const dispatch = useDispatch();
+	const createdUser = useSelector(confirmPaymentSelectorUser);
+	const creditCardInfo = useSelector(confirmPaymentSelectorCardInfo);
+	const clientIp = useSelector(confirmPaymentSelectorIp);
+	const user = useSelector(userSelector);
+
+	const { clearData } = userActions;
+
+	const [isLoading, setIsLoading] = useState(false);
+	console.log("createdUser: ", createdUser);
+	console.log("creditCardInfo: ", creditCardInfo);
+	console.log("clientIp: ", clientIp);
+	console.log("user: ", user);
+
 	console.log("produtos: , ", produtos, "valor: ", valor);
 	const handleBack = () => {
 		navigation.goBack();
@@ -31,9 +57,6 @@ const ConfirmCardPage = ({ navigation, route }) => {
 
 	const setLabelTimes = (times) => {
 		if (times === 1) {
-			return "À Vista";
-		}
-		if (parseInt(times.trim()) === 1) {
 			return "À Vista";
 		}
 		return `${times}x de R$ ${(valor / times).toLocaleString("pt-br", {
@@ -76,7 +99,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 						marginTop: 20
 					}}
 				>
-					Comprovante enviado para:{" "}
+					Comprovante enviado por email para:{" "}
 					<Text style={{ fontWeight: "bold" }}>{email}</Text>
 				</Text>
 				<Text
@@ -86,29 +109,40 @@ const ConfirmCardPage = ({ navigation, route }) => {
 						fontSize: 8
 					}}
 				>
-					Caso o cliente não receba o comprovante, falar com o
+					Caso o cliente não receba o comprovante, falar com
 					financeiro@pitayajoias.com.br
 				</Text>
 			</View>
 		);
 	};
-
-	const handleSubmit = () => {
-		setIsLoading(true);
-		setTimeout(() => {
-			setIsLoading(false);
-			Dialog.show({
-				type: ALERT_TYPE.SUCCESS,
-				title: <Title text={"Feito!!"} />,
-				textBody: (
-					<TrySom email={dataPay.createdUser.email.toLowerCase()} />
-				),
-				button: "Finalizar",
-				onPressButton: () => {
-					navigation.navigate("PagamentosTab");
-				}
-			});
-		}, 1500);
+	const TrySomError = ({ email }) => {
+		return (
+			<View style={{ width: "100%" }}>
+				<Text
+					style={{
+						color: "whitesmoke",
+						textAlign: "center",
+						fontSize: 12,
+						marginTop: 20
+					}}
+				>
+					<Text style={{ fontWeight: "bold" }}>
+						Parece que alguma coisa saiu errado..
+					</Text>
+				</Text>
+				<Text
+					style={{
+						color: Colors.gold[200],
+						textAlign: "center",
+						marginBottom: 20,
+						fontSize: 12,
+						marginTop: 20
+					}}
+				>
+					Por favor confira os dados e tente novamente mais tarde!
+				</Text>
+			</View>
+		);
 	};
 
 	useLayoutEffect(() => {
@@ -129,105 +163,130 @@ const ConfirmCardPage = ({ navigation, route }) => {
 		});
 	}, []);
 
-	const cardNumber = `**** **** **** ${dataPay.creditCardInfo.number
-		.replaceAll(" ", "")
-		.slice(-4)}`;
-	const cvcNumber = `*${dataPay.creditCardInfo.cvc.slice(-2)}`;
-	const dateCard = dataPay.creditCardInfo.expiry;
-	const cpfNumber = `${dataPay.createdUser.cpfCnpj.slice(
+	const cardNumber = `**** **** **** ${creditCardInfo?.number
+		?.replaceAll(" ", "")
+		?.slice(-4)}`;
+	const cvcNumber = `*${creditCardInfo?.cvc?.slice(-2)}`;
+	const dateCard = creditCardInfo?.expiry;
+	const cpfNumber = `${createdUser?.cpfCnpj?.slice(
 		0,
 		3
-	)}.${dataPay.createdUser.cpfCnpj.slice(
-		3,
-		6
-	)}.${dataPay.createdUser.cpfCnpj.slice(
+	)}.${createdUser?.cpfCnpj?.slice(3, 6)}.${createdUser?.cpfCnpj?.slice(
 		6,
 		9
-	)}-${dataPay.createdUser.cpfCnpj.slice(-2)}`;
+	)}-${createdUser?.cpfCnpj?.slice(-2)}`;
 
-	// let newPayment;
-	// 	if (times > 1) {
-	// 		newPayment = {
-	// 			customer: state.userCreated.id,
-	// 			billingType: "CREDIT_CARD",
-	// 			dueDate: today,
-	// 			totalValue: Number(valuePay),
-	// 			description: "paymentFromPitayaPay",
-	// 			creditCard: state.creditCard,
-	// 			creditCardHolderInfo: state.creditCardHolderInfo,
-	// 			remoteIp: ip,
-	// 			installmentCount: times
-	// 		};
-	// 	} else {
-	// 		newPayment = {
-	// 			customer: state.userCreated.id,
-	// 			billingType: "CREDIT_CARD",
-	// 			dueDate: today,
-	// 			value: Number(valuePay),
-	// 			description: "paymentFromPitayaPay",
-	// 			creditCard: state.creditCard,
-	// 			creditCardHolderInfo: state.creditCardHolderInfo,
-	// 			remoteIp: ip
-	// 		};
-	// 	}
+	console.log(times, typeof times);
 
-	// const handlerCofirmCard = async () => {
-	// 	setCreateUserLoader(true);
-	// 	try {
-	// 		const newPaymentRequest = await createClient.post(
-	// 			"createpayment",
-	// 			null,
-	// 			{
-	// 				params: {
-	// 					newPaymentMethod
-	// 				}
-	// 			}
-	// 		);
-	// 		const { status } = await newPaymentRequest;
-	// 		const { data } = await newPaymentRequest;
-	// 		if (status === 200) {
-	// 			console.log(newPaymentRequest);
-	// 			dispatch({
-	// 				type: ACTIONS_TYPES.SET_REALIZED_OPERATION,
-	// 				payload: data
-	// 			});
-	// 			setStage(4);
-	// 		}
-	// 		try {
-	// 			await addTransaction(
-	// 				user.displayName,
-	// 				user.email,
-	// 				user.uid,
-	// 				"credito",
-	// 				valuePay,
-	// 				times,
-	// 				state.creditCardHolderInfo.email,
-	// 				producttoSellList
-	// 			);
-	// 		} catch (err) {
-	// 			console.log("Problema ao salvar transacao no Firebase: ", err);
-	// 		}
-	// 	} catch (error) {
-	// 		console.log("erro ao gerar o pagamento", error);
-	// 		MySwal.fire({
-	// 			title: "Erro ...",
-	// 			text: "Por favor confirmar os dados do pagamento!!",
-	// 			icon: "error",
-	// 			confirmButtonText: "Revisar"
-	// 		}).then(result => {
-	// 			if (result.isConfirmed) {
-	// 				setStage(1);
-	// 			}
-	// 		});
-	// 	} finally {
-	// 		setCreateUserLoader(false);
-	// 	}
-	// 	// setStage(4);
-	// };
-
-	if (isLoading) {
-		return <LoadingOverlay message={"Processando o Pagamento..."} />;
+	let newPayment;
+	const datetime = new Date();
+	const today = moment(datetime).format("YYYY-MM-DD");
+	const creditCardHolder = {
+		name: createdUser.name,
+		email: createdUser.email,
+		cpfCnpj: createdUser.cpfCnpj,
+		postalCode: createdUser.postalCode,
+		addressNumber: createdUser.addressNumber,
+		phone: createdUser.phone
+	};
+	const creditCardI = {
+		holderName: createdUser.name,
+		number: creditCardInfo.number.replaceAll(" ", ""),
+		expiryMonth: creditCardInfo.expiry.split("/")[0],
+		expiryYear: `20${creditCardInfo.expiry.split("/")[1]}`,
+		ccv: creditCardInfo.cvc
+	};
+	if (times > 1) {
+		newPayment = {
+			customer: createdUser.id,
+			billingType: "CREDIT_CARD",
+			dueDate: today,
+			totalValue: Number(valor),
+			description: "paymentFromPitayaPay",
+			creditCard: creditCardI,
+			creditCardHolderInfo: creditCardHolder,
+			remoteIp: clientIp,
+			installmentCount: times
+		};
+	} else {
+		newPayment = {
+			customer: createdUser.id,
+			billingType: "CREDIT_CARD",
+			dueDate: today,
+			value: Number(valor),
+			description: "paymentFromPitayaPay",
+			creditCard: creditCardI,
+			creditCardHolderInfo: creditCardHolder,
+			remoteIp: clientIp
+		};
 	}
+
+	const handlerCofirmCard = async () => {
+		setIsLoading(true);
+		try {
+			const newPaymentRequest = await createClient.post(
+				"createpayment",
+				null,
+				{
+					params: {
+						newPaymentMethod: newPayment
+					}
+				}
+			);
+			const { status } = await newPaymentRequest;
+			const { data } = await newPaymentRequest;
+			if (status === 200) {
+				console.log(newPaymentRequest);
+				Dialog.show({
+					type: ALERT_TYPE.SUCCESS,
+					title: <Title text={"Feito!!"} />,
+					textBody: (
+						<TrySom email={createdUser.email.toLowerCase()} />
+					),
+					button: "Finalizar",
+					onPressButton: () => {
+						navigation.navigate("PagamentosTab");
+					}
+				});
+			}
+			try {
+				await addTransaction(
+					user.displayName,
+					user.email,
+					user.uid,
+					"credito",
+					valor,
+					times,
+					createdUser.email,
+					produtos
+				);
+			} catch (err) {
+				console.log("Problema ao salvar transacao no Firebase: ", err);
+				Dialog.show({
+					type: ALERT_TYPE.DANGER,
+					title: <Title text={"Ops!!"} />,
+					textBody: <TrySomError />,
+					button: "Finalizar"
+				});
+			}
+		} catch (error) {
+			console.log("erro ao gerar o pagamento", error);
+			Dialog.show({
+				type: ALERT_TYPE.DANGER,
+				title: <Title text={"Ops!!"} />,
+				textBody: <TrySomError />,
+				button: "Finalizar"
+			});
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleSubmit = () => {
+		setIsLoading(true);
+		handlerCofirmCard();
+	};
+
 	return (
 		<AlertNotificationRoot>
 			<View style={styles.mainContainer}>
@@ -302,7 +361,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 						</View>
 						<View style={styles.valueColumn}>
 							<Text style={styles.valueText}>
-								{dataPay.createdUser.name}
+								{createdUser.name}
 							</Text>
 						</View>
 					</View>
@@ -320,7 +379,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 						</View>
 						<View style={styles.valueColumn}>
 							<Text style={styles.valueText}>
-								{dataPay.createdUser.email.toLowerCase()}
+								{createdUser?.email?.toLowerCase()}
 							</Text>
 						</View>
 					</View>
@@ -334,6 +393,14 @@ const ConfirmCardPage = ({ navigation, route }) => {
 					</Button>
 				</View>
 			</View>
+			{isLoading && (
+				<LoadingOverlay
+					color={"whitesmoke"}
+					overContent={true}
+					message={"Processando o Pagamento..."}
+					style={{ fontWeight: "bold" }}
+				/>
+			)}
 		</AlertNotificationRoot>
 	);
 };
@@ -362,12 +429,12 @@ const styles = StyleSheet.create({
 		opacity: 0.9
 	},
 	valueText: {
-		fontSize: 14,
+		fontSize: 16,
 		backgroundColor: Colors.primary[600],
 		overflow: "hidden",
 		borderRadius: 8,
-		// borderColor: "black",
-		// borderWidth: 1,
+		borderColor: "whitesmoke",
+		borderWidth: 0.19,
 		color: "whitesmoke",
 		width: "120%",
 		textAlign: "center",

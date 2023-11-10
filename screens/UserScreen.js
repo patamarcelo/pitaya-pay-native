@@ -11,6 +11,7 @@ import { userSelector } from "../store/redux/selector";
 
 function UserScreen() {
 	const user = useSelector(userSelector);
+	const { displayName } = user;
 
 	const navigation = useNavigation();
 	const handleTermsNav = () => {
@@ -30,7 +31,7 @@ function UserScreen() {
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			tabBarLabel: "Vendedora",
-			title: user.email,
+			title: displayName ? displayName : "User Name",
 			headerTintColor: "whitesmoke",
 			headerShadowVisible: false,
 			headerShown: true,

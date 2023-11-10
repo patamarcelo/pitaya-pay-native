@@ -18,6 +18,13 @@ import { userSelector } from "../../store/redux/selector";
 
 import { createClient } from "../../utils/axios/axios.utils";
 
+import {
+	ALERT_TYPE,
+	Dialog,
+	AlertNotificationRoot,
+	Toast
+} from "react-native-alert-notification";
+
 const schema = yup.object({
 	email: yup
 		.string()
@@ -111,6 +118,46 @@ const MailForm = () => {
 		}));
 	};
 
+	const Title = ({ text }) => {
+		return (
+			<View style={{ paddingTop: 40 }}>
+				<Text style={{ color: "whitesmoke", fontWeight: "bold" }}>
+					{text}
+				</Text>
+			</View>
+		);
+	};
+
+	const TrySomError = ({ email }) => {
+		return (
+			<View style={{ width: "100%" }}>
+				<Text
+					style={{
+						color: "whitesmoke",
+						textAlign: "center",
+						fontSize: 12,
+						marginTop: 20
+					}}
+				>
+					<Text style={{ fontWeight: "bold" }}>
+						Parece que alguma coisa saiu errado..
+					</Text>
+				</Text>
+				<Text
+					style={{
+						color: Colors.gold[200],
+						textAlign: "center",
+						marginBottom: 20,
+						fontSize: 12,
+						marginTop: 20
+					}}
+				>
+					Por favor tente novamente mais tarde!
+				</Text>
+			</View>
+		);
+	};
+
 	const handlerConfirm = async (e) => {
 		console.log("avançar", e);
 		console.log(paymentParams);
@@ -158,9 +205,28 @@ const MailForm = () => {
 						data: { ...paymentParams, pixUri: data.encodedImage }
 					});
 				}, 750);
+			} else {
+				Dialog.show({
+					type: ALERT_TYPE.DANGER,
+					title: <Title text={"Ops!!"} />,
+					textBody: <TrySomError />,
+					button: "Finalizar"
+					// onPressButton: () => {
+					// 	navigation.navigate("PagamentosTab");
+					// }
+				});
 			}
 		} catch (err) {
 			console.log("erro ao gerar a transação", err);
+			Dialog.show({
+				type: ALERT_TYPE.DANGER,
+				title: <Title text={"Ops!!"} />,
+				textBody: <TrySomError />,
+				button: "Finalizar"
+				// onPressButton: () => {
+				// 	navigation.navigate("PagamentosTab");
+				// }
+			});
 		}
 	};
 

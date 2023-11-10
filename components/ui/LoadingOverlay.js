@@ -1,11 +1,23 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../constants/styles";
 
-function LoadingOverlay({ message, style, cntStyles }) {
+function LoadingOverlay({
+	message,
+	style,
+	cntStyles,
+	overContent = false,
+	color = "grey"
+}) {
 	return (
-		<View style={[styles.rootContainer, cntStyles]}>
+		<View
+			style={[
+				styles.rootContainer,
+				cntStyles,
+				overContent && styles.overContent
+			]}
+		>
 			<Text style={[styles.message, style]}>{message}</Text>
-			<ActivityIndicator size="large" />
+			<ActivityIndicator size="large" color={color} />
 		</View>
 	);
 }
@@ -23,5 +35,15 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		marginBottom: 12,
 		color: "whitesmoke"
+	},
+	overContent: {
+		position: "absolute",
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: "rgba(195, 11, 100, 0.8)"
 	}
 });

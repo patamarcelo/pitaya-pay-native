@@ -90,7 +90,7 @@ const ProductsComp = (props) => {
 
 	return isLoading ? (
 		<View style={styles.loaderContainer}>
-			<ActivityIndicator size="large" />
+			<ActivityIndicator size="large" color={"whitesmoke"} />
 		</View>
 	) : (
 		<Animated.View
@@ -117,6 +117,11 @@ const ProductsComp = (props) => {
 					hideSubmitButton={false}
 					selectedItems={parcelasSelected}
 					selectText="Selecione os Produtos"
+					selectedText={
+						parcelasSelected.length > 1
+							? "itens selecionados"
+							: "item selecionado"
+					}
 					searchInputPlaceholderText="Procure os produtos"
 					// onChangeInput={(text) => {
 					// 	console.log("selected: ", text);

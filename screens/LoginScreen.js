@@ -33,7 +33,12 @@ function LoginScreen() {
 	};
 
 	if (isLoading) {
-		return <LoadingOverlay message={"Conectando você..."} />;
+		return (
+			<LoadingOverlay
+				message={"Conectando você..."}
+				color={"whitesmoke"}
+			/>
+		);
 	}
 	return <AuthContent isLogin onAuthenticate={loginUserhandler} />;
 }

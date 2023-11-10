@@ -149,7 +149,7 @@ const CreditCardUserForm = () => {
 	};
 
 	if (isLoading) {
-		return <LoadingOverlay message={"carregando os dados..."} />;
+		return <LoadingOverlay message={"Carregando informações..."} />;
 	}
 	return (
 		<View style={styles.mainContainer}>
@@ -187,7 +187,11 @@ const CreditCardUserForm = () => {
 												label={getLabel}
 												onUpdateValue={(e) => {
 													handlerChange(e, getTitle);
-													onChange(e.trim());
+													if (data.title !== "name") {
+														onChange(e.trim());
+													} else {
+														onChange(e);
+													}
 													// onChange(
 													// 	e
 													// 	// .replace(/[^a-z0-9]/gi, "")

@@ -9,11 +9,14 @@ import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { storage } from "../utils/firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 
+import { Skeleton } from "@rneui/themed";
+
 function WelcomeScreen() {
 	const user = useSelector(userSelector);
 	const storageRef = ref(storage, `img/promo.jpg`);
 	const [pictureUrl, setPictureUrl] = useState();
 	const [isLoading, setIsLoading] = useState(false);
+	const [showImg, setShowImg] = useState(false);
 
 	useEffect(() => {
 		setIsLoading(true);
@@ -37,19 +40,19 @@ function WelcomeScreen() {
 			/>
 		);
 	}
+
 	return (
 		<View style={styles.rootContainer}>
-			{pictureUrl ? (
-				<Image
-					source={{ uri: pictureUrl }}
-					style={styles.imgContainer}
-				/>
-			) : (
-				<Image
-					source={require("../assets/teste.jpg")}
-					style={styles.imgContainer}
-				/>
+			{!showImg && (
+				<View style={{ marginTop: 400 }}>
+					<LoadingOverlay style={{ color: "black" }} color="black" />
+				</View>
 			)}
+			<Image
+				source={{ uri: pictureUrl }}
+				style={styles.imgContainer}
+				onLoad={() => setShowImg(true)}
+			/>
 		</View>
 	);
 }

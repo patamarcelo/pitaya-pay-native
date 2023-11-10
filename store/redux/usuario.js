@@ -31,6 +31,11 @@ const UserSlice = createSlice({
 		},
 		setIp: (state, action) => {
 			state.clientIp = action.payload;
+		},
+		clearData: (state) => {
+			state.createdUser = "";
+			state.creditCardInfo = "";
+			state.clientIp = "";
 		}
 	}
 });

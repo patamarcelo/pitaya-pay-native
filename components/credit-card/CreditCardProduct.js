@@ -40,6 +40,8 @@ export default CreditCardProductPage;
 
 const styles = StyleSheet.create({
 	mainContainer: {
-		flex: 1
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center"
 	}
 });

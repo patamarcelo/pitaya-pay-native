@@ -57,6 +57,10 @@ import CreditCardFormPage from "./components/credit-card/CreditCardForm";
 import CreditCardProductPage from "./components/credit-card/CreditCardProduct";
 import ConfirmCardPage from "./components/credit-card/ConfirmCard";
 
+import Entypo from "@expo/vector-icons/Entypo";
+import * as SplashScreen from "expo-splash-screen";
+import * as Font from "expo-font";
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -440,6 +444,7 @@ function Navigation() {
 const Root = () => {
 	const context = useContext(AuthContext);
 	const [isLoginIn, setIsLoginIn] = useState(true);
+	SplashScreen.preventAutoHideAsync();
 	useEffect(() => {
 		const fetchToken = async () => {
 			const storedToken = await AsyncStorage.getItem("token");
@@ -454,8 +459,14 @@ const Root = () => {
 		fetchToken();
 	}, []);
 
+	useEffect(() => {
+		if (isLoginIn) {
+			SplashScreen.hideAsync();
+		}
+	}, [isLoginIn]);
+
 	if (isLoginIn) {
-		return <AppLoading />;
+		return null;
 	}
 
 	return <Navigation />;

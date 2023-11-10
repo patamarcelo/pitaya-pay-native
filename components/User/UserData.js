@@ -14,9 +14,27 @@ import LoadingOverlay from "../../components/ui/LoadingOverlay";
 import { Divider, Text } from "react-native-paper";
 import { RefreshControl, ActivityIndicator } from "react-native";
 
+import { Skeleton } from "@rneui/themed";
+
+const LINES = [
+	{ line: 1 },
+	{ line: 2 },
+	{ line: 3 },
+	{ line: 4 },
+	{ line: 5 },
+	{ line: 6 },
+	{ line: 7 },
+	{ line: 8 },
+	{ line: 9 },
+	{ line: 10 },
+	{ line: 11 },
+	{ line: 12 }
+];
+
 const UserData = (props) => {
 	const userCustomData = useSelector(userCustomDataSelector);
 	const [cpf, setCpf] = useState(null);
+	const user = useSelector(userSelector);
 
 	useLayoutEffect(() => {
 		setCpf(userCustomData.cpf);
@@ -149,13 +167,39 @@ const UserData = (props) => {
 		}
 	}, []);
 
-	if (isLoading) {
-		return (
-			<LoadingOverlay
-				style={{ color: "black" }}
-				message={"Atualizando os dados.."}
-			/>
-		);
+	if (!isLoading) {
+		return LINES.map((data, i) => {
+			return (
+				<>
+					<View
+						style={{
+							justifyContent: "space-around",
+							// alignItems: "space-between",
+							width: "100%",
+							// rowGap: 5,
+							flex: 1
+						}}
+						key={i}
+					>
+						<View
+							style={{
+								width: "100%",
+								flexDirection: "row",
+								justifyContent: "space-between",
+								alignItems: "center"
+							}}
+						>
+							<Skeleton width={"20%"} height={20} />
+							<Skeleton width={"40%"} height={20} />
+							<Skeleton width={"20%"} height={20} />
+						</View>
+						<View>
+							<Divider width={"100%"} />
+						</View>
+					</View>
+				</>
+			);
+		});
 	}
 
 	const handlePushRefresh = () => {

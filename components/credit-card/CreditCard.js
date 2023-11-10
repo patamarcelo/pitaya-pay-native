@@ -1,14 +1,24 @@
 import { StyleSheet, View, Text } from "react-native";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useEffect } from "react";
 import { Colors } from "../../constants/styles";
 import IconButton from "../ui/IconButton";
 import CreditCardUserForm from "./UserForm";
 import Button from "../ui/Button";
 
+import { useDispatch } from "react-redux";
+import { userActions } from "../../store/redux/usuario";
+
 const CreditCardComponent = ({ navigation }) => {
 	const handleBack = () => {
 		navigation.goBack();
 	};
+	const dispatch = useDispatch();
+
+	const { clearData } = userActions;
+
+	useEffect(() => {
+		dispatch(clearData());
+	}, []);
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -30,9 +40,9 @@ const CreditCardComponent = ({ navigation }) => {
 	return (
 		<View style={styles.mainContainer}>
 			<CreditCardUserForm />
-			<Button onPress={() => navigation.navigate("CARTAOFORM")}>
+			{/* <Button onPress={() => navigation.navigate("CARTAOFORM")}>
 				cardForm
-			</Button>
+			</Button> */}
 		</View>
 	);
 };

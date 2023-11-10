@@ -184,7 +184,7 @@ const PaymentForm = ({ prevRouteName }) => {
 				data: {
 					valor: paymentValue,
 					produtos: parcelasSelected,
-					times: times
+					times: parseInt(times)
 				}
 			});
 		} else {
@@ -196,7 +196,10 @@ const PaymentForm = ({ prevRouteName }) => {
 
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-			<ScrollView>
+			<ScrollView
+				horizontal={true}
+				showsHorizontalScrollIndicator={false}
+			>
 				<View
 					style={[
 						styles.mainContainer,
