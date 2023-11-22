@@ -167,37 +167,35 @@ const UserData = (props) => {
 		}
 	}, []);
 
-	if (!isLoading) {
+	if (isLoading) {
 		return LINES.map((data, i) => {
 			return (
-				<>
+				<View
+					style={{
+						justifyContent: "space-around",
+						// alignItems: "space-between",
+						width: "100%",
+						// rowGap: 5,
+						flex: 1
+					}}
+					key={i}
+				>
 					<View
 						style={{
-							justifyContent: "space-around",
-							// alignItems: "space-between",
 							width: "100%",
-							// rowGap: 5,
-							flex: 1
+							flexDirection: "row",
+							justifyContent: "space-between",
+							alignItems: "center"
 						}}
-						key={i}
 					>
-						<View
-							style={{
-								width: "100%",
-								flexDirection: "row",
-								justifyContent: "space-between",
-								alignItems: "center"
-							}}
-						>
-							<Skeleton width={"20%"} height={20} />
-							<Skeleton width={"40%"} height={20} />
-							<Skeleton width={"20%"} height={20} />
-						</View>
-						<View>
-							<Divider width={"100%"} />
-						</View>
+						<Skeleton width={"20%"} height={20} />
+						<Skeleton width={"40%"} height={20} />
+						<Skeleton width={"20%"} height={20} />
 					</View>
-				</>
+					<View>
+						<Divider width={"100%"} />
+					</View>
+				</View>
 			);
 		});
 	}

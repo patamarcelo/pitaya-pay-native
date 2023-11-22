@@ -35,17 +35,17 @@ function UserScreen() {
 			headerTintColor: "whitesmoke",
 			headerShadowVisible: false,
 			headerShown: true,
-			contentStyle: { backgroundColor: Colors.primary500 },
-			headerRight: ({ tintColor }) => (
-				<IconButton
-					icon="file-text"
-					color={tintColor}
-					size={20}
-					onPress={handleTermsNav}
-					type="awesome"
-					btnStyles={{ marginRight: 15 }}
-				/>
-			)
+			contentStyle: { backgroundColor: Colors.primary500 }
+			// headerRight: ({ tintColor }) => (
+			// 	<IconButton
+			// 		icon="file-text"
+			// 		color={tintColor}
+			// 		size={20}
+			// 		onPress={handleTermsNav}
+			// 		type="awesome"
+			// 		btnStyles={{ marginRight: 15 }}
+			// 	/>
+			// )
 			// headerRight: ({ tintColor }) => (
 			// 	<IconButton
 			// 		icon="refresh"
