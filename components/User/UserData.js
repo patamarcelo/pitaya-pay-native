@@ -1,4 +1,10 @@
-import { StyleSheet, View, FlatList, ScrollView } from "react-native";
+import {
+	StyleSheet,
+	View,
+	FlatList,
+	ScrollView,
+	ScrollViewBase
+} from "react-native";
 import { Colors } from "../../constants/styles";
 
 import {
@@ -15,6 +21,8 @@ import { Divider, Text } from "react-native-paper";
 import { RefreshControl, ActivityIndicator } from "react-native";
 
 import { Skeleton } from "@rneui/themed";
+
+import { useNavigation } from "@react-navigation/native";
 
 const LINES = [
 	{ line: 1 },
@@ -35,6 +43,8 @@ const UserData = (props) => {
 	const userCustomData = useSelector(userCustomDataSelector);
 	const [cpf, setCpf] = useState(null);
 	const user = useSelector(userSelector);
+	const navigation = useNavigation();
+	const { displayName } = user;
 
 	useLayoutEffect(() => {
 		setCpf(userCustomData.cpf);
@@ -43,6 +53,37 @@ const UserData = (props) => {
 	useEffect(() => {
 		console.log("new Cpf");
 	}, [cpf]);
+
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			tabBarLabel: "Vendedora",
+			title: "Produtos",
+			headerTintColor: "whitesmoke",
+			headerShadowVisible: false,
+			headerShown: true,
+			contentStyle: { backgroundColor: "white" }
+			// headerRight: ({ tintColor }) => (
+			// 	<IconButton
+			// 		icon="file-text"
+			// 		color={tintColor}
+			// 		size={20}
+			// 		onPress={handleTermsNav}
+			// 		type="awesome"
+			// 		btnStyles={{ marginRight: 15 }}
+			// 	/>
+			// )
+			// headerRight: ({ tintColor }) => (
+			// 	<IconButton
+			// 		icon="refresh"
+			// 		color={tintColor}
+			// 		size={22}
+			// 		onPress={handleRefresh}
+			// 		type="awesome"
+			// 		btnStyles={{ marginRight: 20 }}
+			// 	/>
+			// )
+		});
+	}, []);
 
 	const { refreshData, setRefreshData, handleRefresh } = props;
 
@@ -243,8 +284,16 @@ const UserData = (props) => {
 					<ActivityIndicator />
 				</View>
 			) : null} */}
-			<ScrollView
+			{/* <ScrollView
 				style={styles.mainContainer}
+				
+			> */}
+			<FlatList
+				// scrollEnabled={false}
+				data={userFilteredData}
+				keyExtractor={(item, i) => i}
+				renderItem={renderSellItem}
+				ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
 				refreshControl={
 					<RefreshControl
 						refreshing={pushRefresh}
@@ -253,17 +302,8 @@ const UserData = (props) => {
 						tintColor={Colors.primary500}
 					/>
 				}
-			>
-				<FlatList
-					// scrollEnabled={false}
-					data={userFilteredData}
-					keyExtractor={(item, i) => i}
-					renderItem={renderSellItem}
-					ItemSeparatorComponent={() => (
-						<View style={{ height: 12 }} />
-					)}
-				/>
-			</ScrollView>
+			/>
+			{/* </ScrollView> */}
 		</View>
 	);
 };
@@ -277,8 +317,13 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	mainContainer: {
+		flex: 1,
+		justifyContent: "flex-start",
+		// alignItems: "flex-start",
 		width: "100%",
-		flex: 1
+		top: 20,
+		backgroundColor: "white",
+		paddingHorizontal: 10
 	},
 	valueCard: {
 		textAlign: "center"

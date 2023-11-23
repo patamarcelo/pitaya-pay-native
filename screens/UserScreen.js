@@ -9,6 +9,8 @@ import IconButton from "../components/ui/IconButton";
 import { useSelector } from "react-redux";
 import { userSelector } from "../store/redux/selector";
 
+import CardButton from "../components/ui/CardButton";
+
 function UserScreen() {
 	const user = useSelector(userSelector);
 	const { displayName } = user;
@@ -35,7 +37,7 @@ function UserScreen() {
 			headerTintColor: "whitesmoke",
 			headerShadowVisible: false,
 			headerShown: true,
-			contentStyle: { backgroundColor: Colors.primary500 }
+			contentStyle: { backgroundColor: "white" }
 			// headerRight: ({ tintColor }) => (
 			// 	<IconButton
 			// 		icon="file-text"
@@ -61,10 +63,15 @@ function UserScreen() {
 
 	return (
 		<View style={styles.rootContainer}>
-			<UserData
-				refreshData={refreshData}
-				setRefreshData={setRefreshData}
-				handleRefresh={handleRefreshPush}
+			<CardButton
+				textTitle="Produtos"
+				nextUrl="DATAUSER"
+				btnStyles={styles.btnStyle}
+			/>
+			<CardButton
+				btnStyles={styles.btnStyle}
+				textTitle="Vendas"
+				nextUrl="VENDASUSER"
 			/>
 		</View>
 	);
@@ -73,6 +80,10 @@ function UserScreen() {
 export default UserScreen;
 
 const styles = StyleSheet.create({
+	btnStyle: {
+		height: 50,
+		width: "80%"
+	},
 	iconContainer: {
 		flexDirection: "row",
 		width: 120,
@@ -94,11 +105,12 @@ const styles = StyleSheet.create({
 	},
 	rootContainer: {
 		flex: 1,
-		justifyContent: "space-between",
+		justifyContent: "center",
 		alignItems: "center",
 		paddingHorizontal: 10,
 		marginTop: 10,
-		width: "100%"
+		width: "100%",
+		gap: 20
 	},
 	title: {
 		fontSize: 20,

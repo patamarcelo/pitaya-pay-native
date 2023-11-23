@@ -4,9 +4,9 @@ import { Colors } from "../../constants/styles";
 import { useNavigation } from "@react-navigation/native";
 
 const CardButton = (props) => {
-	const { type, nextUrl } = props;
-	const sourceImage = ICON_URL[type].uri;
-	const sourceText = ICON_URL[type].title;
+	const { type, nextUrl, textTitle, btnStyles } = props;
+	const sourceImage = type ? ICON_URL[type].uri : "";
+	const sourceText = type ? ICON_URL[type].title : textTitle;
 
 	const navigation = useNavigation();
 
@@ -17,11 +17,12 @@ const CardButton = (props) => {
 		<Pressable
 			style={({ pressed }) => [
 				styles.mainContainer,
-				pressed && styles.pressed
+				pressed && styles.pressed,
+				btnStyles
 			]}
 			onPress={handlePress}
 		>
-			<Image style={styles.image} source={sourceImage} />
+			{type && <Image style={styles.image} source={sourceImage} />}
 			<Text style={styles.text}>{sourceText}</Text>
 		</Pressable>
 	);

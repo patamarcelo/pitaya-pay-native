@@ -28,6 +28,9 @@ import PixMailComponent from "./components/pix/PixMail";
 import CreditCardComponent from "./components/credit-card/CreditCard";
 import CreditCardUserForm from "./components/credit-card/UserForm";
 
+import UserData from "./components/User/UserData";
+import UserVendas from "./components/User/UserVendas";
+
 import { useNavigation } from "@react-navigation/native";
 
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
@@ -147,6 +150,41 @@ function PaymentStack({ route, navigation }) {
 	);
 }
 
+const UserStack = () => {
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerStyle: { backgroundColor: Colors.primary500 }
+			}}
+		>
+			<Stack.Screen
+				name="userScreen"
+				component={UserScreen}
+				options={{
+					headerShown: false,
+					contentStyle: { backgroundColor: Colors.primary500 }
+				}}
+			/>
+			<Stack.Screen
+				name="DATAUSER"
+				component={UserData}
+				options={{
+					headerShown: false,
+					contentStyle: { backgroundColor: Colors.primary500 }
+				}}
+			/>
+			<Stack.Screen
+				name="VENDASUSER"
+				component={UserVendas}
+				options={{
+					headerShown: false,
+					contentStyle: { backgroundColor: Colors.primary500 }
+				}}
+			/>
+		</Stack.Navigator>
+	);
+};
+
 function HomeStack() {
 	const context = useContext(AuthContext);
 
@@ -210,8 +248,9 @@ function HomeStack() {
 			/>
 			<Tab.Screen
 				name="Usuário"
-				component={UserScreen}
+				component={UserStack}
 				options={{
+					headerShown: false,
 					// headerRight: ({ tintColor }) => (
 					// 	<IconButton
 					// 		icon="exit"
