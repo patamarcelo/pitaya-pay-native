@@ -167,6 +167,7 @@ function HomeStack() {
 				component={WelcomeScreen}
 				options={{
 					title: "Seja Bem Vindo",
+					tabBarLabel: "Home",
 					headerRight: ({ tintColor }) => (
 						<IconButton
 							type={"awesome"}
@@ -251,7 +252,8 @@ function AuthenticatedStack(props) {
 		if (!agreedTerms) {
 			try {
 				const allUsers = await getContractsSign();
-				console.log(user);
+				console.log("user: ", user);
+				console.log("AllUsers: ", allUsers);
 				const confirmArr = allUsers.filter(
 					(allUser) => allUser.id === user.uid
 				);

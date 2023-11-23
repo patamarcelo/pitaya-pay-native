@@ -7,7 +7,8 @@ import {
 	Platform,
 	SafeAreaView,
 	TouchableWithoutFeedback,
-	Keyboard
+	Keyboard,
+	ScrollView
 } from "react-native";
 import { useForm, Controler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -154,9 +155,10 @@ const CreditCardUserForm = () => {
 	return (
 		<View style={styles.mainContainer}>
 			<SafeAreaView style={styles.form}>
+				{/* <ScrollView style={{ width: "100%" }}> */}
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<KeyboardAvoidingView
-						keyboardVerticalOffset={height + 47}
+						keyboardVerticalOffset={height - 50}
 						style={styles.form}
 						behavior={Platform.OS === "ios" ? "padding" : "height"}
 					>
@@ -218,22 +220,35 @@ const CreditCardUserForm = () => {
 								</View>
 							);
 						})}
+
+						<View style={styles.buttonContainer}>
+							<Button
+								disabled={
+									Object.keys(errors).length === 0
+										? false
+										: true
+								}
+								onPress={handleSubmit(submitHandler)}
+								btnStyles={
+									Object.keys(errors).length === 0
+										? styles.btnbtnStylesRegister
+										: styles.btnDisabledStyle
+								}
+							>
+								Avançar
+							</Button>
+							<Button
+								onPress={() =>
+									navigation.navigate("PAYCARDFORM")
+								}
+							>
+								cardForm
+							</Button>
+						</View>
 					</KeyboardAvoidingView>
 				</TouchableWithoutFeedback>
+				{/* </ScrollView> */}
 			</SafeAreaView>
-			<View style={styles.buttonContainer}>
-				<Button
-					disabled={Object.keys(errors).length === 0 ? false : true}
-					onPress={handleSubmit(submitHandler)}
-					btnStyles={
-						Object.keys(errors).length === 0
-							? styles.btnbtnStylesRegister
-							: styles.btnDisabledStyle
-					}
-				>
-					Avançar
-				</Button>
-			</View>
 		</View>
 	);
 };

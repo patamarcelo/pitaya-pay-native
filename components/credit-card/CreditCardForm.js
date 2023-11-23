@@ -3,7 +3,8 @@ import {
 	Text,
 	StyleSheet,
 	TouchableWithoutFeedback,
-	Keyboard
+	Keyboard,
+	KeyboardAvoidingView
 } from "react-native";
 import { useSelector } from "react-redux";
 import { createdUserSelector } from "../../store/redux/selector";
@@ -87,40 +88,43 @@ const CreditCardFormPage = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.cardContainer}>
-				<CreditCardInput
-					allowScroll={true}
-					onChange={handlerChange}
-					labelStyle={styles.labelStyle}
-					inputStyle={{ color: "white" }}
-					labels={{
-						number: "Número do Cartão",
-						expiry: "Validade",
-						cvc: "CVC"
-					}}
-					// addtionalInputsProps={{
-					// 	name: {
-					// 		defa
-					// 	}
-					// }}
-					// requiresName={true}
-				/>
+				<KeyboardAvoidingView>
+					<CreditCardInput
+						allowScroll={true}
+						onChange={handlerChange}
+						labelStyle={styles.labelStyle}
+						inputStyle={{ color: "white" }}
+						labels={{
+							number: "Número do Cartão",
+							expiry: "Validade",
+							cvc: "CVC"
+						}}
+						// addtionalInputsProps={{
+						// 	name: {
+						// 		defa
+						// 	}
+						// }}
+						// requiresName={true}
+					/>
+
+					<View style={styles.buttonContainer}>
+						<Button
+							disabled={!cardData.valid}
+							onPress={handleSubmit}
+							btnStyles={
+								!cardData.valid
+									? styles.btnDisabledStyle
+									: styles.btnbtnStylesRegister
+							}
+						>
+							Avançar
+						</Button>
+					</View>
+					{/* <Button onPress={() => navigation.navigate("PAYCARDFORM")}>
+						cardForm
+					</Button> */}
+				</KeyboardAvoidingView>
 			</View>
-			<View style={styles.buttonContainer}>
-				<Button
-					disabled={!cardData.valid}
-					onPress={handleSubmit}
-					btnStyles={
-						!cardData.valid
-							? styles.btnDisabledStyle
-							: styles.btnbtnStylesRegister
-					}
-				>
-					Avançar
-				</Button>
-			</View>
-			{/* <Button onPress={() => navigation.navigate("PAYCARDFORM")}>
-				cardForm
-			</Button> */}
 		</View>
 	);
 };

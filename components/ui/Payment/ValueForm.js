@@ -4,6 +4,7 @@ import {
 	StyleSheet,
 	ScrollView,
 	Keyboard,
+	Platform,
 	TouchableWithoutFeedback
 } from "react-native";
 import { useState, useEffect } from "react";
@@ -309,12 +310,13 @@ const PaymentForm = ({ prevRouteName }) => {
 							</View>
 						)}
 					{parcelado && paymentValue >= 60 && (
-						<View style={styles.pickerView}>
+						<View style={pickerSelectStyles.inputAndroid}>
 							<Picker
 								selectionColor={"rgba(255,255,255,0.2)"}
 								itemStyle={{ color: "whitesmoke" }}
-								style={{ height: 100 }}
 								selectedValue={times}
+								mode="dropdown"
+								placeholderStyle={{ color: "#007aff" }}
 								onValueChange={(e) => {
 									handlerChangeSelect(e, "Parcelas");
 								}}
@@ -322,6 +324,13 @@ const PaymentForm = ({ prevRouteName }) => {
 								{arrayTimes.map((data, i) => {
 									return (
 										<Picker.Item
+											style={{
+												backgroundColor:
+													Colors.primary500,
+												opacity: 0.5,
+												borderRadius: 12
+											}}
+											color="whitesmoke"
 											key={i}
 											label={data.label}
 											value={data.value}
@@ -395,8 +404,8 @@ const styles = StyleSheet.create({
 		width: "100%",
 		justifyContent: "center",
 		alignItems: "center",
-		gap: 20,
-		marginBottom: 10
+		gap: 20
+		// marginBottom: 10
 	},
 	btnOptStyleVista: {
 		width: 120
@@ -452,12 +461,12 @@ const pickerSelectStyles = StyleSheet.create({
 	},
 	inputAndroid: {
 		fontSize: 16,
-		paddingHorizontal: 10,
-		paddingVertical: 8,
-		borderWidth: 0.5,
-		borderColor: "purple",
+		borderColor: "white",
+		width: "70%",
 		borderRadius: 8,
-		color: "black",
-		paddingRight: 30 // to ensure the text is never behind the icon
+		borderWidth: Platform.OS === "ios" ? "" : 0.5,
+		// alignItems: "center",
+		justifyContent: "center",
+		color: "whitesmoke"
 	}
 });

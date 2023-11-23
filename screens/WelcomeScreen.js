@@ -17,13 +17,19 @@ function WelcomeScreen() {
 	const [pictureUrl, setPictureUrl] = useState();
 	const [isLoading, setIsLoading] = useState(false);
 	const [showImg, setShowImg] = useState(false);
+	const [localImg, setlocalImg] = useState(false);
 
 	useEffect(() => {
 		setIsLoading(true);
 		try {
-			getDownloadURL(storageRef).then((downloadURL) => {
-				setPictureUrl(downloadURL);
-			});
+			getDownloadURL(storageRef)
+				.then((downloadURL) => {
+					setPictureUrl(downloadURL);
+				})
+				.catch((err) => {
+					console.log("erro ao pegar a img", err);
+					setlocalImg(true);
+				});
 		} catch (err) {
 			console.log("Erro ao gerar a Imagem", err);
 			pictureUrl(null);
@@ -48,11 +54,19 @@ function WelcomeScreen() {
 					<LoadingOverlay style={{ color: "black" }} color="black" />
 				</View>
 			)}
-			<Image
-				source={{ uri: pictureUrl }}
-				style={styles.imgContainer}
-				onLoad={() => setShowImg(true)}
-			/>
+			{!localImg && (
+				<Image
+					source={{ uri: pictureUrl }}
+					style={styles.imgContainer}
+					onLoad={() => setShowImg(true)}
+				/>
+			)}
+			{localImg && (
+				<Image
+					source={(source = require("../assets/promo.jpg"))}
+					style={styles.imgContainer}
+				/>
+			)}
 		</View>
 	);
 }
