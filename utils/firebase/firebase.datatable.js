@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, where } from "firebase/firestore";
 import { query, orderBy, getDocs } from "firebase/firestore";
 import { TABLES_FIREBASE } from "./firebase.typestables";
 
@@ -109,4 +109,22 @@ export const getContractsSign = async () => {
 			id: docSnapshot.data().id
 		};
 	});
+};
+
+export const getTransactionsById = async (sellerId) => {
+	const q = query(
+		collection(db, TABLES_FIREBASE.transactions),
+		where("sellerId", "==", sellerId)
+	);
+	const querySnapshot = await getDocs(q);
+	let allData = [];
+	querySnapshot.forEach((doc) => {
+		const newData = {
+			id: doc.id,
+			...doc.data()
+		};
+		allData.push(newData);
+	});
+	console.table(allData);
+	return allData;
 };

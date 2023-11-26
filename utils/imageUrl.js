@@ -1,10 +1,10 @@
 export const ICON_URL = {
 	pix: {
-		title: "PIX",
+		title: "Pix",
 		uri: require("../assets/payment/pix.png")
 	},
 	creditCard: {
-		title: "CARTÃO DE CRÉDITO",
+		title: "Cartão de Crédito",
 		uri: require("../assets/payment/credit-card.png")
 	}
 };
