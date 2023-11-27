@@ -20,7 +20,7 @@ import LoadingOverlay from "../../components/ui/LoadingOverlay";
 import { Divider, Text } from "react-native-paper";
 import { RefreshControl, ActivityIndicator } from "react-native";
 
-import { Skeleton } from "@rneui/themed";
+import { Skeleton, LinearGradient } from "@rneui/themed";
 
 import { useNavigation } from "@react-navigation/native";
 
@@ -229,9 +229,24 @@ const UserData = (props) => {
 							alignItems: "center"
 						}}
 					>
-						<Skeleton width={"20%"} height={20} />
-						<Skeleton width={"40%"} height={20} />
-						<Skeleton width={"20%"} height={20} />
+						<Skeleton
+							width={"20%"}
+							height={20}
+							LinearGradientComponent={LinearGradient}
+							animation="wave"
+						/>
+						<Skeleton
+							width={"20%"}
+							height={20}
+							LinearGradientComponent={LinearGradient}
+							animation="wave"
+						/>
+						<Skeleton
+							width={"20%"}
+							height={20}
+							LinearGradientComponent={LinearGradient}
+							animation="wave"
+						/>
 					</View>
 					<View>
 						<Divider width={"100%"} />
