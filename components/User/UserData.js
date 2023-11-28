@@ -24,6 +24,8 @@ import { Skeleton, LinearGradient } from "@rneui/themed";
 
 import { useNavigation } from "@react-navigation/native";
 
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+
 const LINES = [
 	{ line: 1 },
 	{ line: 2 },
@@ -40,6 +42,7 @@ const LINES = [
 ];
 
 const UserData = (props) => {
+	const tabBarHeight = useBottomTabBarHeight();
 	const userCustomData = useSelector(userCustomDataSelector);
 	const [cpf, setCpf] = useState(null);
 	const user = useSelector(userSelector);
@@ -293,7 +296,7 @@ const UserData = (props) => {
 	};
 
 	return (
-		<View style={styles.mainContainer}>
+		<View style={[styles.mainContainer, { marginBottom: tabBarHeight }]}>
 			{/* {pushRefresh ? (
 				<View>
 					<ActivityIndicator />

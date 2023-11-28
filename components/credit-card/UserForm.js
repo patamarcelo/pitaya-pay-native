@@ -153,14 +153,17 @@ const CreditCardUserForm = () => {
 		return <LoadingOverlay message={"Carregando informações..."} />;
 	}
 	return (
-		<View style={styles.mainContainer}>
+		<ScrollView style={styles.mainContainer}>
 			<SafeAreaView style={styles.form}>
 				{/* <ScrollView style={{ width: "100%" }}> */}
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<KeyboardAvoidingView
 						keyboardVerticalOffset={height - 50}
 						style={styles.form}
-						behavior={Platform.OS === "ios" ? "padding" : "height"}
+						// behavior={Platform.OS === "ios" ? "padding" : "height"}
+						behavior={Platform.OS == "ios" ? "padding" : "height"}
+						// keyboardVerticalOffset={Platform.OS == "ios" ? 0 : 20}
+						enabled={Platform.OS === "ios" ? true : false}
 					>
 						<View style={styles.titleForm}>
 							<Text style={styles.titleForm}>
@@ -237,19 +240,19 @@ const CreditCardUserForm = () => {
 							>
 								Avançar
 							</Button>
-							<Button
+							{/* <Button
 								onPress={() =>
 									navigation.navigate("PAYCARDFORM")
 								}
 							>
 								cardForm
-							</Button>
+							</Button> */}
 						</View>
 					</KeyboardAvoidingView>
 				</TouchableWithoutFeedback>
 				{/* </ScrollView> */}
 			</SafeAreaView>
-		</View>
+		</ScrollView>
 	);
 };
 

@@ -4,7 +4,8 @@ import {
 	StyleSheet,
 	ScrollView,
 	FlatList,
-	RefreshControl
+	RefreshControl,
+	Platform
 } from "react-native";
 import { useLayoutEffect, useState, useEffect } from "react";
 import { userSelector } from "../../store/redux/selector";
@@ -20,7 +21,10 @@ import CardVendas from "./CardVendas";
 
 import { Colors } from "../../constants/styles";
 
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+
 const UserVendas = ({ navigation }) => {
+	const tabBarHeight = useBottomTabBarHeight();
 	const user = useSelector(userSelector);
 	const { uid } = user;
 	const [sellerData, setSellerData] = useState([]);
@@ -93,7 +97,17 @@ const UserVendas = ({ navigation }) => {
 	};
 
 	return (
-		<View style={styles.mainContainer}>
+		<View
+			style={[
+				styles.mainContainer,
+				{
+					marginBottom:
+						Platform.OS === "ios"
+							? tabBarHeight - 20
+							: tabBarHeight + 10
+				}
+			]}
+		>
 			<View>
 				<ScrollView
 					horizontal={true}
@@ -126,7 +140,14 @@ const UserVendas = ({ navigation }) => {
 					})}
 				</ScrollView>
 			</View>
-			{/* <Divider width={"100%"} /> */}
+			<Divider
+				width={"100%"}
+				style={{
+					backgroundColor: Colors.primary500,
+					height: 0.5,
+					marginBottom: 5
+				}}
+			/>
 			<View style={styles.containerList}>
 				<ScrollView>
 					{isLoading &&
@@ -167,7 +188,7 @@ const UserVendas = ({ navigation }) => {
 							keyExtractor={(item, i) => item.id}
 							renderItem={VendasList}
 							ItemSeparatorComponent={() => (
-								<View style={{ height: 13 }} />
+								<View style={{ height: 9 }} />
 							)}
 							refreshControl={
 								<RefreshControl
@@ -191,8 +212,8 @@ const styles = StyleSheet.create({
 	textBtnStl: { fontSize: 12 },
 	containerList: {
 		width: "100%",
-		marginVertical: 10,
-		paddingHorizontal: 10
+		// marginVertical: 10,
+		paddingHorizontal: 5
 	},
 	vandasContainer: {
 		height: 100,
