@@ -45,12 +45,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 	const { clearData } = userActions;
 
 	const [isLoading, setIsLoading] = useState(false);
-	console.log("createdUser: ", createdUser);
-	console.log("creditCardInfo: ", creditCardInfo);
-	console.log("clientIp: ", clientIp);
-	console.log("user: ", user);
 
-	console.log("produtos: , ", produtos, "valor: ", valor);
 	const handleBack = () => {
 		navigation.goBack();
 	};
