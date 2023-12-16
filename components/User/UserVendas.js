@@ -22,6 +22,7 @@ import CardVendas from "./CardVendas";
 import { Colors } from "../../constants/styles";
 
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { formatDateFirebaseCompare } from "../../utils/formatDate";
 
 const UserVendas = ({ navigation }) => {
 	const tabBarHeight = useBottomTabBarHeight();
@@ -75,7 +76,19 @@ const UserVendas = ({ navigation }) => {
 		});
 	}, []);
 
+	useEffect(() => {
+		const filteredData = sellerData.filter((data) => {
+			const today = new Date();
+			const priorDate = new Date().setDate(today.getDate() - filterDays);
+			return (
+				new Date(formatDateFirebaseCompare(data.createdAt)) > priorDate
+			);
+		});
+		setFilteredData(filteredData);
+	}, [filterDays]);
+
 	const handlerSelected = (title, days) => {
+		console.log(days);
 		setTitleSelected(title);
 		setFilterDays(days);
 	};
@@ -88,8 +101,8 @@ const UserVendas = ({ navigation }) => {
 		{ title: "30 dias", days: 30 },
 		{ title: "60 dias", days: 60 },
 		{ title: "90 dias", days: 90 },
-		{ title: "Todos", days: 10000 },
-		{ title: "Personalizado" }
+		{ title: "Todos", days: 10000 }
+		// { title: "Personalizado" }
 	];
 
 	const VendasList = (itemData) => {
@@ -182,7 +195,7 @@ const UserVendas = ({ navigation }) => {
 					<View style={styles.containerList}>
 						<FlatList
 							// scrollEnabled={false}
-							data={sellerData.sort(
+							data={filteredData.sort(
 								(a, b) => b.createdAt - a.createdAt
 							)}
 							keyExtractor={(item, i) => item.id}

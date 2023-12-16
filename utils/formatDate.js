@@ -28,3 +28,19 @@ export const formatDateFirebase = (entry) => {
 	// const dateF = "-";
 	return dateF;
 };
+export const formatDateFirebaseCompare = (entry) => {
+	const entrada = entry;
+	let date = "";
+	let atTime = "";
+	if (typeof entrada === "object") {
+		newDate = moment(
+			new Date(entrada.seconds * 1000 + entrada.nanoseconds / 1000000)
+		);
+		date = newDate;
+	} else {
+		date = moment(entry);
+	}
+
+	const dateF = `${date}`;
+	return dateF;
+};
