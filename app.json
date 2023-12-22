@@ -16,7 +16,8 @@
     ],
     "ios": {
       "buildNumber": "1.0.0",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pitayajoias.pitayajoias"
     },
     "android": {
       "versionCode": 1,
@@ -24,7 +25,7 @@
         "foregroundImage": "./assets/appIcon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.patamarcelo.pitayajoias"
+      "package": "com.pitayajoias.pitayajoias"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,6 +34,10 @@
       "eas": {
         "projectId": "16ce1bc1-e463-4530-8a0a-2ddf882b1af6"
       }
+    },
+    "runtimeVersion": "exposdk:46.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/16ce1bc1-e463-4530-8a0a-2ddf882b1af6"
     }
   }
 }

@@ -111,9 +111,9 @@ const styles = StyleSheet.create({
 		shadowColor: Colors.primary800,
 		shadowOffset: { width: 8, height: 8 },
 		shadowOpacity: 1,
-		shadowRadius: 1,
+		shadowRadius: 1
 
-		elevation: 10
+		// elevation: 10
 	},
 	title: {
 		fontSize: 50,

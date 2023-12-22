@@ -87,6 +87,17 @@ const UserVendas = ({ navigation }) => {
 		setFilteredData(filteredData);
 	}, [filterDays]);
 
+	useEffect(() => {
+		const filteredData = sellerData.filter((data) => {
+			const today = new Date();
+			const priorDate = new Date().setDate(today.getDate() - filterDays);
+			return (
+				new Date(formatDateFirebaseCompare(data.createdAt)) > priorDate
+			);
+		});
+		setFilteredData(filteredData);
+	}, [sellerData]);
+
 	const handlerSelected = (title, days) => {
 		console.log(days);
 		setTitleSelected(title);

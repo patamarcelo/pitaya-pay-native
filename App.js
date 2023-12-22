@@ -288,6 +288,7 @@ function AuthenticatedStack(props) {
 
 	const getAllusers = async () => {
 		setIsLoading(true);
+		console.log("start getting users");
 		if (!agreedTerms) {
 			try {
 				const allUsers = await getContractsSign();
