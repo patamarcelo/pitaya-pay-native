@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "pitaya-joias",
+    "name": "Pitaya Joias",
     "slug": "pitaya-joias",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -22,7 +22,7 @@
     "android": {
       "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/appIcon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.pitayajoias.pitayajoias"

@@ -37,3 +37,7 @@ yarn-error.*
 
 *.env
 /eas.json
+# Expo
+# .expo
+dist/
+web-build/
