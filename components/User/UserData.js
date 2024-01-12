@@ -6,7 +6,7 @@ import {
 	ScrollViewBase
 } from "react-native";
 import { Colors } from "../../constants/styles";
-
+import { EXPO_PUBLIC_REACT_APP_GOOGLESHEET_KEY } from "@env";
 import {
 	userSelector,
 	userCustomDataSelector
@@ -91,7 +91,7 @@ const UserData = (props) => {
 	const { refreshData, setRefreshData, handleRefresh } = props;
 
 	const url = "https://docs.google.com/spreadsheets/d/";
-	const ssid = "1D9E-gGvEKmx_pZfeNRUawnQcoNK_mIhuU-FIzqYJbls";
+	const ssid = EXPO_PUBLIC_REACT_APP_GOOGLESHEET_KEY;
 	const query1 = `/gviz/tq?`;
 	const query2 = "tqx=out:json";
 	const query3 = "sheet=ResumoVendas";
