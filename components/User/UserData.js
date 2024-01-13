@@ -9,7 +9,8 @@ import { Colors } from "../../constants/styles";
 import { EXPO_PUBLIC_REACT_APP_GOOGLESHEET_KEY } from "@env";
 import {
 	userSelector,
-	userCustomDataSelector
+	userCustomDataSelector,
+	isSuperUserSelector
 } from "../../store/redux/selector";
 import { useSelector } from "react-redux";
 
@@ -25,6 +26,8 @@ import { Skeleton, LinearGradient } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
 
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+
+import { Searchbar } from "react-native-paper";
 
 const LINES = [
 	{ line: 1 },
@@ -45,12 +48,16 @@ const UserData = (props) => {
 	const tabBarHeight = useBottomTabBarHeight();
 	const userCustomData = useSelector(userCustomDataSelector);
 	const [cpf, setCpf] = useState(null);
+	const [isSuperUser, setIsSuperUser] = useState(false);
 	const user = useSelector(userSelector);
 	const navigation = useNavigation();
 	const { displayName } = user;
 
+	const [searchWord, setSearchWord] = useState("");
+
 	useLayoutEffect(() => {
 		setCpf(userCustomData.cpf);
+		setIsSuperUser(userCustomData.admin);
 	}, [userCustomData]);
 
 	useEffect(() => {
@@ -100,11 +107,12 @@ const UserData = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [pushRefresh, setPushRefresh] = useState(false);
 	const [userFilteredData, setUserFilteredData] = useState([]);
+	const [userSearchData, setUserSearchData] = useState([]);
 
 	// useEffect(() => {
 	// 	console.log(userFilteredData);
 	// }, [userFilteredData]);
-
+	console.log("is super user ??", isSuperUser);
 	const getData = async () => {
 		setIsLoading(true);
 		try {
@@ -129,10 +137,22 @@ const UserData = (props) => {
 						});
 						newDict.push(newObj);
 					});
-					const filtData = newDict
-						.filter((data) => data["CPF"] === userCustomData.cpf)
-						.sort((a, b) => a["Código"] - b["Código"]);
-					setUserFilteredData(filtData);
+					if (!isSuperUser) {
+						const filtData = newDict
+							.filter(
+								(data) => data["CPF"] === userCustomData.cpf
+							)
+							.sort((a, b) => a["Código"] - b["Código"]);
+						setUserFilteredData(filtData);
+						setUserSearchData(filtData);
+					} else {
+						console.log(newDict);
+						const filtData = newDict.sort(
+							(a, b) => a["Código"] - b["Código"]
+						);
+						setUserFilteredData(filtData);
+						setUserSearchData(filtData);
+					}
 				});
 		} catch (err) {
 			console.log("Erro ao pegar os dados ", err);
@@ -165,10 +185,22 @@ const UserData = (props) => {
 						});
 						newDict.push(newObj);
 					});
-					const filtData = newDict
-						.filter((data) => data["CPF"] === userCustomData.cpf)
-						.sort((a, b) => a["Código"] - b["Código"]);
-					setUserFilteredData(filtData);
+					if (!isSuperUser) {
+						const filtData = newDict
+							.filter(
+								(data) => data["CPF"] === userCustomData.cpf
+							)
+							.sort((a, b) => a["Código"] - b["Código"]);
+						setUserFilteredData(filtData);
+						setUserSearchData(filtData);
+					} else {
+						console.log(newDict);
+						const filtData = newDict.sort(
+							(a, b) => a["Código"] - b["Código"]
+						);
+						setUserFilteredData(filtData);
+						setUserSearchData(filtData);
+					}
 				});
 		} catch (err) {
 			console.log("Erro ao pegar os dados ", err);
@@ -206,6 +238,19 @@ const UserData = (props) => {
 	}, [pushRefresh]);
 
 	useEffect(() => {
+		if (searchWord) {
+			const newArr = userFilteredData.filter((data) => {
+				// console.log(data["Valor"]);
+				return data["Código"]?.includes(searchWord);
+				// data["Valor"]?.includes(searchWord)
+			});
+			setUserSearchData(newArr);
+		} else {
+			setUserSearchData(userFilteredData);
+		}
+	}, [searchWord]);
+
+	useEffect(() => {
 		if (userCustomData.cpf) {
 			getData();
 		}
@@ -229,7 +274,8 @@ const UserData = (props) => {
 							width: "100%",
 							flexDirection: "row",
 							justifyContent: "space-between",
-							alignItems: "center"
+							alignItems: "center",
+							padding: "20"
 						}}
 					>
 						<Skeleton
@@ -266,15 +312,16 @@ const UserData = (props) => {
 	const renderSellItem = (itemData) => {
 		return (
 			<View style={styles.mainListContainer}>
+				<Divider />
 				<View style={styles.renderItemContainer}>
 					<View>
-						<Text style={styles.titleCard}>Código</Text>
+						{/* <Text style={styles.titleCard}>Código</Text> */}
 						<Text style={styles.valueCard}>
 							{itemData.item["Código"]}
 						</Text>
 					</View>
 					<View>
-						<Text style={styles.titleCard}>Valor</Text>
+						{/* <Text style={styles.titleCard}>Valor</Text> */}
 						<Text style={styles.valueCard}>
 							R${" "}
 							{itemData.item["Valor"].toLocaleString("pt-br", {
@@ -284,19 +331,21 @@ const UserData = (props) => {
 						</Text>
 					</View>
 					<View>
-						<Text style={styles.titleCard}>Vendedor </Text>
+						{/* <Text style={styles.titleCard}>Vendedor </Text> */}
 						<Text style={styles.valueCard}>
 							{itemData.item["Vendedor"]}
 						</Text>
 					</View>
 				</View>
-				<Divider />
 			</View>
 		);
 	};
 
 	return (
-		<View style={[styles.mainContainer, { marginBottom: tabBarHeight }]}>
+		<View
+			style={[styles.mainContainer]}
+			// style={[styles.mainContainer, { marginBottom: tabBarHeight - 30 }]}
+		>
 			{/* {pushRefresh ? (
 				<View>
 					<ActivityIndicator />
@@ -306,9 +355,28 @@ const UserData = (props) => {
 				style={styles.mainContainer}
 				
 			> */}
+			<View style={styles.searchContainer}>
+				<Searchbar
+					placeholder="Pesquisar pelo código"
+					onChangeText={setSearchWord}
+					value={searchWord}
+				/>
+			</View>
+			<View style={styles.mainListContainerHeaderSearch}>
+				<View>
+					<Text style={styles.titleCard}>Código</Text>
+				</View>
+				<View>
+					<Text style={styles.titleCard}>Valor</Text>
+				</View>
+				<View>
+					<Text style={styles.titleCard}>Vendedor </Text>
+				</View>
+			</View>
+
 			<FlatList
 				// scrollEnabled={false}
-				data={userFilteredData}
+				data={userSearchData}
 				keyExtractor={(item, i) => i}
 				renderItem={renderSellItem}
 				ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
@@ -329,10 +397,21 @@ const UserData = (props) => {
 export default UserData;
 
 const styles = StyleSheet.create({
+	searchContainer: {
+		marginBottom: 15
+	},
 	mainListContainer: {
 		justifyContent: "space-around",
 		rowGap: 10,
 		flex: 1
+	},
+	mainListContainerHeaderSearch: {
+		justifyContent: "space-between",
+		flexDirection: "row",
+		// rowGap: 10,
+		top: 0,
+		marginBottom: 10
+		// backgroundColor: "red"
 	},
 	mainContainer: {
 		flex: 1,
