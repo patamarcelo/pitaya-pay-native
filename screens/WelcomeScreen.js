@@ -9,7 +9,7 @@ import LoadingOverlay from "../components/ui/LoadingOverlay";
 import { storage } from "../utils/firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 
-import { Skeleton } from "@rneui/themed";
+import { Skeleton, LinearGradient } from "@rneui/themed";
 
 function WelcomeScreen() {
 	const user = useSelector(userSelector);
@@ -38,27 +38,72 @@ function WelcomeScreen() {
 			setisError(true);
 			pictureUrl(null);
 		} finally {
+			console.log("setTime Out Func");
+			console.log(isLoading);
 			setIsLoading(false);
 		}
 	}, [storageRef]);
 
+	// if (isLoading) {
+	// 	return (
+	// 		<LoadingOverlay
+	// 			style={{ color: "black" }}
+	// 			message={"Carregando..."}
+	// 		/>
+	// 	);
+	// }
+
 	if (isLoading) {
 		return (
-			<LoadingOverlay
-				style={{ color: "black" }}
-				message={"Carregando..."}
-			/>
+			<View
+				style={{
+					flex: 1
+					// justifyContent: "",
+					// alignItems: "start"
+				}}
+			>
+				<View
+					style={{
+						flex: 1,
+						justifyContent: "center",
+						alignItems: "center",
+						width: "100%"
+					}}
+				>
+					<Skeleton
+						width={"50%"}
+						height={50}
+						LinearGradientComponent={LinearGradient}
+						animation="wave"
+					/>
+				</View>
+				<View
+					style={{
+						flex: 5,
+						justifyContent: "center",
+						alignItems: "center",
+						width: "100%"
+					}}
+				>
+					<Skeleton
+						width={"90%"}
+						height={"90%"}
+						LinearGradientComponent={LinearGradient}
+						animation="wave"
+					/>
+				</View>
+			</View>
 		);
 	}
 
 	return (
 		<View style={styles.rootContainer}>
-			{!showImg && isLoading && (
+			{/* {!showImg && isLoading && (
 				<View style={{ marginTop: 400 }}>
 					<LoadingOverlay style={{ color: "black" }} color="black" />
 				</View>
-			)}
-			{!localImg && !isError && (
+			)} */}
+			{!isError && (
 				<Image
 					source={{ uri: pictureUrl }}
 					style={styles.imgContainer}

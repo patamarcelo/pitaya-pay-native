@@ -213,7 +213,7 @@ function HomeStack() {
 							color={tintColor}
 							size={22}
 							onPress={handlerLogout}
-							btnStyles={{ marginRight: 15 }}
+							btnStyles={{ marginRight: 15, marginTop: 0 }}
 						/>
 					),
 					tabBarIcon: ({ color, size }) => (
