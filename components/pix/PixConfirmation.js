@@ -33,7 +33,7 @@ const ConfirmationPix = () => {
 	};
 
 	const copyToClipboard = async () => {
-		await Clipboard.setStringAsync("30822328000154");
+		await Clipboard.setStringAsync(data.payCopyLoad);
 		Toast.show({
 			type: ALERT_TYPE.SUCCESS,
 			title: "Chave Pix Copiada"
@@ -76,13 +76,18 @@ const ConfirmationPix = () => {
 						]}
 						onPress={copyToClipboard}
 					>
-						<Text style={styles.pixKey}>30.822.328/0001-54</Text>
+						{/* <Text style={styles.pixKey}>30.822.328/0001-54</Text> */}
 						<FontAwesome5
 							name="copy"
 							size={24}
 							color="whitesmoke"
-							style={{ marginLeft: 10 }}
+							style={{ marginLeft: 10, marginBottom: 5 }}
 						/>
+						<View style={styles.pixCopyKey}>
+							<Text style={styles.pixKey}>
+								{data.payCopyLoad}
+							</Text>
+						</View>
 					</Pressable>
 				</View>
 				{imgUri && (
@@ -121,6 +126,10 @@ const ConfirmationPix = () => {
 export default ConfirmationPix;
 
 const styles = StyleSheet.create({
+	pixCopyKey: {
+		width: "90%",
+		textAlign: "center"
+	},
 	pressed: {
 		opacity: 0.5
 	},
@@ -139,13 +148,15 @@ const styles = StyleSheet.create({
 		// width: '100%',
 		flexDirection: "row",
 		justifyContent: "center",
-		alignItems: "center"
+		alignItems: "center",
+		flexDirection: "column"
 		// backgroundColor: "blue"
 	},
 	pixKey: {
-		fontSize: 15,
+		fontSize: 10,
 		color: Colors.primary[100],
-		alignSelf: "center"
+		alignSelf: "center",
+		textAlign: "center"
 	},
 	dataValues: {
 		// flex: 1,
@@ -163,7 +174,7 @@ const styles = StyleSheet.create({
 		fontSize: 24
 	},
 	titleContainer: {
-		margin: 10,
+		// margin: 10,
 		marginBottom: 30
 	},
 	title: {

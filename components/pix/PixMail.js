@@ -45,7 +45,7 @@ const MailForm = () => {
 	const headerHeight = useHeaderHeight();
 	const navigation = useNavigation();
 	const route = useRoute();
-	const disp = Platform.OS
+	const disp = Platform.OS;
 
 	const [showAlert, setShowAlert] = useState(false);
 	const [progress, setProgress] = useState(false);
@@ -174,7 +174,7 @@ const MailForm = () => {
 						: "Vendedor sem nome cadastrado"
 				}`,
 				value: paymentParams.valor,
-				format: "IMAGE"
+				format: "ALL"
 			};
 
 			const respPay = await createClient.post("createpixpay", null, {
@@ -204,7 +204,11 @@ const MailForm = () => {
 					setShowAlert(false);
 					setProgress(false);
 					navigation.navigate("PIXCONFIRMATION", {
-						data: { ...paymentParams, pixUri: data.encodedImage }
+						data: {
+							...paymentParams,
+							pixUri: data.encodedImage,
+							payCopyLoad: data.payload
+						}
 					});
 				}, 750);
 			} else {
