@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
 import { useLayoutEffect } from "react";
 import { Colors } from "../../constants/styles";
 import Button from "../ui/Button";
@@ -35,6 +35,7 @@ import { addTransaction } from "./../../utils/firebase/firebase.datatable";
 
 const ConfirmCardPage = ({ navigation, route }) => {
 	const { produtos, valor, times } = route.params.data;
+	const disp = Platform.OS;
 
 	const dispatch = useDispatch();
 	const createdUser = useSelector(confirmPaymentSelectorUser);
@@ -63,7 +64,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 	const Title = ({ text }) => {
 		return (
 			<View style={{ paddingTop: 40 }}>
-				<Text style={{ color: "whitesmoke", fontWeight: "bold" }}>
+				<Text style={{ color: "black", fontWeight: "bold" }}>
 					{text}
 				</Text>
 			</View>
@@ -75,36 +76,38 @@ const ConfirmCardPage = ({ navigation, route }) => {
 			<View style={{ width: "100%" }}>
 				<Text
 					style={{
-						color: "whitesmoke",
+						color: "black",
 						textAlign: "center",
 						fontSize: 12,
 						marginTop: 20
 					}}
 				>
-					<Text style={{ fontWeight: "bold" }}>
+					<Text style={{ fontWeight: "bold", color: "black" }}>
 						Transação confirmada!!
 					</Text>
 				</Text>
 				<Text
 					style={{
-						color: "whitesmoke",
+						color: "black",
 						textAlign: "center",
 						marginBottom: 20,
 						fontSize: 12,
 						marginTop: 20
 					}}
 				>
-					Comprovante enviado por email para:{" "}
-					<Text style={{ fontWeight: "bold" }}>{email}</Text>
+					Comprovante enviado por email para: {"\n"}
+					<Text style={{ fontWeight: "bold", color: "black" }}>
+						{email}
+					</Text>
 				</Text>
 				<Text
 					style={{
-						color: Colors.gold[200],
+						color: Colors.gold[600],
 						textAlign: "center",
 						fontSize: 8
 					}}
 				>
-					Caso o cliente não receba o comprovante, falar com
+					Caso não receba o comprovante, falar com
 					financeiro@pitayajoias.com.br
 				</Text>
 			</View>
@@ -115,7 +118,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 			<View style={{ width: "100%" }}>
 				<Text
 					style={{
-						color: "whitesmoke",
+						color: "black",
 						textAlign: "center",
 						fontSize: 12,
 						marginTop: 20
@@ -127,7 +130,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 				</Text>
 				<Text
 					style={{
-						color: Colors.gold[200],
+						color: Colors.gold[600],
 						textAlign: "center",
 						marginBottom: 20,
 						fontSize: 12,
@@ -228,8 +231,29 @@ const ConfirmCardPage = ({ navigation, route }) => {
 					}
 				}
 			);
-			const { status } = await newPaymentRequest;
-			const { data } = await newPaymentRequest;
+			const { status, data } = newPaymentRequest;
+			try {
+				await addTransaction(
+					user.displayName,
+					user.email,
+					user.uid,
+					"credito",
+					valor,
+					times,
+					createdUser.email,
+					produtos,
+					data.id,
+					`AppNative - ${disp}`
+				);
+			} catch (err) {
+				console.log("Problema ao salvar transacao no Firebase: ", err);
+				Dialog.show({
+					type: ALERT_TYPE.DANGER,
+					title: <Title text={"Ops!!"} />,
+					textBody: <TrySomError />,
+					button: "Finalizar"
+				});
+			}
 			if (status === 200) {
 				console.log(newPaymentRequest);
 				Dialog.show({
@@ -242,26 +266,6 @@ const ConfirmCardPage = ({ navigation, route }) => {
 					onPressButton: () => {
 						navigation.navigate("PagamentosTab");
 					}
-				});
-			}
-			try {
-				await addTransaction(
-					user.displayName,
-					user.email,
-					user.uid,
-					"credito",
-					valor,
-					times,
-					createdUser.email,
-					produtos
-				);
-			} catch (err) {
-				console.log("Problema ao salvar transacao no Firebase: ", err);
-				Dialog.show({
-					type: ALERT_TYPE.DANGER,
-					title: <Title text={"Ops!!"} />,
-					textBody: <TrySomError />,
-					button: "Finalizar"
 				});
 			}
 		} catch (error) {

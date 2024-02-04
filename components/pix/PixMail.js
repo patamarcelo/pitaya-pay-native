@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
 import { useState, useEffect, useLayoutEffect } from "react";
 import { Colors } from "../../constants/styles";
 
@@ -45,6 +45,7 @@ const MailForm = () => {
 	const headerHeight = useHeaderHeight();
 	const navigation = useNavigation();
 	const route = useRoute();
+	const disp = Platform.OS
 
 	const [showAlert, setShowAlert] = useState(false);
 	const [progress, setProgress] = useState(false);
@@ -195,7 +196,8 @@ const MailForm = () => {
 					"1",
 					paymentParams.email,
 					paymentParams.produtos,
-					data.id
+					data.id,
+					`AppNative - ${disp}`
 				);
 
 				setTimeout(() => {

@@ -16,7 +16,8 @@ export const addTransaction = async (
 	quantityPayment,
 	clientMail,
 	prodctsSell,
-	idAsaas
+	idAsaas,
+	appVersion
 ) => {
 	const createdAt = new Date();
 	let newTransaction;
@@ -33,7 +34,8 @@ export const addTransaction = async (
 				quantityPayment,
 				clientMail,
 				prodctsSell,
-				idAsaas
+				idAsaas,
+				appVersion
 			}
 		);
 	} catch (error) {
