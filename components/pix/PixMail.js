@@ -197,7 +197,8 @@ const MailForm = () => {
 					paymentParams.email,
 					paymentParams.produtos,
 					data.id,
-					`AppNative - ${disp}`
+					`AppNative - ${disp}`,
+					"-"
 				);
 
 				setTimeout(() => {

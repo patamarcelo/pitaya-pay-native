@@ -1,16 +1,19 @@
 import { View, Text, Image, StyleSheet } from "react-native";
-import { Divider } from "react-native-paper";
+import { Button, Divider } from "react-native-paper";
 
 import { ICON_URL } from "../../utils/imageUrl";
 import { formatDateFirebase } from "../../utils/formatDate";
-const CardVendas = ({ data }) => {
-	const { type, createdAt, value, prodctsSell } = data;
+
+const CardVendas = ({ data, handlePressUrl }) => {
+	const { type, createdAt, value, prodctsSell, compUrl } = data;
 	const sourceImage = type ? ICON_URL[type].uri : "";
+	const urlComp = compUrl?.length > 5 ? compUrl : null;
 	let products = null;
 	// if (prodctsSell) {
 	// 	// products = prodctsSell?.split(" ").join(" - ");
 	// 	console.log(typeof prodctsSell);
 	// }
+
 	return (
 		<>
 			<View style={styles.mainContainer}>
@@ -27,7 +30,7 @@ const CardVendas = ({ data }) => {
 				<View>
 					<Text>{products}</Text>
 				</View>
-				<View>
+				{/* <View>
 					<Text>
 						R${" "}
 						{parseFloat(value).toLocaleString("pt-br", {
@@ -35,6 +38,26 @@ const CardVendas = ({ data }) => {
 							maximumFractionDigits: 2
 						})}
 					</Text>
+				</View> */}
+				<View>
+					<Button
+						icon={urlComp && "receipt"}
+						mode="text"
+						onPress={handlePressUrl.bind(this, urlComp)}
+						disabled={!urlComp && true}
+						contentStyle={{
+							flexDirection: "row-reverse"
+							// backgroundColor: "#rgba(11,156,49,0.8)"
+						}}
+					>
+						<Text style={{ color: "black" }}>
+							R${" "}
+							{parseFloat(value).toLocaleString("pt-br", {
+								minimumFractionDigits: 2,
+								maximumFractionDigits: 2
+							})}
+						</Text>
+					</Button>
 				</View>
 			</View>
 			<Divider width="100%" />

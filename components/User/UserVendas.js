@@ -5,10 +5,14 @@ import {
 	ScrollView,
 	FlatList,
 	RefreshControl,
-	Platform
+	Platform,
+	Modal
 } from "react-native";
 import { useLayoutEffect, useState, useEffect } from "react";
-import { userSelector } from "../../store/redux/selector";
+import {
+	userSelector,
+	userCustomDataSelector
+} from "../../store/redux/selector";
 import { useSelector } from "react-redux";
 import { getTransactionsById } from "../../utils/firebase/firebase.datatable";
 
@@ -24,6 +28,8 @@ import { Colors } from "../../constants/styles";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { formatDateFirebaseCompare } from "../../utils/formatDate";
 
+import WebView from "react-native-webview";
+
 const UserVendas = ({ navigation }) => {
 	const tabBarHeight = useBottomTabBarHeight();
 	const user = useSelector(userSelector);
@@ -34,6 +40,12 @@ const UserVendas = ({ navigation }) => {
 	const [refreshing, setRefreshing] = useState(false);
 	const [filterDays, setFilterDays] = useState(30);
 	const [filteredData, setFilteredData] = useState([]);
+	const [visible, setVisible] = useState(false);
+	const [urlComp, seturlComp] = useState("");
+
+	const userCustomData = useSelector(userCustomDataSelector);
+	const [cpf, setCpf] = useState(null);
+	const [isSuperUser, setIsSuperUser] = useState(null);
 
 	const LINES = [
 		{ line: 1 },
@@ -50,10 +62,15 @@ const UserVendas = ({ navigation }) => {
 		{ line: 12 }
 	];
 
+	useLayoutEffect(() => {
+		setCpf(userCustomData.cpf);
+		setIsSuperUser(userCustomData.admin);
+	}, [userCustomData]);
+
 	useEffect(() => {
 		const getSellerTransactions = async () => {
 			setIsLoading(true);
-			const sellerData = await getTransactionsById(uid);
+			const sellerData = await getTransactionsById(uid, isSuperUser);
 			setIsLoading(false);
 			setSellerData(sellerData);
 			setFilteredData(sellerData);
@@ -64,7 +81,7 @@ const UserVendas = ({ navigation }) => {
 			console.log("erro ao pegar os dados: ", err);
 		} finally {
 		}
-	}, []);
+	}, [isSuperUser]);
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -116,117 +133,141 @@ const UserVendas = ({ navigation }) => {
 		// { title: "Personalizado" }
 	];
 
+	const handlePressUrl = (data) => {
+		console.log(data);
+		seturlComp(data);
+		setVisible(true);
+	};
+
 	const VendasList = (itemData) => {
-		return <CardVendas data={itemData.item} />;
+		return (
+			<CardVendas data={itemData.item} handlePressUrl={handlePressUrl} />
+		);
 	};
 
 	return (
-		<View
-			style={[
-				styles.mainContainer,
-				{
-					marginBottom:
-						Platform.OS === "ios"
-							? tabBarHeight - 20
-							: tabBarHeight + 10
-				}
-			]}
-		>
-			<View>
-				<ScrollView
-					horizontal={true}
-					style={styles.rootContainer}
-					contentContainerStyle={{
-						paddingTop: 5,
-						paddingBottom: 15
-					}}
-					showsHorizontalScrollIndicator={false}
-				>
-					{dictTitle.map((data, i) => {
-						return (
-							<Button
-								key={i}
-								btnStyles={
-									titleSelected === data.title
-										? styles.titleContainerSelected
-										: styles.titleContainer
-								}
-								textStyles={styles.textBtnStl}
-								onPress={() =>
-									handlerSelected(data.title, data.days)
-								}
-							>
-								<Text style={styles.textTitle}>
-									{data.title}
-								</Text>
-							</Button>
-						);
-					})}
-				</ScrollView>
-			</View>
-			<Divider
-				width={"100%"}
-				style={{
-					backgroundColor: Colors.primary500,
-					height: 0.5,
-					marginBottom: 5
-				}}
-			/>
-			<View style={styles.containerList}>
-				<ScrollView>
-					{isLoading &&
-						LINES.map((data, i) => {
+		<>
+			<Modal
+				visible={visible}
+				presentationStyle="pageSheet"
+				onRequestClose={() => setVisible(false)}
+				animationType="slide"
+			>
+				<WebView source={{ uri: urlComp }} />
+			</Modal>
+			<View
+				style={[
+					styles.mainContainer,
+					{
+						marginBottom:
+							Platform.OS === "ios"
+								? tabBarHeight - 20
+								: tabBarHeight + 10
+					}
+				]}
+			>
+				<View>
+					<ScrollView
+						horizontal={true}
+						style={styles.rootContainer}
+						contentContainerStyle={{
+							paddingTop: 5,
+							paddingBottom: 15
+						}}
+						showsHorizontalScrollIndicator={false}
+					>
+						{dictTitle.map((data, i) => {
 							return (
-								<View
-									style={{
-										flexDirection: "row",
-										width: "100%",
-										gap: 10,
-										marginVertical: 10,
-										flex: 1
-									}}
+								<Button
 									key={i}
+									btnStyles={
+										titleSelected === data.title
+											? styles.titleContainerSelected
+											: styles.titleContainer
+									}
+									textStyles={styles.textBtnStl}
+									onPress={() =>
+										handlerSelected(data.title, data.days)
+									}
 								>
-									<Skeleton
-										LinearGradientComponent={LinearGradient}
-										animation="wave"
-										circle
-										width={40}
-										height={40}
-									/>
-									<Skeleton width={"70%"} height={40} />
-									<Skeleton circle width={40} height={40} />
-
-									<Divider width={"100%"} />
-								</View>
+									<Text style={styles.textTitle}>
+										{data.title}
+									</Text>
+								</Button>
 							);
 						})}
-				</ScrollView>
-				{sellerData && (
-					<View style={styles.containerList}>
-						<FlatList
-							// scrollEnabled={false}
-							data={filteredData.sort(
-								(a, b) => b.createdAt - a.createdAt
-							)}
-							keyExtractor={(item, i) => item.id}
-							renderItem={VendasList}
-							ItemSeparatorComponent={() => (
-								<View style={{ height: 9 }} />
-							)}
-							refreshControl={
-								<RefreshControl
-									refreshing={refreshing}
-									onRefresh={handleRefresh}
-									colors={["#9Bd35A", "#689F38"]}
-									tintColor={Colors.primary500}
-								/>
-							}
-						/>
-					</View>
-				)}
+					</ScrollView>
+				</View>
+				<Divider
+					width={"100%"}
+					style={{
+						backgroundColor: Colors.primary500,
+						height: 0.5,
+						marginBottom: 5
+					}}
+				/>
+				<View style={styles.containerList}>
+					<ScrollView>
+						{isLoading &&
+							LINES.map((data, i) => {
+								return (
+									<View
+										style={{
+											flexDirection: "row",
+											width: "100%",
+											gap: 10,
+											marginVertical: 10,
+											flex: 1
+										}}
+										key={i}
+									>
+										<Skeleton
+											LinearGradientComponent={
+												LinearGradient
+											}
+											animation="wave"
+											circle
+											width={40}
+											height={40}
+										/>
+										<Skeleton width={"70%"} height={40} />
+										<Skeleton
+											circle
+											width={40}
+											height={40}
+										/>
+
+										<Divider width={"100%"} />
+									</View>
+								);
+							})}
+					</ScrollView>
+					{sellerData && (
+						<View style={styles.containerList}>
+							<FlatList
+								// scrollEnabled={false}
+								data={filteredData.sort(
+									(a, b) => b.createdAt - a.createdAt
+								)}
+								keyExtractor={(item, i) => item.id}
+								renderItem={VendasList}
+								ItemSeparatorComponent={() => (
+									<View style={{ height: 9 }} />
+								)}
+								refreshControl={
+									<RefreshControl
+										refreshing={refreshing}
+										onRefresh={handleRefresh}
+										colors={["#9Bd35A", "#689F38"]}
+										tintColor={Colors.primary500}
+									/>
+								}
+							/>
+						</View>
+					)}
+				</View>
 			</View>
-		</View>
+		</>
 	);
 };
 

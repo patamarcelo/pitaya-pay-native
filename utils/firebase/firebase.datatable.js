@@ -17,7 +17,8 @@ export const addTransaction = async (
 	clientMail,
 	prodctsSell,
 	idAsaas,
-	appVersion
+	appVersion,
+	compUrl
 ) => {
 	const createdAt = new Date();
 	let newTransaction;
@@ -35,7 +36,8 @@ export const addTransaction = async (
 				clientMail,
 				prodctsSell,
 				idAsaas,
-				appVersion
+				appVersion,
+				compUrl
 			}
 		);
 	} catch (error) {
@@ -113,11 +115,17 @@ export const getContractsSign = async () => {
 	});
 };
 
-export const getTransactionsById = async (sellerId) => {
-	const q = query(
-		collection(db, TABLES_FIREBASE.transactions),
-		where("sellerId", "==", sellerId)
-	);
+export const getTransactionsById = async (sellerId, superUser) => {
+	let q = "";
+	console.log(superUser);
+	if (!superUser) {
+		q = query(
+			collection(db, TABLES_FIREBASE.transactions),
+			where("sellerId", "==", sellerId)
+		);
+	} else {
+		q = query(collection(db, TABLES_FIREBASE.transactions));
+	}
 	const querySnapshot = await getDocs(q);
 	let allData = [];
 	querySnapshot.forEach((doc) => {

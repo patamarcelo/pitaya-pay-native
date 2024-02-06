@@ -95,20 +95,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 						marginTop: 20
 					}}
 				>
-					Comprovante enviado por email para: {"\n"}
-					<Text style={{ fontWeight: "bold", color: "black" }}>
-						{email}
-					</Text>
-				</Text>
-				<Text
-					style={{
-						color: Colors.gold[600],
-						textAlign: "center",
-						fontSize: 8
-					}}
-				>
-					Caso não receba o comprovante, falar com
-					financeiro@pitayajoias.com.br
+					Recibo disponível na aba de vendas.
 				</Text>
 			</View>
 		);
@@ -243,7 +230,8 @@ const ConfirmCardPage = ({ navigation, route }) => {
 					createdUser.email,
 					produtos,
 					data.id,
-					`AppNative - ${disp}`
+					`AppNative - ${disp}`,
+					data.transactionReceiptUrl
 				);
 			} catch (err) {
 				console.log("Problema ao salvar transacao no Firebase: ", err);
