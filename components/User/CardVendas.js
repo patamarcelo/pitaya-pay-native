@@ -5,7 +5,16 @@ import { ICON_URL } from "../../utils/imageUrl";
 import { formatDateFirebase } from "../../utils/formatDate";
 
 const CardVendas = ({ data, handlePressUrl }) => {
-	const { type, createdAt, value, prodctsSell, compUrl } = data;
+	console.log(data);
+	const {
+		type,
+		createdAt,
+		value,
+		prodctsSell,
+		compUrl,
+		sellerName,
+		clientMail
+	} = data;
 	const sourceImage = type ? ICON_URL[type].uri : "";
 	const urlComp = compUrl?.length > 5 ? compUrl : null;
 	let products = null;
@@ -14,32 +23,53 @@ const CardVendas = ({ data, handlePressUrl }) => {
 	// 	console.log(typeof prodctsSell);
 	// }
 
+	const getData = (dataVenda) => {
+		if (dataVenda === 1) {
+			return `ontem`;
+		}
+	};
+
+	// const todayDate = new Date();
+	// const todayD = todayDate.toLocaleString("pt-BR");
+	// const finalD = formatDateFirebase(createdAt);
+
+	const produtosText = (prods) => {
+		console.log(prods.length);
+		return (newProd = prods.map((data, i) => {
+			const sep = i + 1 < prods.length ? " - " : "";
+			return data + sep;
+		}));
+	};
 	return (
 		<>
 			<View style={styles.mainContainer}>
-				<View style={styles.dateImgContainer}>
-					<View>
-						<Image style={styles.image} source={sourceImage} />
+				<View style={{ flexDirection: "row" }}>
+					<View style={styles.dateImgContainer}>
+						<View>
+							<Image style={styles.image} source={sourceImage} />
+						</View>
+						<View>
+							<Text style={styles.dateText}>
+								{formatDateFirebase(createdAt)}
+							</Text>
+						</View>
 					</View>
-					<View>
-						<Text style={styles.dateText}>
-							{formatDateFirebase(createdAt)}
-						</Text>
+					<View style={styles.sellerDataContainer}>
+						<View>
+							<Text style={{ fontWeight: "bold" }}>
+								{sellerName.toUpperCase()}
+							</Text>
+							<Text style={{ fontSize: 8 }}>{clientMail}</Text>
+						</View>
+						<View>
+							<Text style={{ fontSize: 8 }}>
+								{produtosText(prodctsSell)}
+							</Text>
+						</View>
 					</View>
 				</View>
-				<View>
-					<Text>{products}</Text>
-				</View>
-				{/* <View>
-					<Text>
-						R${" "}
-						{parseFloat(value).toLocaleString("pt-br", {
-							minimumFractionDigits: 2,
-							maximumFractionDigits: 2
-						})}
-					</Text>
-				</View> */}
-				<View>
+
+				<View style={styles.valueButton}>
 					<Button
 						icon={urlComp && "receipt"}
 						mode="text"
@@ -58,6 +88,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 							})}
 						</Text>
 					</Button>
+					<Text style={{ fontSize: 8 }}>{getData(1)}</Text>
 				</View>
 			</View>
 			<Divider width="100%" />
@@ -68,6 +99,16 @@ const CardVendas = ({ data, handlePressUrl }) => {
 export default CardVendas;
 
 const styles = StyleSheet.create({
+	sellerDataContainer: {
+		justifyContent: "space-between",
+		marginLeft: 15,
+		alignItems: "flex-start",
+		paddingBottom: 4
+	},
+	valueButton: {
+		justifyContent: "flex-end",
+		alignItems: "flex-end"
+	},
 	dateImgContainer: {
 		justifyContent: "center",
 		alignItems: "center"
