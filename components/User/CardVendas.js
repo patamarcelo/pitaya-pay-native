@@ -2,10 +2,12 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import { Button, Divider } from "react-native-paper";
 
 import { ICON_URL } from "../../utils/imageUrl";
-import { formatDateFirebase } from "../../utils/formatDate";
+import {
+	formatDateFirebase,
+	formatDateFirebaseRange
+} from "../../utils/formatDate";
 
 const CardVendas = ({ data, handlePressUrl }) => {
-	console.log(data);
 	const {
 		type,
 		createdAt,
@@ -24,14 +26,27 @@ const CardVendas = ({ data, handlePressUrl }) => {
 	// }
 
 	const getData = (dataVenda) => {
-		if (dataVenda === 1) {
-			return `ontem`;
-		}
-	};
+		const todayDate = new Date();
+		const todayD = todayDate.toLocaleDateString("pt-BR");
+		const finalD = formatDateFirebaseRange(dataVenda);
+		const todayF = todayD.trim().split("/").reverse().join("-");
+		const finalF = finalD.trim().split("/").reverse().join("-");
+		var dif = parseInt(
+			(new Date(todayF) - new Date(finalF)) / (1000 * 60 * 60 * 24),
+			10
+		);
 
-	// const todayDate = new Date();
-	// const todayD = todayDate.toLocaleString("pt-BR");
-	// const finalD = formatDateFirebase(createdAt);
+		if (dif === 0) {
+			return `Hoje`;
+		}
+		if (dif === 1) {
+			return `Ontem`;
+		}
+		if (dif <= 7) {
+			return `Nos últimos 7 dias`;
+		}
+		return `há ${dif} dias`;
+	};
 
 	const produtosText = (prods) => {
 		console.log(prods.length);
@@ -62,7 +77,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 							<Text style={{ fontSize: 8 }}>{clientMail}</Text>
 						</View>
 						<View>
-							<Text style={{ fontSize: 8 }}>
+							<Text style={{ fontSize: 8, fontWeight: 600 }}>
 								{produtosText(prodctsSell)}
 							</Text>
 						</View>
@@ -88,7 +103,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 							})}
 						</Text>
 					</Button>
-					<Text style={{ fontSize: 8 }}>{getData(1)}</Text>
+					<Text style={{ fontSize: 8 }}>{getData(createdAt)}</Text>
 				</View>
 			</View>
 			<Divider width="100%" />

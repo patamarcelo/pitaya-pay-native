@@ -30,6 +30,8 @@ import { formatDateFirebaseCompare } from "../../utils/formatDate";
 
 import WebView from "react-native-webview";
 
+import { Searchbar } from "react-native-paper";
+
 const UserVendas = ({ navigation }) => {
 	const tabBarHeight = useBottomTabBarHeight();
 	const user = useSelector(userSelector);
@@ -42,6 +44,8 @@ const UserVendas = ({ navigation }) => {
 	const [filteredData, setFilteredData] = useState([]);
 	const [visible, setVisible] = useState(false);
 	const [urlComp, seturlComp] = useState("");
+
+	const [searchWord, setSearchWord] = useState("");
 
 	const userCustomData = useSelector(userCustomDataSelector);
 	const [cpf, setCpf] = useState(null);
@@ -166,37 +170,61 @@ const UserVendas = ({ navigation }) => {
 					}
 				]}
 			>
-				<View>
-					<ScrollView
-						horizontal={true}
-						style={styles.rootContainer}
-						contentContainerStyle={{
-							paddingTop: 5,
-							paddingBottom: 15
-						}}
-						showsHorizontalScrollIndicator={false}
-					>
-						{dictTitle.map((data, i) => {
-							return (
-								<Button
-									key={i}
-									btnStyles={
-										titleSelected === data.title
-											? styles.titleContainerSelected
-											: styles.titleContainer
-									}
-									textStyles={styles.textBtnStl}
-									onPress={() =>
-										handlerSelected(data.title, data.days)
-									}
-								>
-									<Text style={styles.textTitle}>
-										{data.title}
-									</Text>
-								</Button>
-							);
-						})}
-					</ScrollView>
+				<View
+					style={{
+						justifyContent: "center",
+						alignItems: "center",
+						width: "100%"
+						// backgroundColor: "red"
+					}}
+				>
+					<View style={styles.rootContainer}>
+						<View
+							style={{
+								flexDirection: "column",
+								justifyContent: "center",
+								alignItems: "center",
+								width: "100%"
+							}}
+						>
+							<View style={styles.searchContainer}>
+								<Searchbar
+									inputStyle={{ fontSize: 12, minHeight: 5 }}
+									elevation={2}
+									placeholder="Pesquisar pelo código"
+									onChangeText={setSearchWord}
+									value={searchWord}
+								/>
+							</View>
+							<View
+								style={{ flexDirection: "row", width: "100%" }}
+							>
+								{dictTitle.map((data, i) => {
+									return (
+										<Button
+											key={i}
+											btnStyles={
+												titleSelected === data.title
+													? styles.titleContainerSelected
+													: styles.titleContainer
+											}
+											textStyles={styles.textBtnStl}
+											onPress={() =>
+												handlerSelected(
+													data.title,
+													data.days
+												)
+											}
+										>
+											<Text style={styles.textTitle}>
+												{data.title}
+											</Text>
+										</Button>
+									);
+								})}
+							</View>
+						</View>
+					</View>
 				</View>
 				<Divider
 					width={"100%"}
@@ -274,6 +302,7 @@ const UserVendas = ({ navigation }) => {
 export default UserVendas;
 
 const styles = StyleSheet.create({
+	searchContainer: { width: "100%", marginBottom: 10 },
 	textBtnStl: { fontSize: 12 },
 	containerList: {
 		width: "100%",
@@ -287,7 +316,11 @@ const styles = StyleSheet.create({
 		height: "100%"
 	},
 	rootContainer: {
-		marginHorizontal: 5
+		marginHorizontal: 5,
+		marginBottom: 5,
+		width: "100%",
+		paddingHorizontal: 10
+
 		// height: 20
 		// flex: 3
 	},
@@ -308,6 +341,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		// justifyContent: "start",
 		// alignItems: "center",
-		marginTop: 20
+		marginTop: 20,
+		width: "100%"
 	}
 });
