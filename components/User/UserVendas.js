@@ -47,9 +47,13 @@ const UserVendas = ({ navigation }) => {
 
 	const [searchWord, setSearchWord] = useState("");
 
+	const [filterQueryFireAll, setfilterQueryFireAll] = useState(false);
+
 	const userCustomData = useSelector(userCustomDataSelector);
 	const [cpf, setCpf] = useState(null);
-	const [isSuperUser, setIsSuperUser] = useState(null);
+	const [isSuperUser, setIsSuperUser] = useState(false);
+
+	const [alreadyGotAll, setalreadyGotAll] = useState(false);
 
 	const LINES = [
 		{ line: 1 },
@@ -74,7 +78,11 @@ const UserVendas = ({ navigation }) => {
 	useEffect(() => {
 		const getSellerTransactions = async () => {
 			setIsLoading(true);
-			const sellerData = await getTransactionsById(uid, isSuperUser);
+			const sellerData = await getTransactionsById(
+				uid,
+				isSuperUser,
+				false
+			);
 			setIsLoading(false);
 			setSellerData(sellerData);
 			setFilteredData(sellerData);
@@ -120,13 +128,32 @@ const UserVendas = ({ navigation }) => {
 	}, [sellerData]);
 
 	const handlerSelected = (title, days) => {
-		console.log(days);
 		setTitleSelected(title);
 		setFilterDays(days);
 	};
 
 	const handleRefresh = () => {
 		console.log("atualizando");
+		const getSellerTransactions = async () => {
+			setIsLoading(true);
+			const sellerData = await getTransactionsById(
+				uid,
+				isSuperUser,
+				false
+			);
+			setIsLoading(false);
+			setSellerData(sellerData);
+			setFilteredData(sellerData);
+		};
+		try {
+			getSellerTransactions();
+		} catch (err) {
+			console.log("erro ao pegar os dados: ", err);
+		} finally {
+		}
+		setFilterDays(30);
+		setTitleSelected("30 dias");
+		setalreadyGotAll(false);
 	};
 
 	const dictTitle = [
@@ -138,10 +165,39 @@ const UserVendas = ({ navigation }) => {
 	];
 
 	const handlePressUrl = (data) => {
-		console.log(data);
 		seturlComp(data);
 		setVisible(true);
 	};
+
+	useEffect(() => {
+		if (filterDays > 90) {
+			if (alreadyGotAll === false) {
+				setfilterQueryFireAll(true);
+				console.log("maior que 90");
+				const getSellerTransactions = async () => {
+					setIsLoading(true);
+					const sellerData = await getTransactionsById(
+						uid,
+						isSuperUser,
+						true
+					);
+					setIsLoading(false);
+					setSellerData(sellerData);
+					setFilteredData(sellerData);
+				};
+				try {
+					getSellerTransactions();
+				} catch (err) {
+					console.log("erro ao pegar os dados: ", err);
+				} finally {
+				}
+				setalreadyGotAll(true);
+			}
+		} else {
+			setfilterQueryFireAll(false);
+		}
+		console.log("FilterDays", filterDays);
+	}, [filterDays]);
 
 	const VendasList = (itemData) => {
 		return (
@@ -189,7 +245,12 @@ const UserVendas = ({ navigation }) => {
 						>
 							<View style={styles.searchContainer}>
 								<Searchbar
-									inputStyle={{ fontSize: 12, minHeight: 5 }}
+									inputStyle={{
+										fontSize: 12,
+										height: 40,
+										minHeight: 0
+									}}
+									style={{ height: 40 }}
 									elevation={2}
 									placeholder="Pesquisar pelo código"
 									onChangeText={setSearchWord}

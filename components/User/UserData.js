@@ -137,6 +137,7 @@ const UserData = (props) => {
 						});
 						newDict.push(newObj);
 					});
+					console.log(isSuperUser);
 					if (!isSuperUser) {
 						const filtData = newDict
 							.filter(
@@ -254,7 +255,7 @@ const UserData = (props) => {
 		if (userCustomData.cpf) {
 			getData();
 		}
-	}, []);
+	}, [userCustomData]);
 
 	if (isLoading) {
 		return LINES.map((data, i) => {

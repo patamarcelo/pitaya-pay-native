@@ -49,9 +49,8 @@ const CardVendas = ({ data, handlePressUrl }) => {
 	};
 
 	const produtosText = (prods) => {
-		console.log(prods.length);
-		return (newProd = prods.map((data, i) => {
-			const sep = i + 1 < prods.length ? " - " : "";
+		return (newProd = prods?.map((data, i) => {
+			const sep = i + 1 < prods?.length ? " - " : "";
 			return data + sep;
 		}));
 	};
@@ -72,7 +71,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 					<View style={styles.sellerDataContainer}>
 						<View>
 							<Text style={{ fontWeight: "bold" }}>
-								{sellerName.toUpperCase()}
+								{sellerName?.toUpperCase()}
 							</Text>
 							<Text style={{ fontSize: 8 }}>{clientMail}</Text>
 						</View>
