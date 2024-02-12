@@ -243,7 +243,7 @@ const UserVendas = ({ navigation }) => {
 								width: "100%"
 							}}
 						>
-							<View style={styles.searchContainer}>
+							{/* <View style={styles.searchContainer}>
 								<Searchbar
 									inputStyle={{
 										fontSize: 12,
@@ -256,7 +256,7 @@ const UserVendas = ({ navigation }) => {
 									onChangeText={setSearchWord}
 									value={searchWord}
 								/>
-							</View>
+							</View> */}
 							<View
 								style={{ flexDirection: "row", width: "100%" }}
 							>
