@@ -185,6 +185,7 @@ const UserStack = () => {
 	);
 };
 
+
 function HomeStack() {
 	const context = useContext(AuthContext);
 
@@ -197,7 +198,14 @@ function HomeStack() {
 			screenOptions={{
 				headerStyle: { backgroundColor: Colors.primary500 },
 				headerTintColor: "white",
-				contentStyle: { backgroundColor: Colors.primary100 }
+				contentStyle: { backgroundColor: Colors.primary100 },
+				tabBarInactiveTintColor: 'rgba(255,255,255,0.7)',
+				tabBarActiveTintColor: 'rgba(255,255,255,1)',
+				tabBarStyle:{
+					backgroundColor: Colors.primary500,	
+					borderBottomWidth: 0,
+					borderTopWidth: 0
+				},
 			}}
 		>
 			<Tab.Screen

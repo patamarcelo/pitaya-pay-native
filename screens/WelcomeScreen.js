@@ -10,17 +10,30 @@ import { storage } from "../utils/firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 
 import { Skeleton, LinearGradient } from "@rneui/themed";
+import { useIsFocused } from "@react-navigation/native";
 
 function WelcomeScreen() {
 	const user = useSelector(userSelector);
-	const storageRef = ref(storage, `img/promo.jpg`);
+	const storageRef = ref(storage, `img/promo.jpeg`);
+	
 	const [pictureUrl, setPictureUrl] = useState();
 	const [isLoading, setIsLoading] = useState(false);
 	const [showImg, setShowImg] = useState(false);
 	const [localImg, setlocalImg] = useState(false);
 	const [isError, setisError] = useState(false);
+	
+	const isFocused = useIsFocused();
+
+
+
 
 	useEffect(() => {
+		setisError(false)
+	}, [isFocused]);
+
+
+	useEffect(() => {
+		console.log('pegando a imagem')
 		setIsLoading(true);
 		try {
 			getDownloadURL(storageRef)
@@ -38,11 +51,12 @@ function WelcomeScreen() {
 			setisError(true);
 			pictureUrl(null);
 		} finally {
-			console.log("setTime Out Func");
+			console.log("imagem caregada");
 			console.log(isLoading);
 			setIsLoading(false);
 		}
-	}, [storageRef]);
+		console.log('here, :', pictureUrl)
+	}, [storageRef, isFocused]);
 
 	// if (isLoading) {
 	// 	return (
@@ -75,6 +89,7 @@ function WelcomeScreen() {
 						height={50}
 						LinearGradientComponent={LinearGradient}
 						animation="wave"
+						sp
 					/>
 				</View>
 				<View
@@ -95,6 +110,26 @@ function WelcomeScreen() {
 			</View>
 		);
 	}
+
+	if(!isError){
+		return (
+			<View style={styles.rootContainer}>
+					{/* {!showImg && isLoading && (
+						<View style={{ marginTop: 400 }}>
+							<LoadingOverlay style={{ color: "black" }} color="black" />
+						</View>
+					)} */}
+						<Image
+							source={{ uri: pictureUrl }}
+							style={styles.imgContainer}
+							onLoad={() => setShowImg(true)}
+						/>
+					
+				</View>
+		
+		)
+	}
+
 
 	return (
 		<View style={styles.rootContainer}>
