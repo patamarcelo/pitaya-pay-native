@@ -2,7 +2,7 @@
   "expo": {
     "name": "Pitaya Joias",
     "slug": "pitaya-joias",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "orientation": "portrait",
     "icon": "./assets/appIcon.png",
     "userInterfaceStyle": "light",
@@ -20,8 +20,8 @@
       "bundleIdentifier": "com.pitayajoias.pitayajoias"
     },
     "android": {
-      "versionCode": 11,
-      "versionName": "1.0.10",
+      "versionCode": 12,
+      "versionName": "1.0.11",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
