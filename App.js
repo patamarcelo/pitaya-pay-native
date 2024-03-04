@@ -204,7 +204,7 @@ function HomeStack() {
 				name="Home"
 				component={WelcomeScreen}
 				options={{
-					title: "Seja Bem Vindo",
+					title: "Seja Bem Vinda",
 					tabBarLabel: "Home",
 					headerRight: ({ tintColor }) => (
 						<IconButton

@@ -26,7 +26,10 @@ function LoginScreen() {
 			dispatch(setUser(user.user));
 		} catch (error) {
 			console.log("erro ao logar usuário", error);
-			Alert.alert("Authentication Failed!!", "Try again later!!");
+			Alert.alert(
+				"Problemas ao se conectar!!",
+				`Tente novamente mais tarde... :${error}`
+			);
 		} finally {
 			setIsLoading(false);
 		}

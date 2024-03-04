@@ -1,4 +1,5 @@
 import { View, Text, TextInput, StyleSheet } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { Colors } from "../../constants/styles";
 
@@ -19,7 +20,10 @@ function Input({
 	inputContainerProps,
 	maxLength,
 	register,
-	nameRegister
+	nameRegister,
+	hasIcon,
+	setshowPassword,
+	showPassword
 }) {
 	return (
 		<View style={[styles.inputContainer, inputContainerProps]}>
@@ -49,7 +53,40 @@ function Input({
 					maxLength={maxLength}
 				/>
 			)}
-			{!register && (
+			{!register && hasIcon && (
+				<View style={styles.iconCointainer}>
+					<TextInput
+						style={[
+							{ flex: 1 },
+							styles.input,
+							inputStyles,
+							isInvalid && styles.inputInvalid,
+							styleInput
+						]}
+						// autoCapitalize={false}
+						keyboardType={keyboardType}
+						secureTextEntry={secure}
+						onChangeText={onUpdateValue}
+						value={value}
+						onBlur={onBlur}
+						placeholder={placeholder}
+						editable={!disabled}
+						selectTextOnFocus={!disabled}
+						multiline={multilne}
+						numberOfLines={numberOfLines}
+						maxLength={maxLength}
+					/>
+
+					<Ionicons
+						style={styles.icon}
+						name={!showPassword ? "eye" : "eye-off"}
+						color={"grey"}
+						size={24}
+						onPress={setshowPassword}
+					/>
+				</View>
+			)}
+			{!register && !hasIcon && (
 				<TextInput
 					style={[
 						styles.input,
@@ -78,6 +115,16 @@ function Input({
 export default Input;
 
 const styles = StyleSheet.create({
+	icon: {
+		position: "absolute",
+		right: 10
+	},
+	iconCointainer: {
+		flexDirection: "row",
+		// paddingBottom: 10,
+		justifyContent: "center",
+		alignItems: "center"
+	},
 	inputContainer: {
 		marginVertical: 8
 	},

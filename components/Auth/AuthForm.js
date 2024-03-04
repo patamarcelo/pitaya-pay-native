@@ -10,6 +10,8 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
 	const [enteredPassword, setEnteredPassword] = useState("");
 	const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
 
+	const [showPassword, setshowPassword] = useState(false);
+
 	const {
 		email: emailIsInvalid,
 		confirmEmail: emailsDontMatch,
@@ -42,6 +44,10 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
 			confirmPassword: enteredConfirmPassword
 		});
 	}
+
+	const handlerPassword = () => {
+		setshowPassword(!showPassword);
+	};
 
 	return (
 		<View style={styles.form}>
@@ -76,16 +82,19 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
 								this,
 								"password"
 							)}
-							secure
+							secure={showPassword}
 							value={enteredPassword}
 							isInvalid={passwordIsInvalid}
+							hasIcon={true}
+							setshowPassword={handlerPassword}
+							showPassword={showPassword}
 						/>
 					</>
 				)}
 
 				<View style={styles.buttons}>
 					<Button onPress={submitHandler}>
-						{isLogin ? "Entrar" : "Redefinr Senha"}
+						{isLogin ? "Entrar" : "Redefinir Senha"}
 					</Button>
 				</View>
 			</View>
