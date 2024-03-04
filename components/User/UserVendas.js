@@ -335,6 +335,7 @@ const UserVendas = ({ navigation }) => {
 						<View style={styles.containerList}>
 							<FlatList
 								// scrollEnabled={false}
+								showsVerticalScrollIndicator={false}
 								data={filteredData.sort(
 									(a, b) => b.createdAt - a.createdAt
 								)}

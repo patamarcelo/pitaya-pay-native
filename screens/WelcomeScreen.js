@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, Text, View, Image, SafeAreaView } from "react-native";
 import { useSelector } from "react-redux";
 import { userSelector } from "../store/redux/selector";
 
@@ -15,26 +15,20 @@ import { useIsFocused } from "@react-navigation/native";
 function WelcomeScreen() {
 	const user = useSelector(userSelector);
 	const storageRef = ref(storage, `img/promo.jpeg`);
-	
+
 	const [pictureUrl, setPictureUrl] = useState();
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 	const [showImg, setShowImg] = useState(false);
 	const [localImg, setlocalImg] = useState(false);
 	const [isError, setisError] = useState(false);
-	
+
 	const isFocused = useIsFocused();
 
-
-
-
 	useEffect(() => {
-		setisError(false)
+		setisError(false);
 	}, [isFocused]);
 
-
 	useEffect(() => {
-		console.log('pegando a imagem')
-		setIsLoading(true);
 		try {
 			getDownloadURL(storageRef)
 				.then((downloadURL) => {
@@ -43,93 +37,75 @@ function WelcomeScreen() {
 				.catch((err) => {
 					console.log("erro ao pegar a img", err);
 					setlocalImg(true);
-					setIsLoading(false);
 					setisError(true);
 				});
 		} catch (err) {
 			console.log("Erro ao gerar a Imagem", err);
+			setIsLoading(false);
 			setisError(true);
 			pictureUrl(null);
 		} finally {
 			console.log("imagem caregada");
 			console.log(isLoading);
-			setIsLoading(false);
 		}
-		console.log('here, :', pictureUrl)
+		console.log("here, :", pictureUrl);
 	}, [storageRef, isFocused]);
 
-	// if (isLoading) {
-	// 	return (
-	// 		<LoadingOverlay
-	// 			style={{ color: "black" }}
-	// 			message={"Carregando..."}
-	// 		/>
-	// 	);
-	// }
-
-	if (isLoading) {
+	if (!isError) {
 		return (
-			<View
-				style={{
-					flex: 1
-					// justifyContent: "",
-					// alignItems: "start"
-				}}
-			>
-				<View
-					style={{
-						flex: 1,
-						justifyContent: "center",
-						alignItems: "center",
-						width: "100%"
-					}}
-				>
-					<Skeleton
-						width={"50%"}
-						height={50}
-						LinearGradientComponent={LinearGradient}
-						animation="wave"
-						sp
+			<>
+				{isLoading && (
+					<SafeAreaView
+						style={{
+							flex: 1,
+							minHeight: '90%',
+							justifyContent: "center",
+							// alignItems: "start"
+						}}
+					>
+						<View
+							style={{
+								justifyContent: "center",
+								alignItems: "center",
+								width: "100%",
+								marginTop: 20
+							}}
+						>
+							<Skeleton
+								width={"80%"}
+								height={35}
+								LinearGradientComponent={LinearGradient}
+								animation="wave"
+							/>
+						</View>
+						<View
+							style={{
+								flex: 12,
+								justifyContent: "center",
+								alignItems: "center",
+								width: "100%"
+							}}
+						>
+							<Skeleton
+								width={"95%"}
+								height={"80%"}
+								LinearGradientComponent={LinearGradient}
+								animation="wave"
+							/>
+						</View>
+					</SafeAreaView>
+				)}
+				<View style={[styles.rootContainer, {flex: !isLoading ? 1 : 0}]}>
+					<Image
+						source={{ uri: pictureUrl }}
+						style={styles.imgContainer}
+						onLoadStart={() => setIsLoading(true)}
+						onLoadEnd={() => setIsLoading(false)}
 					/>
 				</View>
-				<View
-					style={{
-						flex: 5,
-						justifyContent: "center",
-						alignItems: "center",
-						width: "100%"
-					}}
-				>
-					<Skeleton
-						width={"90%"}
-						height={"90%"}
-						LinearGradientComponent={LinearGradient}
-						animation="wave"
-					/>
-				</View>
-			</View>
+			</>
 		);
 	}
-
-	if(!isError){
-		return (
-			<View style={styles.rootContainer}>
-					{/* {!showImg && isLoading && (
-						<View style={{ marginTop: 400 }}>
-							<LoadingOverlay style={{ color: "black" }} color="black" />
-						</View>
-					)} */}
-						<Image
-							source={{ uri: pictureUrl }}
-							style={styles.imgContainer}
-							onLoad={() => setShowImg(true)}
-						/>
-					
-				</View>
-		
-		)
-	}
-
 
 	return (
 		<View style={styles.rootContainer}>
@@ -163,7 +139,6 @@ const styles = StyleSheet.create({
 		height: "100%"
 	},
 	rootContainer: {
-		flex: 1,
 		justifyContent: "center",
 		alignItems: "center"
 		// padding: 32

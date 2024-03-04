@@ -377,6 +377,7 @@ const UserData = (props) => {
 
 			<FlatList
 				// scrollEnabled={false}
+				showsVerticalScrollIndicator={false}
 				data={userSearchData}
 				keyExtractor={(item, i) => i}
 				renderItem={renderSellItem}
