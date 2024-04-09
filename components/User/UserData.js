@@ -144,13 +144,18 @@ const UserData = (props) => {
 								(data) => data["CPF"] === userCustomData.cpf
 							)
 							.sort((a, b) => a["Código"] - b["Código"])
+							.sort((a, b) =>
+								a["Vendedor"].localeCompare(b["Vendedor"])
+							);
 						setUserFilteredData(filtData);
 						setUserSearchData(filtData);
 					} else {
 						console.log(newDict);
-						const filtData = newDict.sort(
-							(a, b) => a["Código"] - b["Código"]
-						).sort((a, b) => a["Vendedor"].localeCompare(b["Vendedor"]))
+						const filtData = newDict
+							.sort((a, b) => a["Código"] - b["Código"])
+							.sort((a, b) =>
+								a["Vendedor"].localeCompare(b["Vendedor"])
+							);
 						setUserFilteredData(filtData);
 						setUserSearchData(filtData);
 					}
@@ -242,7 +247,10 @@ const UserData = (props) => {
 		if (searchWord) {
 			const newArr = userFilteredData.filter((data) => {
 				// console.log(data["Valor"]);
-				return data["Código"]?.includes(searchWord) || data["Vendedor"]?.includes(searchWord) ;
+				return (
+					data["Código"]?.includes(searchWord) ||
+					data["Vendedor"]?.includes(searchWord)
+				);
 				// data["Valor"]?.includes(searchWord)
 			});
 			setUserSearchData(newArr);
