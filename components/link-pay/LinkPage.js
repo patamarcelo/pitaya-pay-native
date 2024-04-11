@@ -4,13 +4,11 @@ import { Colors } from '../../constants/styles';
 import IconButton from '../ui/IconButton';
 import LinkForm from './LinkForm';
 
-import { useState } from 'react';
+
 
 
 
 const LinkPage = ({navigation}) => {
-
-	const [valuesFormObj, setvaluesFormObj] = useState("");
 
     const handleBack = () => {
 		navigation.goBack();
@@ -39,7 +37,7 @@ const LinkPage = ({navigation}) => {
     return (  
         <View style={styles.mainContainer}>
 			<View style={styles.formView}>
-            	<LinkForm setvaluesFormObj={setvaluesFormObj}/>
+            	<LinkForm />
 			</View>
 
         </View>

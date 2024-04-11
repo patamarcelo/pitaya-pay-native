@@ -26,6 +26,10 @@ import { useState } from "react";
 
 import { createClient } from "../../utils/axios/axios.utils";
 
+import LoadingOverlay from '../ui/LoadingOverlay'
+import { useNavigation } from "@react-navigation/native";
+
+
 import {
     ALERT_TYPE,
     Dialog,
@@ -33,12 +37,14 @@ import {
     Toast
 } from "react-native-alert-notification";
 
+import { Colors } from "../../constants/styles";
+
 const schema = yup.object({
     name: yup.string().required("De um nome para esta transação"),
     description: yup
         .string()
         .required("Informe uma descrição para esta transação"),
-    value: yup.number().required("Valor não pode ser zerado")
+    value: yup.number("Digite um número válido").required("Valor não pode ser zerado")
 });
 
 const INPUTDATA = [
@@ -62,10 +68,14 @@ const INPUTDATA = [
     }
 ];
 
-const LinkForm = (props) => {
-    const { setvaluesFormObj } = props;
+const LinkForm = () => {
+    const navigation = useNavigation();
+
 
     const [linkToShare, setlinkToShare] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    
+    const [valuesFormObj, setvaluesFormObj] = useState({});
 
     const height = useHeaderHeight();
     const {
@@ -82,15 +92,19 @@ const LinkForm = (props) => {
             name: "",
             description: "",
             value: "",
-            chargeType: "DETACHED",
+            chargeType: "INSTALLMENT",
+            // chargeType: "DETACHED",
             endDate: "2024-04-11",
             dueDateLimitDays: "10",
-            billingType: "CREDIT_CARD"
+            billingType: "CREDIT_CARD",
+            maxInstallmentCount: "3"
         }
     });
 
     const handleLinkGenerator = async (formData) => {
+        setIsLoading(true)
         console.log("Gerando o Link", formData);
+        setvaluesFormObj(formData)
         try {
             const newPaymentMethod = formData;
             const respPay = await createClient.post("createlinkpay", null, {
@@ -105,8 +119,10 @@ const LinkForm = (props) => {
             } else {
                 console.log("erro ao gerar o Link");
             }
+            setIsLoading(false)
         } catch (err) {
             console.log("erro ao gerar a transação", err);
+            setIsLoading(false)
             // Dialog.show({
             // 	type: ALERT_TYPE.DANGER,
             // 	title: <Title text={"Ops!!"} />,
@@ -122,11 +138,12 @@ const LinkForm = (props) => {
     const onShare = async () => {
         try {
             const result = await Share.share({
-                message: `${linkToShare}`
+                message: `Olá. Segue o link de pagamento Pitaya Joias no valor de R$ xx,xx ${linkToShare}`
             });
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {
                     // shared with activity type of result.activityType
+                    handleHome()
                 } else {
                     // shared
                 }
@@ -138,9 +155,9 @@ const LinkForm = (props) => {
         }
     };
 
-    // useEffect(() => {
-
-    // }, []);
+    const handleHome = ()=>{
+        navigation.navigate("PagamentosTab");
+    }
     return (
         <>
             <ScrollView style={styles.mainContainer} scrollEnabled={false}>
@@ -208,11 +225,20 @@ const LinkForm = (props) => {
                             </KeyboardAvoidingView>
                         </TouchableWithoutFeedback>
                     </View>
-                    {linkToShare && linkToShare !== null && (
-                        <View style={{ width: "90%" }}>
+                    {
+                        isLoading && 
+                        <View style={{ width: "90%", marginTop: 200 }}>
+                            <LoadingOverlay message={"Gerando Link...."}/>
+                        </View>
+                    }
+                    {!isLoading && linkToShare && linkToShare !== null && (
+                        <View style={[{ width: "100%", marginTop: 120 }, styles.shareConatiner]}>
+                            <Text style={styles.textLink}>Link gerado no valor de R$ {valuesFormObj.value}</Text>
+                            <View style={{width: '90%', marginTop: 30}}>
                             <Button onPress={onShare}>
-                                <Text>Link Gerado com sucesso!!</Text>
+                                <Text>Compartilhar Link</Text>
                             </Button>
+                            </View>
                         </View>
                     )}
                     {/* </ScrollView> */}
@@ -220,10 +246,10 @@ const LinkForm = (props) => {
             </ScrollView>
             <View style={styles.btnView}>
                 <Button
-                    btnStyles={styles.btnStyle}
-                    onPress={handleSubmit(handleLinkGenerator)}
+                    btnStyles={[styles.btnStyle, linkToShare && {backgroundColor: Colors.gold[600]} ]}
+                    onPress={linkToShare ? handleHome : handleSubmit(handleLinkGenerator)}
                 >
-                    Gerar Link
+                    {linkToShare ? "Link Gerado" : "Gerar Link"}
                 </Button>
             </View>
         </>
@@ -233,6 +259,15 @@ const LinkForm = (props) => {
 export default LinkForm;
 
 const styles = StyleSheet.create({
+    textLink:{
+        fontSize: 18,
+        color: Colors.secondary[200]
+    },
+    shareConatiner:{
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },  
     formView: {
         flex: 1,
         width: "100%"
@@ -252,5 +287,10 @@ const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         width: "100%"
-    }
+    },
+    labelError: {
+		alignSelf: "flex-start",
+		color: Colors.gold[500],
+		marginBottom: 2
+	},
 });
