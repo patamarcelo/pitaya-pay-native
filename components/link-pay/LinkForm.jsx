@@ -138,7 +138,7 @@ const LinkForm = () => {
     const onShare = async () => {
         try {
             const result = await Share.share({
-                message: `Olá. Segue o link de pagamento Pitaya Joias no valor de R$ xx,xx ${linkToShare}`
+                message: `Olá. Segue o link de pagamento Pitaya Joias no valor de R$ ${valuesFormObj.value} ${linkToShare}`
             });
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {
@@ -247,7 +247,8 @@ const LinkForm = () => {
             <View style={styles.btnView}>
                 <Button
                     btnStyles={[styles.btnStyle, linkToShare && {backgroundColor: Colors.gold[600]} ]}
-                    onPress={linkToShare ? handleHome : handleSubmit(handleLinkGenerator)}
+                    onPress={handleSubmit(handleLinkGenerator)}
+                    disabled={linkToShare && true}
                 >
                     {linkToShare ? "Link Gerado" : "Gerar Link"}
                 </Button>
