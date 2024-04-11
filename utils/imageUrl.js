@@ -10,5 +10,9 @@ export const ICON_URL = {
 	credito: {
 		title: "Cartão de Crédito",
 		uri: require("../assets/payment/credit-card.png")
+	},
+	linkPay: {
+		title: 'Link para Pagamento',
+		uri: require('../assets/payment/link.png')
 	}
 };

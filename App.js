@@ -63,6 +63,7 @@ import ConfirmCardPage from "./components/credit-card/ConfirmCard";
 import Entypo from "@expo/vector-icons/Entypo";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
+import LinkPage from "./components/link-pay/LinkPage";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -99,6 +100,19 @@ function AuthStack() {
 	);
 }
 
+function LinkStack({ navigation }) {
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerStyle: { backgroundColor: Colors.primary500 }
+			}}
+		>
+			<Stack.Screen name="LINK" component={LinkPage} />
+			{/* <Stack.Screen name="PIXMAIL" component={PixMailComponent} />
+			<Stack.Screen name="PIXCONFIRMATION" component={ConfirmationPix} /> */}
+		</Stack.Navigator>
+	);
+}
 function PixStack({ navigation }) {
 	return (
 		<Stack.Navigator
@@ -422,6 +436,26 @@ function AuthenticatedStack(props) {
 									color={color}
 								/>
 							)
+						}}
+					/>
+					<Stack.Screen
+						name="linkPayStack"
+						component={LinkStack}
+						options={{
+							title: "Link",
+							headerShown: false,
+							// tabBarLabel: "Cartão",
+							// tabBarStyle: { display: "none" },
+							headerRight: ({ tintColor }) => (
+								<IconButton
+									icon="exit"
+									color={tintColor}
+									size={24}
+									onPress={() =>
+										navigation.navigate("Welcome")
+									}
+								/>
+							),
 						}}
 					/>
 					<Stack.Screen

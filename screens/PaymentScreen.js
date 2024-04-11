@@ -14,6 +14,7 @@ const PaymentScreen = () => {
 			</Text>
 			<CardButton type="pix" nextUrl="pixStack" />
 			<CardButton type="creditCard" nextUrl="cartaoStack" />
+			<CardButton type="linkPay" nextUrl="linkPayStack" />
 		</View>
 	);
 };

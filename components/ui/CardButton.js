@@ -18,11 +18,12 @@ const CardButton = (props) => {
 			style={({ pressed }) => [
 				styles.mainContainer,
 				pressed && styles.pressed,
+				type === 'linkPay' && styles.linkPayContainer,
 				btnStyles
 			]}
 			onPress={handlePress}
 		>
-			{type && <Image style={styles.image} source={sourceImage} />}
+			{type && <Image style={[styles.image, type === 'linkPay' && styles.linkPayImg]} source={sourceImage} />}
 			<Text style={styles.text}>{sourceText}</Text>
 		</Pressable>
 	);
@@ -50,6 +51,14 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 2, height: 4 },
 		shadowRadius: 2,
 		borderRadius: 20
+	},
+	linkPayContainer:{
+		height: 68
+	},
+	linkPayImg:{
+		width: 20,
+		height: 20,
+		marginRight: 15
 	},
 	image: {
 		width: 50,
