@@ -10,7 +10,8 @@ import {
     Keyboard,
     ScrollView,
     Share,
-    Pressable
+    Pressable,
+    Animated
 } from "react-native";
 
 import { useForm, Controler } from "react-hook-form";
@@ -22,11 +23,11 @@ import { Controller } from "react-hook-form";
 import Input from "../Auth/Input";
 import Button from "../ui/Button";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { createClient } from "../../utils/axios/axios.utils";
 
-import LoadingOverlay from '../ui/LoadingOverlay'
+import LoadingOverlay from "../ui/LoadingOverlay";
 import { useNavigation } from "@react-navigation/native";
 
 
@@ -39,12 +40,28 @@ import {
 
 import { Colors } from "../../constants/styles";
 
+
+import {Dimensions} from 'react-native';
+const windowWidth = Dimensions.get('window').width;
+
+
 const schema = yup.object({
     name: yup.string().required("De um nome para esta transação"),
     description: yup
         .string()
         .required("Informe uma descrição para esta transação"),
-    value: yup.number("Digite um número válido").required("Valor não pode ser zerado")
+    // value: yup.number("Digite um número válido").required("Valor não pode ser zerado")
+    value: yup
+        .string()
+        .matches(/^\d{1,}(,\d{0,2})?$/, "valor inválido")
+        .transform((value, originalValue) =>
+            originalValue ? originalValue.replace(/\./g, ",") : ""
+        )
+        .test("decimal-places", "Invalid decimal places", (value) => {
+            if (!value) return true;
+            const [, decimalPart] = value.split(",");
+            return !decimalPart || decimalPart.length <= 2;
+        })
 });
 
 const INPUTDATA = [
@@ -71,11 +88,51 @@ const INPUTDATA = [
 const LinkForm = () => {
     const navigation = useNavigation();
 
-
     const [linkToShare, setlinkToShare] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const [valuesFormObj, setvaluesFormObj] = useState({});
+    const [errorHandler, setErrorHandler] = useState({
+        name: "",
+        description: "",
+        value: ""
+    });
+
+    const [altura, setAltura] = useState(new Animated.Value(120));
+	const [largura, setLargura] = useState(new Animated.Value(0));
+
+    useEffect(() => {
+		if (linkToShare && linkToShare.length > 0) {
+			Animated.sequence([
+				Animated.timing(largura, {
+					toValue: windowWidth,
+					duration: 180,
+					useNativeDriver: false
+				})
+				// Animated.timing(altura, {
+				// 	toValue: 150,
+				// 	duration: 100
+				// 	// useNativeDriver: true
+				// })
+			]).start();
+		}
+	}, [linkToShare]);
+
+    const getFutureDate = () => {
+        // Get current date
+        let currentDate = new Date();
+
+        // Add two days
+        currentDate.setDate(currentDate.getDate() + 2);
+
+        // Format the date to YYYY-MM-DD
+        let year = currentDate.getFullYear();
+        let month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Adding 1 because January is 0
+        let day = String(currentDate.getDate()).padStart(2, "0");
+
+        // Return the formatted date
+        return `${year}-${month}-${day}`;
+    };
 
     const height = useHeaderHeight();
     const {
@@ -89,40 +146,57 @@ const LinkForm = () => {
     } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            name: "",
-            description: "",
-            value: "",
-            chargeType: "INSTALLMENT",
-            // chargeType: "DETACHED",
-            endDate: "2024-04-11",
-            dueDateLimitDays: "10",
+            endDate: getFutureDate(),
             billingType: "CREDIT_CARD",
-            maxInstallmentCount: "3"
-        }
+            chargeType: "INSTALLMENT",
+            description: "",
+            name: "",
+            value: "",
+            // chargeType: "DETACHED",
+            maxInstallmentCount: parseInt(5.2),
+            dueDateLimitDays: "10",
+            }
     });
 
+    const handleResetForm = () => {
+        console.log("resetando o formilário");
+        setlinkToShare(null);
+        setErrorHandler({
+            name: "",
+            description: "",
+            value: ""
+        });
+        reset();
+    };
+
+    const handlerChangeObj = (key, data) => {
+        setErrorHandler((prev) => ({ ...prev, [key]: data }));
+        console.log(errorHandler)
+    };
+
     const handleLinkGenerator = async (formData) => {
-        setIsLoading(true)
+        setIsLoading(true);
         console.log("Gerando o Link", formData);
-        setvaluesFormObj(formData)
+        setvaluesFormObj(formData);
         try {
             const newPaymentMethod = formData;
             const respPay = await createClient.post("createlinkpay", null, {
                 params: {
-                    newPaymentMethod
+                    newPaymentMethod: {...newPaymentMethod, maxInstallmentCount: parseInt(3)}
                 }
             });
             const { data, status } = respPay;
             if (status === 200) {
                 console.log("link gerado com sucesso: ", data);
                 setlinkToShare(data.url);
+                reset()
             } else {
                 console.log("erro ao gerar o Link");
             }
-            setIsLoading(false)
+            setIsLoading(false);
         } catch (err) {
             console.log("erro ao gerar a transação", err);
-            setIsLoading(false)
+            setIsLoading(false);
             // Dialog.show({
             // 	type: ALERT_TYPE.DANGER,
             // 	title: <Title text={"Ops!!"} />,
@@ -143,7 +217,7 @@ const LinkForm = () => {
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {
                     // shared with activity type of result.activityType
-                    handleHome()
+                    handleHome();
                 } else {
                     // shared
                 }
@@ -155,9 +229,9 @@ const LinkForm = () => {
         }
     };
 
-    const handleHome = ()=>{
+    const handleHome = () => {
         navigation.navigate("PagamentosTab");
-    }
+    };
     return (
         <>
             <ScrollView style={styles.mainContainer} scrollEnabled={false}>
@@ -183,12 +257,16 @@ const LinkForm = () => {
                                                 name={getTitle}
                                                 render={({ field: { onChange, onBlur, value } }) => (
                                                     <Input
+                                                    disabled={linkToShare && linkToShare.length > 0 ? true : false}
                                                         styleInput={{
                                                             borderWidth: errors.getTitle && 1,
                                                             borderColor: errors.getTitle && "#ff375b"
                                                         }}
                                                         label={getLabel}
-                                                        onUpdateValue={onChange}
+                                                        onUpdateValue={(e) => {
+                                                            handlerChangeObj(data.title, e);
+                                                            onChange(e);
+                                                        }}
                                                         // onUpdateValue={(e) => {
                                                         // 	handlerChange(e, getTitle);
                                                         // 	if (data.title !== "name") {
@@ -225,33 +303,55 @@ const LinkForm = () => {
                             </KeyboardAvoidingView>
                         </TouchableWithoutFeedback>
                     </View>
-                    {
-                        isLoading && 
+                    {isLoading && (
                         <View style={{ width: "90%", marginTop: 200 }}>
-                            <LoadingOverlay message={"Gerando Link...."}/>
+                            <LoadingOverlay message={"Gerando Link...."} />
                         </View>
-                    }
+                    )}
                     {!isLoading && linkToShare && linkToShare !== null && (
-                        <View style={[{ width: "100%", marginTop: 120 }, styles.shareConatiner]}>
-                            <Text style={styles.textLink}>Link gerado no valor de R$ {valuesFormObj.value}</Text>
-                            <View style={{width: '90%', marginTop: 30}}>
-                            <Button onPress={onShare}>
+                        <Animated.View
+                            style={[{marginTop: 120 }, styles.shareConatiner, { width: largura, minHeight: altura }]}
+                        >
+                            <Text style={styles.textLink}>
+                                Link gerado no valor de R$ {valuesFormObj.value}
+                            </Text>
+                            <View style={{ width: "90%", marginTop: 30}}>
+                                <Button onPress={onShare}>                               
                                 <Text>Compartilhar Link</Text>
-                            </Button>
+                                </Button>
                             </View>
-                        </View>
+                        </Animated.View>
                     )}
                     {/* </ScrollView> */}
                 </SafeAreaView>
             </ScrollView>
             <View style={styles.btnView}>
-                <Button
-                    btnStyles={[styles.btnStyle, linkToShare && {backgroundColor: Colors.gold[600]} ]}
-                    onPress={handleSubmit(handleLinkGenerator)}
-                    disabled={linkToShare && true}
-                >
-                    {linkToShare ? "Link Gerado" : "Gerar Link"}
-                </Button>
+                {linkToShare && linkToShare.length > 0 ? (
+                    <Button
+                        btnStyles={[
+                            styles.btnStyle,
+                            linkToShare && { backgroundColor: Colors.gold[600] }
+                        ]}
+                        onPress={handleResetForm}
+                    >
+                        Gerar outro Link
+                    </Button>
+                ) : (
+                    <Button
+                        btnStyles={[
+                            styles.btnStyle,
+                            linkToShare && { backgroundColor: Colors.gold[600] }
+                        ]}
+                        onPress={handleSubmit(handleLinkGenerator)}
+                        disabled={
+                            errorHandler.description === "" ||
+                            errorHandler.name === "" ||
+                            errorHandler.value === "" ? true : false
+                        }
+                    >
+                        Gerar Link
+                    </Button>
+                )}
             </View>
         </>
     );
@@ -260,15 +360,15 @@ const LinkForm = () => {
 export default LinkForm;
 
 const styles = StyleSheet.create({
-    textLink:{
+    textLink: {
         fontSize: 18,
         color: Colors.secondary[200]
     },
-    shareConatiner:{
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },  
+    shareConatiner: {
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center"
+    },
     formView: {
         flex: 1,
         width: "100%"
@@ -290,8 +390,8 @@ const styles = StyleSheet.create({
         width: "100%"
     },
     labelError: {
-		alignSelf: "flex-start",
-		color: Colors.gold[500],
-		marginBottom: 2
-	},
+        alignSelf: "flex-start",
+        color: Colors.gold[500],
+        marginBottom: 2
+    }
 });
