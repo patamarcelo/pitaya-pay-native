@@ -30,6 +30,10 @@ import { createClient } from "../../utils/axios/axios.utils";
 import LoadingOverlay from "../ui/LoadingOverlay";
 import { useNavigation } from "@react-navigation/native";
 
+import { addTransaction } from "../../utils/firebase/firebase.datatable";
+import { useSelector } from "react-redux";
+import { userSelector } from "../../store/redux/selector";
+
 
 import {
     ALERT_TYPE,
@@ -87,6 +91,8 @@ const INPUTDATA = [
 
 const LinkForm = () => {
     const navigation = useNavigation();
+    const user = useSelector(userSelector);
+    const disp = Platform.OS;
 
     const [linkToShare, setlinkToShare] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -100,6 +106,7 @@ const LinkForm = () => {
 
     const [altura, setAltura] = useState(new Animated.Value(120));
 	const [largura, setLargura] = useState(new Animated.Value(0));
+    
 
     useEffect(() => {
 		if (linkToShare && linkToShare.length > 0) {
@@ -188,6 +195,21 @@ const LinkForm = () => {
             const { data, status } = respPay;
             if (status === 200) {
                 console.log("link gerado com sucesso: ", data);
+                const newTrans = await addTransaction(
+					user.displayName
+						? user.displayName
+						: "Vendedor sem nome cadastrado",
+					user.email,
+					user.uid,
+					"Link de pagamento",
+					formData.value,
+					"1",
+					`Nome - ${formData.name}`,
+					`descricao - ${formData.description}`,
+					data.id,
+					`AppNative - ${disp}`,
+					"-"
+				);
                 setlinkToShare(data.url);
                 reset()
             } else {

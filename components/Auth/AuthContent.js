@@ -14,6 +14,8 @@ import AuthForm from "./AuthForm";
 import { Colors } from "../../constants/styles";
 import { useNavigation } from "@react-navigation/native";
 
+import { expo } from "../../app.json";
+
 function AuthContent({ isLogin, onAuthenticate }) {
 	const navigation = useNavigation();
 	const [credentialsInvalid, setCredentialsInvalid] = useState({
@@ -77,19 +79,20 @@ function AuthContent({ isLogin, onAuthenticate }) {
 
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+			<>
 			<View style={styles.mainContainer}>
 				<View style={styles.titleContainer}>
 					<Image
 						source={require("../../assets/Logo.png")}
 						style={styles.logo}
-					/>
+						/>
 				</View>
 				<View style={styles.authContent}>
 					<AuthForm
 						isLogin={isLogin}
 						onSubmit={submitHandler}
 						credentialsInvalid={credentialsInvalid}
-					/>
+						/>
 					<View style={styles.buttons}>
 						<FlatButton onPress={switchAuthModeHandler}>
 							{isLogin ? "Esqueci minha senha" : "Tela de Login"}
@@ -97,6 +100,10 @@ function AuthContent({ isLogin, onAuthenticate }) {
 					</View>
 				</View>
 			</View>
+			<View style={{marginBottom: 30, marginTop: -20, justifyContent: 'center', alignItems: 'center'}}>
+				<Text style={{color: Colors.secondary[100], fontWeight: 'bold'}}>{expo.version}</Text>
+			</View>
+						</>
 		</TouchableWithoutFeedback>
 	);
 }
