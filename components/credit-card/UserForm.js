@@ -240,13 +240,13 @@ const CreditCardUserForm = () => {
 							>
 								Avançar
 							</Button>
-							<Button
+							{/* <Button
 								onPress={() =>
 									navigation.navigate("PAYCARDFORM")
 								}
 							>
 								cardForm
-							</Button>
+							</Button> */}
 						</View>
 					</KeyboardAvoidingView>
 				</TouchableWithoutFeedback>
