@@ -85,6 +85,7 @@ const UserVendas = ({ navigation }) => {
 			);
 			setIsLoading(false);
 			setSellerData(sellerData);
+			console.log(sellerData);
 			setFilteredData(sellerData);
 		};
 		try {

@@ -17,7 +17,8 @@ const CardVendas = ({ data, handlePressUrl }) => {
 		sellerName,
 		clientMail
 	} = data;
-	const sourceImage = type ? ICON_URL[type]?.uri : "";
+	const newType = type === "Link de pagamento" ? "linkPay" : type
+	const sourceImage = newType ? ICON_URL[newType]?.uri : "";
 	const urlComp = compUrl?.length > 5 ? compUrl : null;
 	let products = null;
 	// if (prodctsSell) {
@@ -25,6 +26,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 	// 	console.log(typeof prodctsSell);
 	// }
 
+	console.log(ICON_URL[type])
 	const getData = (dataVenda) => {
 		const todayDate = new Date();
 		const todayD = todayDate.toLocaleDateString("pt-BR");
@@ -64,7 +66,12 @@ const CardVendas = ({ data, handlePressUrl }) => {
 				<View style={{ flexDirection: "row" }}>
 					<View style={styles.dateImgContainer}>
 						<View>
-							<Image style={styles.image} source={sourceImage} />
+							<Image 
+							style={[styles.image, {
+								width: newType === 'linkPay' ? 20 : 30,
+								height: newType === 'linkPay' ? 20 : 30,
+							}]}
+							source={sourceImage} />
 						</View>
 						<View>
 							<Text style={styles.dateText}>
@@ -143,8 +150,6 @@ const styles = StyleSheet.create({
 		marginBottom: 5
 	},
 	image: {
-		width: 30,
-		height: 30,
 		marginRight: 15
 	}
 });
