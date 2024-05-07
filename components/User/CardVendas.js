@@ -17,7 +17,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 		sellerName,
 		clientMail
 	} = data;
-	const sourceImage = type ? ICON_URL[type].uri : "";
+	const sourceImage = type ? ICON_URL[type]?.uri : "";
 	const urlComp = compUrl?.length > 5 ? compUrl : null;
 	let products = null;
 	// if (prodctsSell) {
@@ -49,10 +49,14 @@ const CardVendas = ({ data, handlePressUrl }) => {
 	};
 
 	const produtosText = (prods) => {
-		return (newProd = prods?.map((data, i) => {
+		if(typeof prods === 'string') {
+			return prods
+		}
+		return newProd = prods?.map((data, i) => {
 			const sep = i + 1 < prods?.length ? " - " : "";
 			return data + sep;
-		}));
+		});
+		
 	};
 	return (
 		<>
@@ -71,7 +75,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 					<View style={styles.sellerDataContainer}>
 						<View>
 							<Text style={{ fontWeight: "bold" }}>
-								{sellerName?.toUpperCase()}
+								{sellerName?.length > 18 ? sellerName?.toUpperCase().substring(0,18) + '...' : sellerName?.toUpperCase()}
 							</Text>
 							<Text style={{ fontSize: 8 }}>{clientMail}</Text>
 						</View>
