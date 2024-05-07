@@ -162,6 +162,7 @@ const LinkForm = () => {
             // chargeType: "DETACHED",
             maxInstallmentCount: parseInt(5.2),
             dueDateLimitDays: "10",
+            notificationEnabled: false,
             }
     });
 

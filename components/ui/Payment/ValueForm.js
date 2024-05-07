@@ -5,7 +5,8 @@ import {
 	ScrollView,
 	Keyboard,
 	Platform,
-	TouchableWithoutFeedback
+	TouchableWithoutFeedback,
+	Dimensions
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Colors } from "../../../constants/styles";
@@ -197,9 +198,12 @@ const PaymentForm = ({ prevRouteName }) => {
 
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+			<>
 			<ScrollView
-				horizontal={true}
+				// horizontal={true}
 				showsHorizontalScrollIndicator={false}
+				showsVerticalScrollIndicator={false}
+				automaticallyAdjustContentInsets={true}
 			>
 				<View
 					style={[
@@ -340,7 +344,12 @@ const PaymentForm = ({ prevRouteName }) => {
 							</Picker>
 						</View>
 					)}
+				</View>
+			</ScrollView>
 					{parcelasSelected?.length > 0 && (
+						<View
+							style={styles.btnContainer}
+						>
 						<Button
 							btnStyles={styles.btnStyles}
 							disabled={
@@ -348,12 +357,12 @@ const PaymentForm = ({ prevRouteName }) => {
 								parcelasSelected.length === 0
 							}
 							onPress={handlerConfirm}
-						>
+							>
 							Avançar
 						</Button>
+						</View>
 					)}
-				</View>
-			</ScrollView>
+					</>
 		</TouchableWithoutFeedback>
 	);
 };
@@ -427,11 +436,20 @@ const styles = StyleSheet.create({
 	mainContainer: {
 		marginTop: 20,
 		width: "100%",
-		flex: 1,
+		// flex: 2,
 		gap: 10,
 		// justifyContent: "center",
-		alignItems: "center"
+		alignItems: "center",
+		// backgroundColor: 'blue'
 	},
+	btnContainer:{
+		height: 50,
+		marginBottom: 70,
+		flex: 1,
+		width: '100%',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},	
 	title: {
 		fontSize: 22,
 		color: Colors.secondary[200],
@@ -467,6 +485,6 @@ const pickerSelectStyles = StyleSheet.create({
 		borderWidth: Platform.OS === "ios" ? "" : 0.5,
 		// alignItems: "center",
 		justifyContent: "center",
-		color: "whitesmoke"
+		color: "whitesmoke",
 	}
 });

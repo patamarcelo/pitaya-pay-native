@@ -240,13 +240,13 @@ const CreditCardUserForm = () => {
 							>
 								Avançar
 							</Button>
-							{/* <Button
+							<Button
 								onPress={() =>
 									navigation.navigate("PAYCARDFORM")
 								}
 							>
 								cardForm
-							</Button> */}
+							</Button>
 						</View>
 					</KeyboardAvoidingView>
 				</TouchableWithoutFeedback>
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
 	},
 	buttonContainer: {
 		flex: 1,
-		width: "90%",
+		width: "100%",
 		margin: 20,
 		gap: 10
 	},
