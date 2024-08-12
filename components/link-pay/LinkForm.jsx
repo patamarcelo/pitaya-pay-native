@@ -190,7 +190,8 @@ const LinkForm = () => {
             const newPaymentMethod = formData;
             const respPay = await createClient.post("createlinkpay", null, {
                 params: {
-                    newPaymentMethod: {...newPaymentMethod, maxInstallmentCount: parseInt(3)}
+                    newPaymentMethod: {...newPaymentMethod, maxInstallmentCount: parseInt(3)},
+                    user: user
                 }
             });
             const { data, status } = respPay;

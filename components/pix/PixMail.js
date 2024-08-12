@@ -179,7 +179,8 @@ const MailForm = () => {
 
 			const respPay = await createClient.post("createpixpay", null, {
 				params: {
-					newPaymentMethod
+					newPaymentMethod: newPaymentMethod, 
+					user: user
 				}
 			});
 			const { data, status } = respPay;
