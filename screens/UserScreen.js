@@ -70,7 +70,7 @@ function UserScreen() {
 			/> */}
 			<CardButton
 				btnStyles={styles.btnStyle}
-				textTitle="Cobranças"
+				textTitle="Cobranças Emitidas"
 				nextUrl="VENDASUSER"
 			/>
 		</View>
