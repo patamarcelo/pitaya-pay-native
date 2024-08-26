@@ -63,14 +63,14 @@ function UserScreen() {
 
 	return (
 		<View style={styles.rootContainer}>
-			<CardButton
+			{/* <CardButton
 				textTitle="Produtos"
 				nextUrl="DATAUSER"
 				btnStyles={styles.btnStyle}
-			/>
+			/> */}
 			<CardButton
 				btnStyles={styles.btnStyle}
-				textTitle="Vendas"
+				textTitle="Cobranças"
 				nextUrl="VENDASUSER"
 			/>
 		</View>

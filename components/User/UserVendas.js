@@ -98,7 +98,7 @@ const UserVendas = ({ navigation }) => {
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			title: "Vendas",
+			title: "Cobranças",
 			headerTintColor: "whitesmoke",
 			headerShadowVisible: false,
 			headerShown: true,
