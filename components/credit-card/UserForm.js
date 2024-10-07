@@ -10,7 +10,7 @@ import {
 	Keyboard,
 	ScrollView
 } from "react-native";
-import { useForm, Controler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
@@ -29,7 +29,7 @@ import {
 } from "../../utils/firebase/firebase.datatable";
 import { signOutUser } from "../../utils/firebase/firebase";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 import LoadingOverlay from "../ui/LoadingOverlay";
 import { useDispatch } from "react-redux";
@@ -109,9 +109,9 @@ const CreditCardUserForm = () => {
 	const navigation = useNavigation();
 	const height = useHeaderHeight();
 
-	const handlerChange = (e, name) => {
+	const handlerChange = useCallback((e, name) => {
 		console.log("Label: ", name, "value: ", e);
-	};
+	}, []);
 
 	const submitHandler = async (valuesform) => {
 		console.log("valores: ", valuesform);
