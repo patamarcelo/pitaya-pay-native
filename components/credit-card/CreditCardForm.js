@@ -17,8 +17,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 import {
-	CreditCardInput
-	// LiteCreditCardInput
+	CreditCardInput,
+	LiteCreditCardInput
 } from "react-native-credit-card-input";
 
 import Button from "../ui/Button";
@@ -89,7 +89,7 @@ const CreditCardFormPage = ({ navigation }) => {
 		<View style={styles.container}>
 			<View style={styles.cardContainer}>
 				<KeyboardAvoidingView>
-					<CreditCardInput
+					<LiteCreditCardInput
 						allowScroll={true}
 						onChange={handlerChange}
 						labelStyle={styles.labelStyle}
@@ -133,7 +133,8 @@ export default CreditCardFormPage;
 
 const styles = StyleSheet.create({
 	cardContainer: {
-		flex: 1
+		flex: 1,
+		marginTop: 60
 	},
 	labelStyle: {
 		color: Colors.primary[900]
