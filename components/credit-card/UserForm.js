@@ -8,7 +8,8 @@ import {
 	SafeAreaView,
 	TouchableWithoutFeedback,
 	Keyboard,
-	ScrollView
+	ScrollView,
+	FlatList
 } from "react-native";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -109,9 +110,7 @@ const CreditCardUserForm = () => {
 	const navigation = useNavigation();
 	const height = useHeaderHeight();
 
-	const handlerChange = useCallback((e, name) => {
-		console.log("Label: ", name, "value: ", e);
-	}, []);
+
 
 	const submitHandler = async (valuesform) => {
 		console.log("valores: ", valuesform);
@@ -127,18 +126,18 @@ const CreditCardUserForm = () => {
 			if (!newCust) {
 				signOutUser();
 			}
-			const newUser = await createClient.post("createclient", null, {
-				params: {
-					valuesform
-				}
-			});
-			const { status } = newUser;
-			const { data } = newUser;
-			if (status === 200) {
-				console.log("Usuário criado com sucesso");
-				dispatch(setCreatedUser(data));
-				navigation.navigate("CARTAOFORM");
-			}
+			// const newUser = await createClient.post("createclient", null, {
+			// 	params: {
+			// 		valuesform
+			// 	}
+			// });
+			// const { status } = newUser;
+			// const { data } = newUser;
+			// if (status === 200) {
+			// 	console.log("Usuário criado com sucesso");
+			// 	dispatch(setCreatedUser(data));
+			// 	navigation.navigate("CARTAOFORM");
+			// }
 		} catch (error) {
 			console.log("error ao gerar o usuário", error.response.data);
 			Alert.alert(
@@ -153,106 +152,78 @@ const CreditCardUserForm = () => {
 		return <LoadingOverlay message={"Carregando informações..."} />;
 	}
 	return (
-		<ScrollView style={styles.mainContainer}>
-			<SafeAreaView style={styles.form}>
-				{/* <ScrollView style={{ width: "100%" }}> */}
-				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-					<KeyboardAvoidingView
-						keyboardVerticalOffset={height - 50}
-						style={styles.form}
-						// behavior={Platform.OS === "ios" ? "padding" : "height"}
-						behavior={Platform.OS == "ios" ? "padding" : "height"}
-						// keyboardVerticalOffset={Platform.OS == "ios" ? 0 : 20}
-						enabled={Platform.OS === "ios" ? true : false}
-					>
-						<View style={styles.titleForm}>
-							<Text style={styles.titleForm}>
-								Dados do Titular do Cartão
-							</Text>
-						</View>
-						{INPUTDATA.map((data, i) => {
-							const getTitle = data.title;
-							const getLabel = data.label;
-							return (
-								<View key={i} style={{ width: "100%" }}>
-									<Controller
-										control={control}
-										name={getTitle}
-										render={({
-											field: { onChange, onBlur, value }
-										}) => (
-											<Input
-												styleInput={{
-													borderWidth:
-														errors.getTitle && 1,
-													borderColor:
-														errors.getTitle &&
-														"#ff375b"
-												}}
-												label={getLabel}
-												onUpdateValue={(e) => {
-													handlerChange(e, getTitle);
-													if (data.title !== "name") {
-														onChange(e.trim());
-													} else {
-														onChange(e);
-													}
-													// onChange(
-													// 	e
-													// 	// .replace(/[^a-z0-9]/gi, "")
-													// 	// .toUpperCase()
-													// );
-												}}
-												value={value}
-												// keyboardType="email-address"
-												onBlur={onBlur}
-												inputStyles={styles.inputStyles}
-												placeholder={data.placeholder}
-												maxLength={data.maxLen}
-												inputContainerProps={{
-													width: "100%"
-												}}
-											/>
-										)}
+		<SafeAreaView style={styles.mainContainer}>
+			<KeyboardAvoidingView
+				style={styles.keyboardAvoidingView}
+				behavior={Platform.OS === "ios" ? "padding" : "height"}
+				keyboardVerticalOffset={Platform.OS === "ios" ? 120 : 0} // Adjust this based on your header height
+			>
+				<FlatList
+					data={INPUTDATA}
+					keyExtractor={(item) => item.title}
+					renderItem={({ item }) => (
+						<View style={{ width: "100%" }}>
+							<Controller
+								control={control}
+								name={item.title}
+								render={({ field: { onChange, onBlur, value } }) => (
+									<Input
+										styleInput={{
+											borderWidth: errors[item.title] && 1,
+											borderColor: errors[item.title] && "#ff375b"
+										}}
+										label={item.label}
+										onUpdateValue={(e) => {
+											if (item.title !== "name") {
+												onChange(e.trim());
+											} else {
+												onChange(e);
+											}
+										}}
+										value={value}
+										onBlur={onBlur}
+										inputStyles={styles.inputStyles}
+										placeholder={item.placeholder}
+										maxLength={item.maxLen}
+										inputContainerProps={{ width: "100%" }}
 									/>
-									{errors[getTitle] && (
-										<Text style={styles.labelError}>
-											{errors[getTitle]?.message}
-										</Text>
-									)}
-								</View>
-							);
-						})}
-
-						<View style={styles.buttonContainer}>
-							<Button
-								disabled={
-									Object.keys(errors).length === 0
-										? false
-										: true
-								}
-								onPress={handleSubmit(submitHandler)}
-								btnStyles={
-									Object.keys(errors).length === 0
-										? styles.btnbtnStylesRegister
-										: styles.btnDisabledStyle
-								}
-							>
-								Avançar
-							</Button>
-							{/* <Button
-								onPress={() =>
-									navigation.navigate("PAYCARDFORM")
-								}
-							>
-								cardForm
-							</Button> */}
+								)}
+							/>
+							{errors[item.title] && (
+								<Text style={styles.labelError}>
+									{errors[item.title]?.message}
+								</Text>
+							)}
 						</View>
-					</KeyboardAvoidingView>
-				</TouchableWithoutFeedback>
-				{/* </ScrollView> */}
-			</SafeAreaView>
-		</ScrollView>
+					)}
+					showsVerticalScrollIndicator={false} // Hide vertical scroll bar
+					showsHorizontalScrollIndicator={false} // Hide horizontal scroll bar (if needed)
+					ListHeaderComponent={
+						<View style={styles.titleForm}>
+							<Text style={styles.titleForm}>Dados do Titular do Cartão</Text>
+						</View>
+					}
+				/>
+
+			</KeyboardAvoidingView>
+			<View style={styles.buttonContainer}>
+				<Button
+					disabled={
+						Object.keys(errors).length === 0
+							? false
+							: true
+					}
+					onPress={handleSubmit(submitHandler)}
+					btnStyles={
+						Object.keys(errors).length === 0
+							? styles.btnbtnStylesRegister
+							: styles.btnDisabledStyle
+					}
+				>
+					Avançar
+				</Button>
+			</View>
+		</SafeAreaView >
 	);
 };
 
@@ -262,11 +233,14 @@ const styles = StyleSheet.create({
 	titleForm: {
 		fontSize: 19,
 		color: Colors.gold[200],
-		fontStyle: "italic"
+		fontStyle: "italic",
+		textAlign: 'center'
 	},
 	mainContainer: {
-		flex: 1,
-		width: "100%"
+		flex: 5,
+		width: "90%",
+		paddingHorizontal: 10,
+		justifyContent: 'center'
 	},
 	form: {
 		flex: 5,
@@ -278,8 +252,9 @@ const styles = StyleSheet.create({
 	buttonContainer: {
 		flex: 1,
 		width: "100%",
-		margin: 20,
-		gap: 10
+
+
+		justifyContent: 'center'
 	},
 	btnbtnStylesRegister: {
 		backgroundColor: "green"
