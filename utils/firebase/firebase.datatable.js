@@ -1,6 +1,6 @@
 import { db } from "./firebase";
 import { collection, addDoc, where } from "firebase/firestore";
-import { query, orderBy, getDocs } from "firebase/firestore";
+import { query, orderBy, getDocs, limit } from "firebase/firestore";
 import { TABLES_FIREBASE } from "./firebase.typestables";
 
 // import { query, orderBy, onSnapshot, getDocs } from "firebase/firestore";

@@ -7,6 +7,10 @@ import {
 	formatDateFirebaseRange
 } from "../../utils/formatDate";
 
+import Ionicons from '@expo/vector-icons/Ionicons';
+
+import { Colors } from "../../constants/styles";
+
 const CardVendas = ({ data, handlePressUrl }) => {
 	const {
 		type,
@@ -15,7 +19,8 @@ const CardVendas = ({ data, handlePressUrl }) => {
 		prodctsSell,
 		compUrl,
 		sellerName,
-		clientMail
+		clientMail,
+		pagamento
 	} = data;
 	const newType = type === "Link de pagamento" ? "linkPay" : type
 	const sourceImage = newType ? ICON_URL[newType]?.uri : "";
@@ -51,27 +56,30 @@ const CardVendas = ({ data, handlePressUrl }) => {
 	};
 
 	const produtosText = (prods) => {
-		if(typeof prods === 'string') {
+		if (typeof prods === 'string') {
 			return prods
 		}
 		return newProd = prods?.map((data, i) => {
 			const sep = i + 1 < prods?.length ? " - " : "";
 			return data + sep;
 		});
-		
+
 	};
+
+	const paymentsArr = ['Confirmado', 'Pago']
+	const isPaid = paymentsArr.includes(pagamento)
 	return (
 		<>
 			<View style={styles.mainContainer}>
 				<View style={{ flexDirection: "row" }}>
 					<View style={styles.dateImgContainer}>
 						<View>
-							<Image 
-							style={[styles.image, {
-								width: newType === 'linkPay' ? 20 : 30,
-								height: newType === 'linkPay' ? 20 : 30,
-							}]}
-							source={sourceImage} />
+							<Image
+								style={[styles.image, {
+									width: newType === 'linkPay' ? 20 : 30,
+									height: newType === 'linkPay' ? 20 : 30,
+								}]}
+								source={sourceImage} />
 						</View>
 						<View>
 							<Text style={styles.dateText}>
@@ -82,7 +90,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 					<View style={styles.sellerDataContainer}>
 						<View>
 							<Text style={{ fontWeight: "bold" }}>
-								{sellerName?.length > 18 ? sellerName?.toUpperCase().substring(0,18) + '...' : sellerName?.toUpperCase()}
+								{sellerName?.length > 18 ? sellerName?.toUpperCase().substring(0, 18) + '...' : sellerName?.toUpperCase()}
 							</Text>
 							<Text style={{ fontSize: 8 }}>{clientMail}</Text>
 						</View>
@@ -95,6 +103,22 @@ const CardVendas = ({ data, handlePressUrl }) => {
 				</View>
 
 				<View style={styles.valueButton}>
+					{
+						pagamento ?
+							<View style={styles.containerPaidStatus}>
+								<Text style={styles.paymentText}>
+									{isPaid ? 'Pago' : 'Pendente'}
+								</Text>
+								<Ionicons name={isPaid ? "checkmark-done" : 'warning-outline'} size={16} color={isPaid ? Colors.succes[400] : Colors.gold[600]} />
+							</View>
+							:
+
+							<Text>
+								-
+							</Text>
+
+
+					}
 					<Button
 						icon={urlComp && "receipt"}
 						mode="text"
@@ -107,7 +131,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 					>
 						<Text style={{ color: "black" }}>
 							R${" "}
-							{parseFloat(value).toLocaleString("pt-br", {
+							{value.toLocaleString("pt-br", {
 								minimumFractionDigits: 2,
 								maximumFractionDigits: 2
 							})}
@@ -124,6 +148,16 @@ const CardVendas = ({ data, handlePressUrl }) => {
 export default CardVendas;
 
 const styles = StyleSheet.create({
+	containerPaidStatus: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		flexDirection: 'row',
+	},
+	paymentText: {
+		fontSize: 8,
+		marginRight: 8,
+		fontWeight: 'bold'
+	},
 	sellerDataContainer: {
 		justifyContent: "space-between",
 		marginLeft: 15,
