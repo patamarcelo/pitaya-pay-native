@@ -106,10 +106,12 @@ const CardVendas = ({ data, handlePressUrl }) => {
 					{
 						pagamento ?
 							<View style={styles.containerPaidStatus}>
-								<Text style={styles.paymentText}>
-									{isPaid ? 'Pago' : 'Pendente'}
-								</Text>
-								<Ionicons name={isPaid ? "checkmark-done" : 'warning-outline'} size={16} color={isPaid ? Colors.succes[400] : Colors.gold[600]} />
+								 <View style={[styles.chip, { backgroundColor: isPaid ?  Colors.succes[100] : Colors.gold[200]}]}>
+									<Text style={styles.paymentText}>
+										{isPaid ? 'Pago' : 'Pendente'}
+									</Text>
+								</View>
+								{/* <Ionicons name={isPaid ? "checkmark-done" : 'warning-outline'} size={16} color={isPaid ? Colors.succes[400] : Colors.gold[600]} /> */}
 							</View>
 							:
 
@@ -137,7 +139,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 							})}
 						</Text>
 					</Button>
-					<Text style={{ fontSize: 8 }}>{getData(createdAt)}</Text>
+					<Text style={{ fontSize: 8, fontWeight: 'bold' }}>{getData(createdAt)}</Text>
 				</View>
 			</View>
 			<Divider width="100%" />
@@ -156,7 +158,8 @@ const styles = StyleSheet.create({
 	paymentText: {
 		fontSize: 8,
 		marginRight: 8,
-		fontWeight: 'bold'
+		fontWeight: 'bold',
+		color: "grey",
 	},
 	sellerDataContainer: {
 		justifyContent: "space-between",
@@ -185,5 +188,13 @@ const styles = StyleSheet.create({
 	},
 	image: {
 		marginRight: 15
-	}
+	},
+	chip: {
+		paddingVertical: 8,
+		paddingHorizontal: 16,
+		borderRadius: 16,
+		alignItems: "center",
+		justifyContent: "center",
+		margin: 4
+	},
 });
