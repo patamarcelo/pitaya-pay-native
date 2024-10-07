@@ -126,18 +126,18 @@ const CreditCardUserForm = () => {
 			if (!newCust) {
 				signOutUser();
 			}
-			// const newUser = await createClient.post("createclient", null, {
-			// 	params: {
-			// 		valuesform
-			// 	}
-			// });
-			// const { status } = newUser;
-			// const { data } = newUser;
-			// if (status === 200) {
-			// 	console.log("Usuário criado com sucesso");
-			// 	dispatch(setCreatedUser(data));
-			// 	navigation.navigate("CARTAOFORM");
-			// }
+			const newUser = await createClient.post("createclient", null, {
+				params: {
+					valuesform
+				}
+			});
+			const { status } = newUser;
+			const { data } = newUser;
+			if (status === 200) {
+				console.log("Usuário criado com sucesso");
+				dispatch(setCreatedUser(data));
+				navigation.navigate("CARTAOFORM");
+			}
 		} catch (error) {
 			console.log("error ao gerar o usuário", error.response.data);
 			Alert.alert(
