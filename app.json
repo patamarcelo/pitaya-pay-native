@@ -17,10 +17,7 @@
     "ios": {
       "buildNumber": "1.0.19",
       "supportsTablet": false,
-      "bundleIdentifier": "com.pitayajoias.pitayajoias",
-      "infoPlist": {
-        "UISupportedDevices": ["iPhone"] 
-      }
+      "bundleIdentifier": "com.pitayajoias.pitayajoias"
     },
     "android": {
       "versionCode": 19,
