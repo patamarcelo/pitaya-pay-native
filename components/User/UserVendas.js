@@ -13,7 +13,7 @@ import {
 	userSelector,
 	userCustomDataSelector
 } from "../../store/redux/selector";
-import { useSelector } from "react-redux";
+import { useSelector, shallowEqual } from "react-redux";
 import { getTransactionsById } from "../../utils/firebase/firebase.datatable";
 
 import Button from "../ui/Button";
@@ -36,7 +36,7 @@ const UserVendas = ({ navigation }) => {
 	const tabBarHeight = useBottomTabBarHeight();
 	const user = useSelector(userSelector);
 	const { uid } = user;
-	const [sellerData, setSellerData] = useState([]);
+	const [sellerData, setSellerData] = useState(null);
 	const [titleSelected, setTitleSelected] = useState("30 dias");
 	const [isLoading, setIsLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
@@ -49,7 +49,7 @@ const UserVendas = ({ navigation }) => {
 
 	const [filterQueryFireAll, setfilterQueryFireAll] = useState(false);
 
-	const userCustomData = useSelector(userCustomDataSelector);
+	const userCustomData = useSelector(userCustomDataSelector, shallowEqual);
 	const [cpf, setCpf] = useState(null);
 	const [isSuperUser, setIsSuperUser] = useState(false);
 
@@ -85,7 +85,6 @@ const UserVendas = ({ navigation }) => {
 			);
 			setIsLoading(false);
 			setSellerData(sellerData);
-			console.log(sellerData);
 			setFilteredData(sellerData);
 		};
 		try {
@@ -107,7 +106,7 @@ const UserVendas = ({ navigation }) => {
 	}, []);
 
 	useEffect(() => {
-		const filteredData = sellerData.filter((data) => {
+		const filteredData = sellerData?.filter((data) => {
 			const today = new Date();
 			const priorDate = new Date().setDate(today.getDate() - filterDays);
 			return (
@@ -118,7 +117,7 @@ const UserVendas = ({ navigation }) => {
 	}, [filterDays]);
 
 	useEffect(() => {
-		const filteredData = sellerData.filter((data) => {
+		const filteredData = sellerData?.filter((data) => {
 			const today = new Date();
 			const priorDate = new Date().setDate(today.getDate() - filterDays);
 			return (
@@ -298,7 +297,7 @@ const UserVendas = ({ navigation }) => {
 				/>
 				<View style={styles.containerList}>
 					<ScrollView>
-						{isLoading &&
+						{(isLoading || sellerData === null) &&
 							LINES.map((data, i) => {
 								return (
 									<View
@@ -337,7 +336,7 @@ const UserVendas = ({ navigation }) => {
 							<FlatList
 								// scrollEnabled={false}
 								showsVerticalScrollIndicator={false}
-								data={filteredData.sort(
+								data={filteredData?.sort(
 									(a, b) => b.createdAt - a.createdAt
 								)}
 								keyExtractor={(item, i) => item.id}

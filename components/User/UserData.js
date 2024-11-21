@@ -150,7 +150,7 @@ const UserData = (props) => {
 						setUserFilteredData(filtData);
 						setUserSearchData(filtData);
 					} else {
-						console.log(newDict);
+						console.log('new dict:', newDict);
 						const filtData = newDict
 							.sort((a, b) => a["Código"] - b["Código"])
 							.sort((a, b) =>
