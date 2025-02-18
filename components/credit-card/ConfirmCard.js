@@ -215,7 +215,7 @@ const ConfirmCardPage = ({ navigation, route }) => {
 				{
 					params: {
 						newPaymentMethod: newPayment,
-						user: user
+						user: JSON.stringify(user)
 					}
 				}
 			);

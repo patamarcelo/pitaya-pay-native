@@ -191,7 +191,7 @@ const LinkForm = () => {
             const respPay = await createClient.post("createlinkpay", null, {
                 params: {
                     newPaymentMethod: {...newPaymentMethod, maxInstallmentCount: parseInt(3)},
-                    user: user
+                    user: JSON.stringify(user)
                 }
             });
             const { data, status } = respPay;

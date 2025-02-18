@@ -20,7 +20,6 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import AppLoading from "expo-app-loading";
 
 import PixComponent from "./components/pix/Pix";
 import PixMailComponent from "./components/pix/PixMail";
@@ -64,6 +63,8 @@ import Entypo from "@expo/vector-icons/Entypo";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
 import LinkPage from "./components/link-pay/LinkPage";
+
+import { selectUser } from "./store/redux/selector";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -164,7 +165,7 @@ function PaymentStack({ route, navigation }) {
 	);
 }
 
-const UserStack = () => {
+const UserStack = () => {	
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -207,6 +208,12 @@ function HomeStack() {
 		signOutUser();
 		context.logout();
 	};
+
+	const currentUser = useSelector(selectUser)
+	console.log('user: ', currentUser.displayName)
+	const getFirstName = (name) => name.split(' ')[0].charAt(0).toUpperCase() + name.split(' ')[0].slice(1).toLowerCase();
+	const getUserName = currentUser?.displayName ? getFirstName(currentUser?.displayName) : 'Usuário'
+
 	return (
 		<Tab.Navigator
 			screenOptions={{
@@ -269,7 +276,7 @@ function HomeStack() {
 				}}
 			/>
 			<Tab.Screen
-				name="Usuário"
+				name={getUserName}
 				component={UserStack}
 				options={{
 					headerShown: false,

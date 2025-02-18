@@ -31,6 +31,7 @@ import { formatDateFirebaseCompare } from "../../utils/formatDate";
 import WebView from "react-native-webview";
 
 import { Searchbar } from "react-native-paper";
+import { createClient } from "../../utils/axios/axios.utils";
 
 const UserVendas = ({ navigation }) => {
 	const tabBarHeight = useBottomTabBarHeight();
@@ -174,13 +175,21 @@ const UserVendas = ({ navigation }) => {
 			if (alreadyGotAll === false) {
 				setfilterQueryFireAll(true);
 				console.log("maior que 90");
+				const valuesForm = {
+					uid: uid,
+					isSuperUser: isSuperUser,
+					allContent: true
+				};
 				const getSellerTransactions = async () => {
 					setIsLoading(true);
-					const sellerData = await getTransactionsById(
-						uid,
-						isSuperUser,
-						true
-					);
+					const sellerData = await createClient.post("list-transactions", null, {
+						params: JSON.stringify(valuesForm)
+					})
+					// const sellerData = await getTransactionsById(
+					// 	uid,
+					// 	isSuperUser,
+					// 	true
+					// );
 					setIsLoading(false);
 					setSellerData(sellerData);
 					setFilteredData(sellerData);

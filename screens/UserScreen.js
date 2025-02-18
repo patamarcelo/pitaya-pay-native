@@ -30,10 +30,12 @@ function UserScreen() {
 		console.log("refresgData");
 		setRefreshData(true);
 	};
+	const formatName = (name) => name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			tabBarLabel: "Vendedora",
-			title: displayName ? displayName : "User Name",
+			title: displayName ? formatName(displayName) : "User Name",
 			headerTintColor: "whitesmoke",
 			headerShadowVisible: false,
 			headerShown: true,
