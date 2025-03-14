@@ -102,8 +102,12 @@ const ProductsComp = (props) => {
 						};
 					});
 					console.log('\n')
-					if(kitProdsResp.data.length === 0){
-						Alert.alert('Sem Kit Liberado!!', 'Sem produtos disponíveis, contatar a Administração.')
+					if (kitProdsResp.data.length === 0) {
+						Alert.alert('Sem Kit Liberado!!', 'Sem produtos disponíveis, contatar a Administração.',
+						[
+							{ text: "OK", onPress: () => navigation.goBack() } // 👈 This goes back
+						]
+						)
 					}
 					setProductsComp(formatedArr);
 					setProducts(kitProdsResp);
