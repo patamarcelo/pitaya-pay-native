@@ -1,3 +1,4 @@
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -39,7 +40,7 @@ import ServiceTerms from "./components/terms/ServiceTerms";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./store/redux/store";
-import { Text, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View , TextInput} from "react-native";
 
 import { useSelector, useDispatch } from "react-redux";
 import { termsSelector, userSelector } from "./store/redux/selector";
@@ -65,9 +66,16 @@ import * as Font from "expo-font";
 import LinkPage from "./components/link-pay/LinkPage";
 
 import { selectUser } from "./store/redux/selector";
+import ProdutosScreen from "./components/produtos/Produtos";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = false;
+
+TextInput.defaultProps = TextInput.defaultProps || {};
+TextInput.defaultProps.allowFontScaling = false;
 
 function AuthStack() {
 	return (
@@ -101,6 +109,17 @@ function AuthStack() {
 	);
 }
 
+// function ProdutosStack({ navigation }) {
+// 	return (
+// 		<Stack.Navigator
+// 			screenOptions={{
+// 				headerStyle: { backgroundColor: Colors.primary500 }
+// 			}}
+// 		>
+// 			<Stack.Screen name="ProdutosScreen" component={ProdutosScreen} />
+// 		</Stack.Navigator>
+// 	);
+// }
 function LinkStack({ navigation }) {
 	return (
 		<Stack.Navigator
@@ -463,6 +482,17 @@ function AuthenticatedStack(props) {
 									}
 								/>
 							),
+						}}
+					/>
+					<Stack.Screen
+						name="ProdutosStack"
+						component={ProdutosScreen}
+						options={{
+							headerLargeTitle: true,
+							title: "Produtos",
+							headerShown: false,
+							// tabBarLabel: "Cartão",
+							// tabBarStyle: { display: "none" },
 						}}
 					/>
 					<Stack.Screen

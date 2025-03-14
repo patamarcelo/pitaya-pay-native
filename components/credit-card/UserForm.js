@@ -230,6 +230,9 @@ const CreditCardUserForm = () => {
 export default CreditCardUserForm;
 
 const styles = StyleSheet.create({
+	keyboardAvoidingView:{
+		flex: 1,
+	},
 	titleForm: {
 		fontSize: 19,
 		color: Colors.gold[200],
@@ -237,24 +240,27 @@ const styles = StyleSheet.create({
 		textAlign: 'center'
 	},
 	mainContainer: {
-		flex: 5,
+		flex: 1,
 		width: "90%",
-		paddingHorizontal: 10,
-		justifyContent: 'center'
+		paddingHorizontal: 80,
+		marginVertical: 20,
+		// justifyContent: 'center'
 	},
 	form: {
-		flex: 5,
+		flex: 1,
 		width: "100%",
 		justifyContent: "center",
 		alignItems: "center",
 		paddingHorizontal: 10
 	},
 	buttonContainer: {
-		flex: 1,
 		width: "100%",
-
-
-		justifyContent: 'center'
+		position: 'absolute',
+		bottom: 0,
+		paddingBottom: 40,
+		justifyContent: 'center',
+		backgroundColor: 'rgba(195,11,100,1)',
+		paddingTop: 20,
 	},
 	btnbtnStylesRegister: {
 		backgroundColor: "green"

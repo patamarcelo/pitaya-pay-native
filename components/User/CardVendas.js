@@ -59,6 +59,14 @@ const CardVendas = ({ data, handlePressUrl }) => {
 		if (typeof prods === 'string') {
 			return prods
 		}
+		if (prods[0]?.product_id_produto) {
+			const onlyprods = prods.map((data) => data.product_id_produto).map((data, i) => {
+				const sep = i + 1 < prods?.length ? " - " : "";
+				return data + sep;
+			})
+			return onlyprods
+
+		}
 		return newProd = prods?.map((data, i) => {
 			const sep = i + 1 < prods?.length ? " - " : "";
 			return data + sep;
@@ -90,7 +98,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 					<View style={styles.sellerDataContainer}>
 						<View>
 							<Text style={{ fontWeight: "bold" }}>
-								{sellerName?.length > 18 ? sellerName?.toUpperCase().substring(0, 18) + '...' : sellerName?.toUpperCase()}
+								{sellerName?.length > 23 ? sellerName?.toUpperCase().substring(0, 23) + '...' : sellerName?.toUpperCase()}
 							</Text>
 							<Text style={{ fontSize: 8 }}>{clientMail}</Text>
 						</View>
@@ -106,7 +114,7 @@ const CardVendas = ({ data, handlePressUrl }) => {
 					{
 						pagamento ?
 							<View style={styles.containerPaidStatus}>
-								 <View style={[styles.chip, { backgroundColor: isPaid ?  Colors.succes[100] : Colors.gold[200]}]}>
+								<View style={[styles.chip, { backgroundColor: isPaid ? Colors.succes[100] : Colors.gold[200] }]}>
 									<Text style={styles.paymentText}>
 										{isPaid ? 'Pago' : 'Pendente'}
 									</Text>
@@ -127,11 +135,12 @@ const CardVendas = ({ data, handlePressUrl }) => {
 						onPress={handlePressUrl.bind(this, urlComp)}
 						disabled={!urlComp && true}
 						contentStyle={{
-							flexDirection: "row-reverse"
+							flexDirection: "row-reverse",
+							marginRight: -10
 							// backgroundColor: "#rgba(11,156,49,0.8)"
 						}}
 					>
-						<Text style={{ color: "black" }}>
+						<Text style={{ color: Colors.succes[800], fontWeight: 'bold' }}>
 							R${" "}
 							{value.toLocaleString("pt-br", {
 								minimumFractionDigits: 2,
@@ -157,9 +166,9 @@ const styles = StyleSheet.create({
 	},
 	paymentText: {
 		fontSize: 8,
-		marginRight: 8,
+		marginRight: 0,
 		fontWeight: 'bold',
-		color: "grey",
+		color: Colors.secondary[900],
 	},
 	sellerDataContainer: {
 		justifyContent: "space-between",
@@ -169,7 +178,8 @@ const styles = StyleSheet.create({
 	},
 	valueButton: {
 		justifyContent: "flex-end",
-		alignItems: "flex-end"
+		alignItems: "flex-end",
+		marginRight: 0
 	},
 	dateImgContainer: {
 		justifyContent: "center",
@@ -184,7 +194,8 @@ const styles = StyleSheet.create({
 		color: "grey",
 		fontSize: 9,
 		marginTop: 3,
-		marginBottom: 5
+		marginBottom: 5,
+		fontWeight: 'bold'
 	},
 	image: {
 		marginRight: 15

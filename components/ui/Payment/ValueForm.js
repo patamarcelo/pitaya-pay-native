@@ -6,7 +6,8 @@ import {
 	Keyboard,
 	Platform,
 	TouchableWithoutFeedback,
-	Dimensions
+	Dimensions,
+	KeyboardAvoidingView
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Colors } from "../../../constants/styles";
@@ -35,6 +36,7 @@ import { Ionicons } from "@expo/vector-icons";
 import IconButton from "../IconButton";
 
 import { Picker } from "@react-native-picker/picker";
+import * as Haptics from 'expo-haptics';
 
 const PaymentForm = ({ prevRouteName }) => {
 	const [paymentValue, setPaymentValue] = useState(0);
@@ -146,23 +148,34 @@ const PaymentForm = ({ prevRouteName }) => {
 	};
 
 	const handleDeleteProduct = (e) => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
 		setParcelasSelected(parcelasSelected.filter((data) => data !== e));
 	};
 
 	useEffect(() => {
-		const totalQuantity = products.filter((data) =>
-			parcelasSelected.includes(data.codigo)
-		);
-		const total = products
-			.filter((data) => parcelasSelected.includes(data.codigo))
-			.reduce((acc, curr) => (acc += curr.valor), 0);
-		if (total > 0) {
-			setPaymentValue(total);
-			setQuantityProd(totalQuantity.length);
+		if (productsComp.length > 0 && parcelasSelected.length > 0) {
+			console.log('prods error arr:', products.data)
+			console.log('parcelas Selected::', parcelasSelected)
+			const totalQuantity = products.data.filter((data) =>
+				parcelasSelected.includes(data)
+			);
+			console.log('total quantityProd', totalQuantity)
+			const total = products.data
+				.filter((data) => parcelasSelected.includes(data))
+				.reduce((acc, curr) => (acc += curr.sell_price), 0);
+			console.log('total ', total)
+			if (total > 0) {
+				setPaymentValue(total);
+				setQuantityProd(totalQuantity.length);
+			} else {
+				setPaymentValue(0);
+				setQuantityProd(0);
+			}
 		} else {
 			setPaymentValue(0);
 			setQuantityProd(0);
 		}
+
 	}, [productsComp, parcelasSelected]);
 
 	// ------------------------	PRODUTCOM -------------------------------- //
@@ -198,158 +211,163 @@ const PaymentForm = ({ prevRouteName }) => {
 
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-			<>
-			<ScrollView
-				// horizontal={true}
-				showsHorizontalScrollIndicator={false}
-				showsVerticalScrollIndicator={false}
-				automaticallyAdjustContentInsets={true}
-			>
-				<View
-					style={[
-						styles.mainContainer,
-						{ marginBottom: headerHeight }
-					]}
+			<View style={{ flex: 1 }}>
+				<KeyboardAvoidingView
+					style={{ flex: 1 }}
+					behavior={Platform.OS === "ios" ? "padding" : "height"}
 				>
-					<View>
-						{paymentValue > 0 && (
-							<Text style={styles.value}>
-								R${" "}
-								{paymentValue && paymentValue > 0
-									? paymentValue?.toLocaleString("pt-br", {
-											minimumFractionDigits: 2,
-											maximumFractionDigits: 2
-									  })
-									: "0,00"}
-							</Text>
-						)}
-						<ProductsComp
-							products={products}
-							setProducts={setProducts}
-							productsComp={productsComp}
-							setProductsComp={setProductsComp}
-							parcelasSelected={parcelasSelected}
-							setParcelasSelected={setParcelasSelected}
-							handlerChangeParcelas={handlerChangeParcelas}
-							handleDeleteProduct={handleDeleteProduct}
-							paymentValue={paymentValue}
-							quantityProd={quantityProd}
-						/>
-					</View>
-					{parcelasSelected?.length > 0 && (
-						<View style={styles.form}>
-							<Controller
-								control={control}
-								name="valor"
-								render={({
-									field: { onChange, onBlur, value }
-								}) => (
-									<CurrencyInputType
-										register={register}
-										nameRegister={"valor"}
-										inputContainerProps={
-											styles.containerProps
-										}
-										styleInput={{
-											textAlign: "center",
-											borderWidth: errors.placa && 1,
-											borderColor:
-												errors.placa && "#ff375b"
-										}}
-										// label="Valor"
-										onUpdateValue={(e) => {
-											handlerChange(e, "valor");
-											onChange(e);
-										}}
-										value={paymentValue}
-										// keyboardType="email-address"
-										onBlur={onBlur}
-										inputStyles={styles.inputStyles}
-										placeholder="Insira o valor"
-										// maxLength={7}
-									/>
-								)}
-							/>
-
-							{errors.valor && (
-								<Text style={styles.labelError}>
-									{errors.valor?.message}
-								</Text>
-							)}
-							<View>
-								<Text style={styles.helperValue}>
-									Altere o valor se precisar
-								</Text>
-							</View>
-						</View>
-					)}
-					{prevRouteName &&
-						prevRouteName === "CARTAO" &&
-						paymentValue >= 60 && (
-							<View style={styles.optionContainer}>
-								<View>
-									<Button
-										btnStyles={[
-											styles.btnOptStyleVista,
-											vista && styles.active,
-											!vista && styles.deactivetaed
-										]}
-										onPress={handlerVista}
-									>
-										À Vista
-									</Button>
-								</View>
-								<View>
-									<Button
-										btnStyles={[
-											styles.btnOptStyleParc,
-											parcelado && styles.active,
-											!parcelado && styles.deactivetaed
-										]}
-										onPress={handlerParcelado}
-									>
-										Parcelado
-									</Button>
-								</View>
-							</View>
-						)}
-					{parcelado && paymentValue >= 60 && (
-						<View style={pickerSelectStyles.inputAndroid}>
-							<Picker
-								selectionColor={"rgba(255,255,255,0.2)"}
-								itemStyle={{ color: "whitesmoke" }}
-								selectedValue={times}
-								mode="dropdown"
-								placeholderStyle={{ color: "#007aff" }}
-								onValueChange={(e) => {
-									handlerChangeSelect(e, "Parcelas");
-								}}
-							>
-								{arrayTimes.map((data, i) => {
-									return (
-										<Picker.Item
-											style={{
-												backgroundColor:
-													Colors.primary500,
-												opacity: 0.5,
-												borderRadius: 12
-											}}
-											color="whitesmoke"
-											key={i}
-											label={data.label}
-											value={data.value}
-										/>
-									);
-								})}
-							</Picker>
-						</View>
-					)}
-				</View>
-			</ScrollView>
-					{parcelasSelected?.length > 0 && (
+					<ScrollView
+						// horizontal={true}
+						showsHorizontalScrollIndicator={false}
+						showsVerticalScrollIndicator={false}
+						automaticallyAdjustContentInsets={true}
+					>
 						<View
-							style={styles.btnContainer}
+							style={[
+								styles.mainContainer,
+								{ marginBottom: headerHeight }
+							]}
 						>
+							<View>
+								{paymentValue > 0 && (
+									<Text style={styles.value}>
+										R${" "}
+										{paymentValue && paymentValue > 0
+											? paymentValue?.toLocaleString("pt-br", {
+												minimumFractionDigits: 2,
+												maximumFractionDigits: 2
+											})
+											: "0,00"}
+									</Text>
+								)}
+								<ProductsComp
+									products={products}
+									setProducts={setProducts}
+									productsComp={productsComp}
+									setProductsComp={setProductsComp}
+									parcelasSelected={parcelasSelected}
+									setParcelasSelected={setParcelasSelected}
+									handlerChangeParcelas={handlerChangeParcelas}
+									handleDeleteProduct={handleDeleteProduct}
+									paymentValue={paymentValue}
+									quantityProd={quantityProd}
+								/>
+							</View>
+							{parcelasSelected?.length > 0 && (
+								<View style={styles.form}>
+									<Controller
+										control={control}
+										name="valor"
+										render={({
+											field: { onChange, onBlur, value }
+										}) => (
+											<CurrencyInputType
+												register={register}
+												nameRegister={"valor"}
+												inputContainerProps={
+													styles.containerProps
+												}
+												styleInput={{
+													textAlign: "center",
+													borderWidth: errors.placa && 1,
+													borderColor:
+														errors.placa && "#ff375b"
+												}}
+												// label="Valor"
+												onUpdateValue={(e) => {
+													handlerChange(e, "valor");
+													onChange(e);
+												}}
+												value={paymentValue}
+												// keyboardType="email-address"
+												onBlur={onBlur}
+												inputStyles={styles.inputStyles}
+												placeholder="Insira o valor"
+											// maxLength={7}
+											/>
+										)}
+									/>
+
+									{errors.valor && (
+										<Text style={styles.labelError}>
+											{errors.valor?.message}
+										</Text>
+									)}
+									<View>
+										<Text style={styles.helperValue}>
+											Altere o valor se precisar
+										</Text>
+									</View>
+								</View>
+							)}
+							{prevRouteName &&
+								prevRouteName === "CARTAO" &&
+								paymentValue >= 60 && (
+									<View style={styles.optionContainer}>
+										<View>
+											<Button
+												btnStyles={[
+													styles.btnOptStyleVista,
+													vista && styles.active,
+													!vista && styles.deactivetaed
+												]}
+												onPress={handlerVista}
+											>
+												À Vista
+											</Button>
+										</View>
+										<View>
+											<Button
+												btnStyles={[
+													styles.btnOptStyleParc,
+													parcelado && styles.active,
+													!parcelado && styles.deactivetaed
+												]}
+												onPress={handlerParcelado}
+											>
+												Parcelado
+											</Button>
+										</View>
+									</View>
+								)}
+							{parcelado && paymentValue >= 60 && (
+								<View style={pickerSelectStyles.inputAndroid}>
+									<Picker
+										selectionColor={"rgba(255,255,255,0.2)"}
+										itemStyle={{ color: "whitesmoke" }}
+										selectedValue={times}
+										mode="dropdown"
+										placeholderStyle={{ color: "#007aff" }}
+										onValueChange={(e) => {
+											handlerChangeSelect(e, "Parcelas");
+										}}
+									>
+										{arrayTimes.map((data, i) => {
+											return (
+												<Picker.Item
+													style={{
+														backgroundColor:
+															Colors.primary500,
+														opacity: 0.5,
+														borderRadius: 12
+													}}
+													color="whitesmoke"
+													key={i}
+													label={data.label}
+													value={data.value}
+												/>
+											);
+										})}
+									</Picker>
+								</View>
+							)}
+						</View>
+					</ScrollView>
+				</KeyboardAvoidingView>
+				{parcelasSelected?.length > 0 && (
+					<View
+						style={styles.btnContainer}
+					>
 						<Button
 							btnStyles={styles.btnStyles}
 							disabled={
@@ -357,12 +375,12 @@ const PaymentForm = ({ prevRouteName }) => {
 								parcelasSelected.length === 0
 							}
 							onPress={handlerConfirm}
-							>
+						>
 							Avançar
 						</Button>
-						</View>
-					)}
-					</>
+					</View>
+				)}
+			</View>
 		</TouchableWithoutFeedback>
 	);
 };
@@ -442,14 +460,19 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		// backgroundColor: 'blue'
 	},
-	btnContainer:{
-		height: 50,
-		marginBottom: 70,
-		flex: 1,
-		width: '100%',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},	
+	btnContainer: {
+		position: "absolute",
+		bottom: 0,
+		paddingBottom: 40,
+		borderTopLeftRadius: 12,
+		borderTopRightRadius: 12,
+		left: 0,
+		right: 0,
+		backgroundColor: Colors.primary[500], // Adjust based on your UI
+		backgroundColor: 'rgba(195,11,100,0.7)', // Adjust based on your UI
+		padding: 16,
+		alignItems: "center",
+	},
 	title: {
 		fontSize: 22,
 		color: Colors.secondary[200],
@@ -458,7 +481,9 @@ const styles = StyleSheet.create({
 	value: {
 		fontSize: 24,
 		color: Colors.succes[200],
-		textAlign: "center",
+		textAlign: "right",
+		fontWeight: 'bold',
+		marginRight: 10,
 		marginBottom: 4
 	}
 });

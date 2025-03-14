@@ -39,7 +39,7 @@ const PixComponent = ({ route, navigation }) => {
 	}, []);
 
 	return (
-		<KeyboardAwareScrollView
+		<View style={{flex: 1}}
 		// behavior={Platform.OS === "ios" ? "padding" : "height"}
 		// style={styles.container}
 		>
@@ -48,7 +48,7 @@ const PixComponent = ({ route, navigation }) => {
 					<PaymentForm />
 				</View>
 			</TouchableWithoutFeedback>
-		</KeyboardAwareScrollView>
+		</View>
 	);
 };
 

@@ -4,11 +4,11 @@ import {
 	StyleSheet,
 	Pressable,
 	ActivityIndicator,
-	Animated
+	Animated,
 } from "react-native";
 import { Colors } from "../../../constants/styles";
-import { createClient } from "../../../utils/axios/axios.utils";
-import { useState, useEffect } from "react";
+import { createDjangoClient } from "../../../utils/axios/axios.utils";
+import { useState, useEffect, useCallback } from "react";
 
 import MultiSelect from "react-native-multiple-select";
 import { FontAwesome } from "@expo/vector-icons";
@@ -18,12 +18,28 @@ import { Ionicons } from "@expo/vector-icons";
 import { Divider } from "react-native-paper";
 import { Dimensions } from "react-native";
 
+import {
+	userSelector,
+} from "../../../store/redux/selector";
+import { useSelector } from "react-redux";
+
+import { useNavigation, useRoute } from "@react-navigation/native";
+
+import Icon from "react-native-vector-icons/FontAwesome";
+import * as Haptics from 'expo-haptics';
+
+
+
 const width = Dimensions.get("window").width; //full width
 
 const ProductsComp = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [altura, setAltura] = useState(new Animated.Value(120));
 	const [largura, setLargura] = useState(new Animated.Value(0));
+	const user = useSelector(userSelector);
+	const navigation = useNavigation();
+	const route = useRoute();
+
 
 	const {
 		products,
@@ -56,29 +72,30 @@ const ProductsComp = (props) => {
 	}, [products]);
 
 	const getProduct = (product) => {
-		return productsComp.filter((data) => data.id === product)[0].name;
+		return productsComp.find((data) => data.id === product);
 	};
 
 	useEffect(() => {
 		const getProductsQuery = async () => {
 			setIsLoading(true);
 			try {
-				const {
-					data: { data }
-				} = await createClient("pitaya-products", null, {});
-				const formatedArr = data.map((data) => {
+				const
+					res
+						= await createDjangoClient.post("products/register_prods/get_kitprods_open_byseller_rnapp/",
+							// { 'seller_email': user.email }
+							{ 'seller_email': 'gayerale78@gmail.com' }
+						);
+				console.log('data', res.data.dados.data)
+				const formatedArr = res.data.dados.data.map((data) => {
 					return {
-						id: data.codigo,
-						name: `${
-							data.codigo
-						} - R$ ${data?.valor?.toLocaleString("pt-br", {
-							minimumFractionDigits: 2,
-							maximumFractionDigits: 2
-						})}`
+						id: data.product_id_produto,
+						model: data.content_type__model,
+						value: data?.sell_price,
+						name: data.product_id_produto
 					};
 				});
 				setProductsComp(formatedArr);
-				setProducts(data);
+				setProducts(res.data.dados);
 			} catch (error) {
 				console.log("erro ao pegar os produtos", error);
 			} finally {
@@ -88,83 +105,52 @@ const ProductsComp = (props) => {
 		getProductsQuery();
 	}, []);
 
+
+	const formatNumber = number => {
+		if (!number) return 0
+		return number?.toLocaleString("pt-br", {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2
+		})
+	}
+	const handleSelect = (prod) => {
+		const dataToSend = {
+			// data: products, existProds: parcelasSelected
+			data: products, existProds: parcelasSelected
+		}
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
+		navigation.navigate("ProdutosStack", {
+			data: dataToSend,
+			onGoBack: (data) => {
+				console.log('data received here', data);
+				setParcelasSelected(data);
+			},
+		});
+
+		// navigation.push("ProdutosStack", { data: products })
+	}
 	return isLoading ? (
 		<View style={styles.loaderContainer}>
 			<ActivityIndicator size="large" color={"whitesmoke"} />
 		</View>
 	) : (
-		<Animated.View
+		<View
 			style={[
 				styles.mainContainer,
-				{ width: largura, minHeight: altura }
+				{ paddingBottom: parcelasSelected.length > 0 ? 20 : 0 }
 			]}
 		>
-			<View style={styles.titleView}>
-				<Text style={styles.title}>Selecione pelo menos 1 produto</Text>
-			</View>
-			<View style={styles.multiContainer}>
-				<MultiSelect
-					hideTags
-					items={productsComp}
-					uniqueKey="id"
-					ref={(component) => {
-						this.multiSelect = component;
-					}}
-					onSelectedItemsChange={(e) => {
-						handlerChangeParcelas(e);
-						this.multiSelect._clearSelectorCallback();
-					}}
-					hideSubmitButton={false}
-					selectedItems={parcelasSelected}
-					selectText="Selecione os Produtos"
-					selectedText={
-						parcelasSelected.length > 1
-							? "itens selecionados"
-							: "item selecionado"
-					}
-					searchInputPlaceholderText="Procure os produtos"
-					// onChangeInput={(text) => {
-					// 	console.log("selected: ", text);
-					// 	console.log("selected: ", text);
-					// }}
-					// altFontFamily="ProximaNova-Light"
-					tagRemoveIconColor="#CCC"
-					tagBorderColor="white"
-					tagTextColor="white"
-					selectedItemTextColor="#CCC"
-					selectedItemIconColor="#CCC"
-					itemTextColor="#000"
-					displayKey="name"
-					styleDropdownMenu={{ backgroundColor: Colors.primary[800] }}
-					styleMainWrapper={{ backgroundColor: Colors.primary[800] }}
-					searchInputStyle={{
-						color: "#CCC",
-						padding: 8
-					}}
-					submitButtonColor="black"
-					submitButtonText="Confirmar"
-					styleDropdownMenuSubsection={{
-						borderRadius: 8
-						// backgroundColor: Colors.primary500
-					}}
-					styleTextDropdown={{
-						paddingHorizontal: 8
-					}}
-					styleTextDropdownSelected={{
-						paddingHorizontal: 8
-					}}
-					// styleDropdownMenu={{ marginTop: 8 }}
-					styleIndicator={{ bottom: 5, left: 10 }}
-					// tagContainerStyle={{
-					// 	borderRadius: 8
-					// }}
-					// styleItemsContainer={
-					// 	{
-					// 		// maxHeightheight: "80%"
-					// 	}
-					// }
-				/>
-			</View>
+			{/* <View style={styles.mainContainer}> */}
+			<Pressable
+				onPress={handleSelect.bind(this, 'select-produtos')}
+				style={({ pressed }) => [
+					pressed && styles.pressed,
+					styles.selectContainer
+				]}>
+				<Text style={styles.selectTitle}>Selecionar Produtos</Text>
+				<Icon name="chevron-right" size={18} color={Colors.gold[100]} />
+			</Pressable>
+			{/* </View> */}
 
 			<View style={styles.mainDataViewContainer}>
 				{parcelasSelected &&
@@ -177,9 +163,28 @@ const ProductsComp = (props) => {
 										size={20}
 										color={Colors.succes[300]}
 									/>
-									<Text style={styles.dataContent}>
-										{getProduct(data)}
-									</Text>
+									<Pressable
+										onPress={handleDeleteProduct.bind(
+											this,
+											data
+										)}
+										style={({ pressed }) => [
+											pressed && styles.pressed,
+											{ justifyContent: 'space-between', flexDirection: 'row', width: '100%', paddingRight: 20 }
+										]}
+
+
+									>
+										<Text style={styles.dataContent}>
+											{getProduct(data.product_id_produto)?.name}
+										</Text>
+										<Text style={styles.dataContent}>
+											{getProduct(data.product_id_produto)?.model.charAt(0).toUpperCase() + getProduct(data.product_id_produto)?.model.slice(1)}
+										</Text>
+										<Text style={styles.dataContent}>
+											R$ {formatNumber(getProduct(data.product_id_produto)?.value)}
+										</Text>
+									</Pressable>
 								</View>
 								<Pressable
 									onPress={handleDeleteProduct.bind(
@@ -209,19 +214,19 @@ const ProductsComp = (props) => {
 									: `Item: ${quantityProd}`}
 							</Text>
 							<Text style={styles.valueText}>
-								Subtotal: R${" "}
+								R$ {" "}
 								{paymentValue && paymentValue > 0
 									? paymentValue.toLocaleString("pt-br", {
-											minimumFractionDigits: 2,
-											maximumFractionDigits: 2
-									  })
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 2
+									})
 									: "0,00"}
 							</Text>
 						</View>
 					</>
 				)}
 			</View>
-		</Animated.View>
+		</View>
 	);
 };
 
@@ -237,7 +242,7 @@ const styles = StyleSheet.create({
 	resumContainer: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		paddingHorizontal: 20,
+		paddingHorizontal: 10,
 		paddingTop: 10,
 		paddingBottom: 5
 	},
@@ -246,14 +251,18 @@ const styles = StyleSheet.create({
 	},
 	mainDataViewContainer: {
 		backgroundColor: Colors.primary[600],
-		borderRadius: 8,
-		paddingVertical: 5
+		borderRadius: 6,
+		paddingVertical: 5,
 	},
 	multiContainer: {
-		width: "94%"
+		width: "90%"
 	},
-	titleView: {
-		marginVertical: 10
+	selectContainer: {
+		width: '100%',
+		paddingHorizontal: 10,
+		justifyContent: 'space-between',
+		flexDirection: 'row',
+		alignItems: 'center'
 	},
 	title: {
 		alignSelf: "center",
@@ -270,8 +279,9 @@ const styles = StyleSheet.create({
 	productContainerInside: {
 		width: "90%",
 		flexDirection: "row",
-		justifyContent: "flex-start",
-		alignItems: "center"
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginRight: 10
 	},
 	productContainer: {
 		width: "90%",
@@ -281,12 +291,19 @@ const styles = StyleSheet.create({
 		marginHorizontal: 10
 	},
 	mainContainer: {
-		width: "95%",
+		width: "10%%",
 		backgroundColor: Colors.primary[800],
-		paddingBottom: 20,
 		alignItems: "center",
-		borderRadius: 12
-		// alignItems: "center"
-		// backgroundColor: Colors.secondary[200]
+		justifyContent: 'center',
+		borderRadius: 6,
+		paddingHorizontal: 10,
+		marginHorizontal: 10,
+	},
+	selectTitle: {
+		color: Colors.gold[100],
+		fontSize: 20,
+		fontWeight: 'bold',
+		paddingVertical: 20,
+		textAlign: 'left'
 	}
 });

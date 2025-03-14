@@ -3,6 +3,8 @@ import { ICON_URL } from "../../utils/imageUrl";
 import { Colors } from "../../constants/styles";
 import { useNavigation } from "@react-navigation/native";
 
+import Animated, { BounceIn, BounceOut, FadeIn, FadeInRight,FadeOutRight, FadeInUp, FadeOut, FadeOutUp, FlipInEasyX, FlipOutEasyX, Layout, SlideInLeft, SlideInRight, SlideOutRight, SlideOutUp, StretchInY, StretchOutX, ZoomIn, ZoomOut } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 const CardButton = (props) => {
 	const { type, nextUrl, textTitle, btnStyles } = props;
 	const sourceImage = type ? ICON_URL[type].uri : "";
@@ -11,21 +13,30 @@ const CardButton = (props) => {
 	const navigation = useNavigation();
 
 	const handlePress = () => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
 		navigation.navigate(nextUrl);
 	};
 	return (
-		<Pressable
-			style={({ pressed }) => [
-				styles.mainContainer,
-				pressed && styles.pressed,
-				type === 'linkPay' && styles.linkPayContainer,
-				btnStyles
-			]}
-			onPress={handlePress}
+		<Animated.View
+			entering={FadeInRight.duration(500)} // Root-level animation for appearance
+			exiting={FadeOutRight.duration(500)} // Root-level animation for disappearance
+			layout={Layout.springify()}    // 
+			style={{width: '100%', justifyContent: 'center', alignItems: 'center'}}
 		>
-			{type && <Image style={[styles.image, type === 'linkPay' && styles.linkPayImg]} source={sourceImage} />}
-			<Text style={styles.text}>{sourceText}</Text>
-		</Pressable>
+
+			<Pressable
+				style={({ pressed }) => [
+					styles.mainContainer,
+					pressed && styles.pressed,
+					type === 'linkPay' && styles.linkPayContainer,
+					btnStyles
+				]}
+				onPress={handlePress}
+			>
+				{type && <Image style={[styles.image, type === 'linkPay' && styles.linkPayImg]} source={sourceImage} />}
+				<Text style={styles.text}>{sourceText}</Text>
+			</Pressable>
+		</Animated.View>
 	);
 };
 
@@ -52,10 +63,10 @@ const styles = StyleSheet.create({
 		shadowRadius: 2,
 		borderRadius: 20
 	},
-	linkPayContainer:{
+	linkPayContainer: {
 		height: 68
 	},
-	linkPayImg:{
+	linkPayImg: {
 		width: 20,
 		height: 20,
 		marginRight: 15

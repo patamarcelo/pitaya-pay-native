@@ -400,7 +400,9 @@ const styles = StyleSheet.create({
     btnView: {
         // flex: 1,
         width: "90%",
-        marginBottom: 100
+        position: 'absolute',
+        bottom: 0,
+        marginBottom: 50
     },
     form: {
         flex: 1,
