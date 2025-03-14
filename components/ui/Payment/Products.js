@@ -83,22 +83,30 @@ const ProductsComp = (props) => {
 				const
 					res
 						= await createDjangoClient.post("products/register_prods/get_kitprods_open_byseller_rnapp/",
-							// { 'seller_email': user.email }
-							{ 'seller_email': 'gayerale78@gmail.com' }
+							{ 'seller_email': user.email }
+							// { 'seller_email': 'gayerale78@gmail.com' }
 						);
 				if (res.status === 200) {
+					const kitProdsResp = res.data.dados
+
 					console.log('data', res.data.dados.data)
-					console.log('res', res)
-					const formatedArr = res.data.dados.data.map((data) => {
+					console.log('res', res, '\n')
+					const formatedArr = kitProdsResp.data.map((data) => {
+						console.log('data here: ', data)
 						return {
 							id: data.product_id_produto,
 							model: data.content_type__model,
 							value: data?.sell_price,
-							name: data.product_id_produto
+							name: data.product_id_produto,
+							pk: data.pk
 						};
 					});
+					console.log('\n')
+					if(kitProdsResp.data.length === 0){
+						Alert.alert('Sem Kit Liberado!!', 'Sem produtos disponíveis, contatar a Administração.')
+					}
 					setProductsComp(formatedArr);
-					setProducts(res.data.dados);
+					setProducts(kitProdsResp);
 				}
 			} catch (error) {
 				console.log("erro ao pegar os produtos", error);
@@ -118,6 +126,8 @@ const ProductsComp = (props) => {
 		})
 	}
 	const handleSelect = (prod) => {
+		console.log('products: ', products)
+		console.log('parcelasSelected: ', parcelasSelected)
 		const dataToSend = {
 			// data: products, existProds: parcelasSelected
 			data: products, existProds: parcelasSelected

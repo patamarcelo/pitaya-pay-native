@@ -24,7 +24,6 @@ const ProdutosScreen = ({ navigation, route }) => {
 	useEffect(() => {
 		console.log('inside here:')
 		if (route?.params?.data) {
-			console.log('after get data')
 			const sortedProds = route.params.data.data?.data
 				? [...route.params.data.data.data].sort(
 					(a, b) => Number(a.product_id_produto) - Number(b.product_id_produto)
@@ -72,7 +71,7 @@ const ProdutosScreen = ({ navigation, route }) => {
 
 	useEffect(() => {
 		setSelectProdsList(existentProds || [])
-	}, []);
+	}, [existentProds]);
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -94,7 +93,6 @@ const ProdutosScreen = ({ navigation, route }) => {
 
 	const handleSelectProds = () => {
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
-		console.log('selected Prods: ')
 		// Set params before going back
 		const { onGoBack } = route.params; // Retrieve the callback function
 		if (onGoBack) {
@@ -106,14 +104,13 @@ const ProdutosScreen = ({ navigation, route }) => {
 
 	const handleFilterProds = (data) => {
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
-		console.log('filter Prods: ', data)
 		setSelectedFilterPod(data)
 	}
 
 	const handleDeleteProduct = (model) => {
 		setSelectProdsList((prev) => {
-			console.log('prev', prev)
-			console.log('prevModel', model)
+			// console.log('prev', prev)
+			// console.log('prevModel', model)
 			return prev.filter((data) => data.content_type__model !== model.model)
 		})
 	}
@@ -166,7 +163,6 @@ const ProdutosScreen = ({ navigation, route }) => {
 						selectProdsList.length > 0 && (
 							resumeCardReducer.map((data, i) => {
 								return (
-
 									<View key={i} style={[styles.resumeContainer, { marginTop: i === 0 ? 10 : 0 }]}>
 										<View style={{ flexDirection: 'row', width: 120, justifyContent: 'space-between' }}>
 											<Text style={{ fontWeight: 'bold', color: Colors.secondary[200] }}>{data?.model.charAt(0).toUpperCase() + data?.model?.slice(1)}</Text>
@@ -188,6 +184,7 @@ const ProdutosScreen = ({ navigation, route }) => {
 											/>
 										</Pressable>
 									</View>
+
 								)
 							})
 

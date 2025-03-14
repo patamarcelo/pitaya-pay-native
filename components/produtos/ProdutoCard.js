@@ -15,29 +15,31 @@ const ProdutoCard = ({ item,  setSelectProdsList, selectProdsList }) => {
             })
     }
 
+    
+
     const handlePress = (product) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
-        console.log('dataHerePress: ', product)
         setSelectProdsList((prevList) => {
-            const exists = prevList.find((p) => p.product_id_produto === product.product_id_produto);
+            const exists = prevList.find((p) => p.pk === product.pk);
     
             if (exists) {
                 // Remove the product if it exists
-                return prevList.filter((p) => p.product_id_produto !== product.product_id_produto);
+                return prevList.filter((p) => p.pk !== product.pk);
             } else {
                 // Add the product if it doesn't exist
                 return [...prevList, product];
             }
         });
     }
+
     return (
         <Pressable
             style={({ pressed }) => [
                 styles.mainContainer,
                 pressed && styles.pressed,
-                { backgroundColor: selectProdsList?.some((p) => p.product_id_produto === item.product_id_produto) ? 'rgba(153,204,153,1)' : 'white' }, 
-                { border: selectProdsList?.some((p) => p.product_id_produto === item.product_id_produto) ? 'green' : 'white' }, 
-                { borderWidth: selectProdsList?.some((p) => p.product_id_produto === item.product_id_produto) ? 1 : 0 }, 
+                { backgroundColor: selectProdsList?.some((p) => p.pk === item.pk) ? 'rgba(153,204,153,1)' : 'white' }, 
+                { border: selectProdsList?.some((p) => p.pk === item.pk) ? 'green' : 'white' }, 
+                { borderWidth: selectProdsList?.some((p) => p.pk === item.pk) ? 1 : 0 }, 
             ]}
             onPress={() => handlePress(item)}
         >
@@ -50,13 +52,13 @@ const ProdutoCard = ({ item,  setSelectProdsList, selectProdsList }) => {
             {/* Right: Product Info */}
             <View style={styles.textContainer}>
                 <Text style={styles.productId}>{item.product_id_produto}</Text>
-                <Text style={[styles.model,{ color: selectProdsList?.some((p) => p.product_id_produto === item.product_id_produto) ? 'white' : '#2A9D8F'  }]}>
-                {item.content_type__model?.charAt(0).toUpperCase() + item?.content_type__model?.slice(1)}
+                <Text style={[styles.model,{ color: selectProdsList?.some((p) => p.pk === item.pk) ? 'white' : '#2A9D8F'  }]}>
+                {item.content_type__model?.charAt(0).toUpperCase() + item?.content_type__model?.slice(1)} {item.product_tamanho ? " - " + item.product_tamanho : ''}
                     </Text>
             </View>
 
             {/* Right: Price */}
-            <Text style={[styles.price,{ color: selectProdsList?.some((p) => p.product_id_produto === item.product_id_produto) ? 'white' : '#2A9D8F'  }, ]}>R$ {formaCurrency(item.sell_price)}</Text>
+            <Text style={[styles.price,{ color: selectProdsList?.some((p) => p.pk === item.pk) ? 'white' : '#2A9D8F'  }, ]}>R$ {formaCurrency(item.sell_price)}</Text>
         </Pressable>
     )
 }
@@ -64,14 +66,6 @@ const ProdutoCard = ({ item,  setSelectProdsList, selectProdsList }) => {
 export default ProdutoCard
 
 const styles = StyleSheet.create({
-    // mainContainer:{
-    //     backgroundColor: Colors.secondary[100],
-    //     borderRadius: 6,
-    //     // width: '100%',
-    //     marginHorizontal: 10,
-
-
-    // },
     price: {
         fontSize: 16,
         fontWeight: 'bold',
