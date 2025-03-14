@@ -45,7 +45,7 @@ const ProdutosScreen = ({ navigation, route }) => {
 
 	useEffect(() => {
 		if (prods?.length > 0) {
-			const onlyprods = prods?.map((data) => data?.content_type__model)?.sort((a,b) => a?.localeCompare(b))
+			const onlyprods = prods.map((data) => data.content_type__model)
 			const removeDupliProds = [... new Set(['Todos', ...onlyprods])]
 			setFilterProdsHeader(removeDupliProds)
 		}
@@ -129,7 +129,7 @@ const ProdutosScreen = ({ navigation, route }) => {
 				<FlatList
 					contentInsetAdjustmentBehavior="automatic" // Helps auto-hide the large title
 					scrollEnabled={true}
-					data={selectedFilterPod === 'Todos' ? prods : prods?.filter((data) => data?.content_type__model === selectedFilterPod)}
+					data={selectedFilterPod === 'Todos' ? prods : prods.filter((data) => data.content_type__model === selectedFilterPod)}
 					keyExtractor={(item, i) => item.product_id_produto + i}
 					renderItem={({ item }) => (
 						<ProdutoCard
