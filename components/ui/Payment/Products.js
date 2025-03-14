@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
 		marginHorizontal: 10
 	},
 	mainContainer: {
-		width: "10%%",
+		width: "95%",
 		backgroundColor: Colors.primary[800],
 		alignItems: "center",
 		justifyContent: 'center',
