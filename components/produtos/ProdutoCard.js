@@ -1,7 +1,9 @@
-import { StyleSheet, Text, View, Pressable, Image } from 'react-native'
+import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React from 'react'
 import * as Haptics from 'expo-haptics';
 import { Colors } from '../../constants/styles';
+import { Image } from 'expo-image';
+
 
 const ProdutoCard = ({ item,  setSelectProdsList, selectProdsList }) => {
     const formaCurrency = (number) => {

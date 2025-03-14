@@ -12,12 +12,31 @@ import { Ionicons } from "@expo/vector-icons";
 import ProdutoCard from './ProdutoCard';
 const ProdutosScreen = ({ navigation, route }) => {
 
+	const [prods, setProds] = useState([]);
+	const [existentProds, setExistentProds] = useState([]);
+
 	// const { data } = route?.params
 	const handleBack = () => {
 		navigation.goBack();
 	};
-	const prods = route?.params?.data?.data?.data?.sort((a,b) => Number(a.product_id_produto) - Number(b.product_id_produto))
-	const existentProds = route?.params?.data?.existProds
+
+	// Effect to update prods when route.params changes
+	useEffect(() => {
+		console.log('inside here:')
+		if (route?.params?.data) {
+			console.log('after get data')
+			const sortedProds = route.params.data.data?.data
+				? [...route.params.data.data.data].sort(
+					(a, b) => Number(a.product_id_produto) - Number(b.product_id_produto)
+				)
+				: [];
+
+			setProds(sortedProds);
+			setExistentProds(route.params.data.existProds ?? []);
+		}
+	}, [route.params]); // Depend on `route.params` to re-run when it changes
+
+
 
 
 
