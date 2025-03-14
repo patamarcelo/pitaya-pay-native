@@ -14,7 +14,7 @@ export const createClient = axios.create({
 	}
 });
 export const createDjangoClient = axios.create({
-	baseURL: process.env.NODE_ENV !== "production" ? baseURLdevDjango : baseURL,
+	baseURL: process.env.NODE_ENV !== "production" ? baseURLdevDjango : baseURLdevDjango,
 	headers: {
 		"Content-Type": "application/json",
 		'Authorization': `Token ${EXPO_PUBLIC_REACT_APP_DJANGO_TOKEN}`

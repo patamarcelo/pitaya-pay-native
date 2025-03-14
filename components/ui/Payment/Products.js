@@ -5,6 +5,7 @@ import {
 	Pressable,
 	ActivityIndicator,
 	Animated,
+	Alert
 } from "react-native";
 import { Colors } from "../../../constants/styles";
 import { createDjangoClient } from "../../../utils/axios/axios.utils";
@@ -85,17 +86,20 @@ const ProductsComp = (props) => {
 							// { 'seller_email': user.email }
 							{ 'seller_email': 'gayerale78@gmail.com' }
 						);
-				console.log('data', res.data.dados.data)
-				const formatedArr = res.data.dados.data.map((data) => {
-					return {
-						id: data.product_id_produto,
-						model: data.content_type__model,
-						value: data?.sell_price,
-						name: data.product_id_produto
-					};
-				});
-				setProductsComp(formatedArr);
-				setProducts(res.data.dados);
+				if (res.status === 200) {
+					console.log('data', res.data.dados.data)
+					console.log('res', res)
+					const formatedArr = res.data.dados.data.map((data) => {
+						return {
+							id: data.product_id_produto,
+							model: data.content_type__model,
+							value: data?.sell_price,
+							name: data.product_id_produto
+						};
+					});
+					setProductsComp(formatedArr);
+					setProducts(res.data.dados);
+				}
 			} catch (error) {
 				console.log("erro ao pegar os produtos", error);
 			} finally {
