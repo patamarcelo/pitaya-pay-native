@@ -30,7 +30,7 @@ import {
 } from "../../utils/firebase/firebase.datatable";
 import { signOutUser } from "../../utils/firebase/firebase";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 import LoadingOverlay from "../ui/LoadingOverlay";
 import { useDispatch } from "react-redux";
@@ -110,6 +110,24 @@ const CreditCardUserForm = () => {
 	const navigation = useNavigation();
 	const height = useHeaderHeight();
 
+	const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+	useEffect(() => {
+		const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+			setKeyboardVisible(true);
+		});
+
+		const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
+			setKeyboardVisible(false);
+		});
+
+		return () => {
+			keyboardDidShowListener.remove();
+			keyboardDidHideListener.remove();
+		};
+	}, []);
+
+
 
 
 	const submitHandler = async (valuesform) => {
@@ -155,7 +173,7 @@ const CreditCardUserForm = () => {
 		<SafeAreaView style={styles.mainContainer}>
 			<KeyboardAvoidingView
 				style={styles.keyboardAvoidingView}
-				behavior={Platform.OS === "ios" ? "padding" : "height"}
+				behavior={Platform.OS === "ios" ? "padding" : "position"}
 				keyboardVerticalOffset={Platform.OS === "ios" ? 120 : 0} // Adjust this based on your header height
 			>
 				<FlatList
@@ -198,6 +216,8 @@ const CreditCardUserForm = () => {
 					)}
 					showsVerticalScrollIndicator={false} // Hide vertical scroll bar
 					showsHorizontalScrollIndicator={false} // Hide horizontal scroll bar (if needed)
+					keyboardShouldPersistTaps="handled" // Dismiss keyboard on tap
+					contentContainerStyle={{ flexGrow: 1 }} // Allows scrolling properly
 					ListHeaderComponent={
 						<View style={styles.titleForm}>
 							<Text style={styles.titleForm}>Dados do Titular do Cartão</Text>
@@ -206,23 +226,47 @@ const CreditCardUserForm = () => {
 				/>
 
 			</KeyboardAvoidingView>
-			<View style={styles.buttonContainer}>
-				<Button
-					disabled={
-						Object.keys(errors).length === 0
-							? false
-							: true
-					}
-					onPress={handleSubmit(submitHandler)}
-					btnStyles={
-						Object.keys(errors).length === 0
-							? styles.btnbtnStylesRegister
-							: styles.btnDisabledStyle
-					}
-				>
-					Avançar
-				</Button>
-			</View>
+			{
+				Platform.OS === "ios" && (
+					<View style={styles.buttonContainer}>
+						<Button
+							disabled={
+								Object.keys(errors).length === 0
+									? false
+									: true
+							}
+							onPress={handleSubmit(submitHandler)}
+							btnStyles={
+								Object.keys(errors).length === 0
+									? styles.btnbtnStylesRegister
+									: styles.btnDisabledStyle
+							}
+						>
+							Avançar
+						</Button>
+					</View>
+				)
+			}
+			{!keyboardVisible && Platform.OS !== "ios" &&(
+				<View style={styles.buttonContainer}>
+					<Button
+						disabled={
+							Object.keys(errors).length === 0
+								? false
+								: true
+						}
+						onPress={handleSubmit(submitHandler)}
+						btnStyles={
+							Object.keys(errors).length === 0
+								? styles.btnbtnStylesRegister
+								: styles.btnDisabledStyle
+						}
+					>
+						Avançar
+					</Button>
+				</View>
+			)
+			}
 		</SafeAreaView >
 	);
 };
@@ -230,7 +274,7 @@ const CreditCardUserForm = () => {
 export default CreditCardUserForm;
 
 const styles = StyleSheet.create({
-	keyboardAvoidingView:{
+	keyboardAvoidingView: {
 		flex: 1,
 	},
 	titleForm: {
@@ -241,8 +285,8 @@ const styles = StyleSheet.create({
 	},
 	mainContainer: {
 		flex: 1,
-		width: "90%",
-		paddingHorizontal: 80,
+		width: Platform.OS === 'ios' ? '90%' : '100%',
+		paddingHorizontal: Platform.OS === 'ios' ? 80 : 10,
 		marginVertical: 20,
 		// justifyContent: 'center'
 	},

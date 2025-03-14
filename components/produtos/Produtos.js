@@ -157,7 +157,7 @@ const ProdutosScreen = ({ navigation, route }) => {
 					// ItemSeparatorComponent={() => <View style={{ height: 0 }} />}
 					ListFooterComponent={<View style={{ height: 40 }} />}
 				/>
-				<View style={[styles.buttonContainer, { paddingHorizontal: 10, paddingTop: 10, marginBottom: -40 }]}>
+				<View style={[styles.buttonContainer, { paddingHorizontal: 10, paddingTop: 10, marginBottom: Platform.OS === 'ios' ? -40 : -20 }]}>
 
 					{
 						selectProdsList.length > 0 && (

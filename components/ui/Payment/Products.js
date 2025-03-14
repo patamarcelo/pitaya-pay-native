@@ -147,6 +147,11 @@ const ProductsComp = (props) => {
 
 		// navigation.push("ProdutosStack", { data: products })
 	}
+
+	if(productsComp.length === 0 && !isLoading){
+		return 
+	}
+
 	return isLoading ? (
 		<View style={styles.loaderContainer}>
 			<ActivityIndicator size="large" color={"whitesmoke"} />
