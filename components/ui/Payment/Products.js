@@ -282,10 +282,12 @@ const styles = StyleSheet.create({
 	},
 	selectContainer: {
 		width: '100%',
+		paddingTop: 5,
 		paddingHorizontal: 10,
 		justifyContent: 'space-between',
 		flexDirection: 'row',
-		alignItems: 'center'
+		alignItems: 'center',
+		
 	},
 	title: {
 		alignSelf: "center",

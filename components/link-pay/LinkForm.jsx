@@ -34,6 +34,11 @@ import { addTransaction } from "../../utils/firebase/firebase.datatable";
 import { useSelector } from "react-redux";
 import { userSelector } from "../../store/redux/selector";
 
+import ProductsComp from "../ui/Payment/Products";
+import { Divider } from 'react-native-paper';
+import * as Haptics from 'expo-haptics';
+
+
 
 import {
     ALERT_TYPE,
@@ -45,7 +50,7 @@ import {
 import { Colors } from "../../constants/styles";
 
 
-import {Dimensions} from 'react-native';
+import { Dimensions } from 'react-native';
 const windowWidth = Dimensions.get('window').width;
 
 
@@ -105,25 +110,25 @@ const LinkForm = () => {
     });
 
     const [altura, setAltura] = useState(new Animated.Value(120));
-	const [largura, setLargura] = useState(new Animated.Value(0));
-    
+    const [largura, setLargura] = useState(new Animated.Value(0));
+
 
     useEffect(() => {
-		if (linkToShare && linkToShare.length > 0) {
-			Animated.sequence([
-				Animated.timing(largura, {
-					toValue: windowWidth,
-					duration: 180,
-					useNativeDriver: false
-				})
-				// Animated.timing(altura, {
-				// 	toValue: 150,
-				// 	duration: 100
-				// 	// useNativeDriver: true
-				// })
-			]).start();
-		}
-	}, [linkToShare]);
+        if (linkToShare && linkToShare.length > 0) {
+            Animated.sequence([
+                Animated.timing(largura, {
+                    toValue: windowWidth,
+                    duration: 180,
+                    useNativeDriver: false
+                })
+                // Animated.timing(altura, {
+                // 	toValue: 150,
+                // 	duration: 100
+                // 	// useNativeDriver: true
+                // })
+            ]).start();
+        }
+    }, [linkToShare]);
 
     const getFutureDate = () => {
         // Get current date
@@ -149,6 +154,7 @@ const LinkForm = () => {
         setValue,
         reset,
         resetField,
+        clearErrors,
         formState: { errors }
     } = useForm({
         resolver: yupResolver(schema),
@@ -163,11 +169,45 @@ const LinkForm = () => {
             maxInstallmentCount: parseInt(5.2),
             dueDateLimitDays: "10",
             notificationEnabled: false,
-            }
+        }
     });
+
+    const [products, setProducts] = useState([]);
+    const [productsComp, setProductsComp] = useState([]);
+    const [parcelasSelected, setParcelasSelected] = useState([]);
+    const [paymentValue, setPaymentValue] = useState(0);
+    const [quantityProd, setQuantityProd] = useState(0);
+
+    useEffect(() => {
+        if (Number(paymentValue) > 0) {
+            setValue("value", String(paymentValue), { shouldValidate: true, shouldDirty: true });
+            console.log(getValues())
+            
+            setErrorHandler((prev) => {
+                return {...prev, value: String(paymentValue)}
+            })
+        } else {
+            // setValue("value",'', { shouldValidate: true, shouldDirty: true });
+            
+            // setErrorHandler((prev) => {
+            //     return {...prev, value: ''}
+            // })
+        }
+    }, [paymentValue, setValue]);
+
+    const handlerChangeParcelas = (e) => {
+        console.log(e);
+        setParcelasSelected(e);
+    };
+
+    const handleDeleteProduct = (e) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
+        setParcelasSelected(parcelasSelected.filter((data) => data !== e));
+    };
 
     const handleResetForm = () => {
         console.log("resetando o formilário");
+        setParcelasSelected([])
         setlinkToShare(null);
         setErrorHandler({
             name: "",
@@ -178,19 +218,53 @@ const LinkForm = () => {
     };
 
     const handlerChangeObj = (key, data) => {
-        setErrorHandler((prev) => ({ ...prev, [key]: data }));
-        console.log(errorHandler)
+        setErrorHandler((prev) => {
+            const updatedState = { ...prev, [key]: data };
+            return updatedState;
+        });
+
+        clearErrors(key); // Clear validation error from react-hook-form
     };
+
+    useEffect(() => {
+        if (productsComp.length > 0 && parcelasSelected.length > 0) {
+            console.log('prods error arr:', products.data)
+            console.log('parcelas Selected::', parcelasSelected)
+            const totalQuantity = products.data.filter((data) =>
+                parcelasSelected.includes(data)
+            );
+            console.log('total quantityProd', totalQuantity)
+            const total = products.data
+                .filter((data) => parcelasSelected.includes(data))
+                .reduce((acc, curr) => (acc += curr.sell_price), 0);
+            console.log('total ', total)
+            if (total > 0) {
+                setPaymentValue(total);
+                setQuantityProd(totalQuantity.length);
+            } else {
+                setPaymentValue(0);
+                setQuantityProd(0);
+            }
+        } else {
+            setPaymentValue(0);
+            setQuantityProd(0);
+        }
+
+    }, [productsComp, parcelasSelected]);
 
     const handleLinkGenerator = async (formData) => {
         setIsLoading(true);
         console.log("Gerando o Link", formData);
-        setvaluesFormObj(formData);
+        const newForm = {
+            ...formData,
+            prodctsSell: parcelasSelected
+        }
+        setvaluesFormObj(newForm);
         try {
-            const newPaymentMethod = formData;
+            const newPaymentMethod = newForm
             const respPay = await createClient.post("createlinkpay", null, {
                 params: {
-                    newPaymentMethod: {...newPaymentMethod, maxInstallmentCount: parseInt(3)},
+                    newPaymentMethod: { ...newPaymentMethod, maxInstallmentCount: parseInt(3) },
                     user: JSON.stringify(user)
                 }
             });
@@ -198,20 +272,20 @@ const LinkForm = () => {
             if (status === 200) {
                 console.log("link gerado com sucesso: ", data);
                 const newTrans = await addTransaction(
-					user.displayName
-						? user.displayName
-						: "Vendedor sem nome cadastrado",
-					user.email,
-					user.uid,
-					"Link de pagamento",
-					formData.value,
-					"1",
-					`Nome - ${formData.name}`,
-					`descricao - ${formData.description}`,
-					data.id,
-					`AppNative - ${disp}`,
-					"-"
-				);
+                    user.displayName
+                        ? user.displayName
+                        : "Vendedor sem nome cadastrado",
+                    user.email,
+                    user.uid,
+                    "Link de pagamento",
+                    formData.value,
+                    "1",
+                    `Nome - ${formData.name}`,
+                    [{descricao: `descricao - ${formData.description}`}, ...parcelasSelected],
+                    data.id,
+                    `AppNative - ${disp}`,
+                    "-"
+                );
                 setlinkToShare(data.url);
                 reset()
             } else {
@@ -256,6 +330,14 @@ const LinkForm = () => {
     const handleHome = () => {
         navigation.navigate("PagamentosTab");
     };
+
+    const isDisabled = Object.values(errorHandler).some((value) => value === "");
+    const isDisabledTeste = Object.values(errorHandler).some((value) => {
+        console.log("Checking value:", value, "Result:", value === "");
+        return value === "";
+    });
+    console.log('isDisabledTeste', isDisabledTeste)
+    console.log('error handler: ', errorHandler)
     return (
         <>
             <ScrollView style={styles.mainContainer} scrollEnabled={false}>
@@ -281,15 +363,17 @@ const LinkForm = () => {
                                                 name={getTitle}
                                                 render={({ field: { onChange, onBlur, value } }) => (
                                                     <Input
-                                                    disabled={linkToShare && linkToShare.length > 0 ? true : false}
+                                                        disabled={linkToShare && linkToShare.length > 0 ? true : false}
                                                         styleInput={{
                                                             borderWidth: errors.getTitle && 1,
-                                                            borderColor: errors.getTitle && "#ff375b"
+                                                            borderColor: errors.getTitle && "#ff375b",
+                                                            marginHorizontal: 10,
                                                         }}
                                                         label={getLabel}
                                                         onUpdateValue={(e) => {
+                                                            console.log('changing here: ', e);
                                                             handlerChangeObj(data.title, e);
-                                                            onChange(e);
+                                                            onChange(e);  // This will update the field correctly
                                                         }}
                                                         // onUpdateValue={(e) => {
                                                         // 	handlerChange(e, getTitle);
@@ -304,7 +388,7 @@ const LinkForm = () => {
                                                         // 	// 	// .toUpperCase()
                                                         // 	// );
                                                         // }}
-                                                        value={value}
+                                                        value={value ?? ""}
                                                         keyboardType={data.keyboardType}
                                                         onBlur={onBlur}
                                                         inputStyles={styles.inputStyles}
@@ -322,8 +406,25 @@ const LinkForm = () => {
                                                 </Text>
                                             )}
                                         </View>
+
                                     );
                                 })}
+                                {/* <View style={{ height: 1, backgroundColor: 'gray', marginVertical: 8 }} /> */}
+                                <View style={{ width: '100%' }}>
+                                    <Divider style={{ height: 0.5, opacity: 0.5, backgroundColor: 'whitesmoke', marginVertical: 8 }} />
+                                </View>
+                                <ProductsComp
+                                    products={products}
+                                    setProducts={setProducts}
+                                    productsComp={productsComp}
+                                    setProductsComp={setProductsComp}
+                                    parcelasSelected={parcelasSelected}
+                                    setParcelasSelected={setParcelasSelected}
+                                    handlerChangeParcelas={handlerChangeParcelas}
+                                    handleDeleteProduct={handleDeleteProduct}
+                                    paymentValue={paymentValue}
+                                    quantityProd={quantityProd}
+                                />
                             </KeyboardAvoidingView>
                         </TouchableWithoutFeedback>
                     </View>
@@ -334,14 +435,14 @@ const LinkForm = () => {
                     )}
                     {!isLoading && linkToShare && linkToShare !== null && (
                         <Animated.View
-                            style={[{marginTop: 120 }, styles.shareConatiner, { width: largura, minHeight: altura }]}
+                            style={[{ marginTop: 120 }, styles.shareConatiner, { width: largura, minHeight: altura }]}
                         >
                             <Text style={styles.textLink}>
                                 Link gerado no valor de R$ {valuesFormObj.value}
                             </Text>
-                            <View style={{ width: "90%", marginTop: 30}}>
-                                <Button onPress={onShare}>                               
-                                <Text>Compartilhar Link</Text>
+                            <View style={{ width: "90%", marginTop: 30 }}>
+                                <Button onPress={onShare}>
+                                    <Text>Compartilhar Link</Text>
                                 </Button>
                             </View>
                         </Animated.View>
@@ -367,11 +468,7 @@ const LinkForm = () => {
                             linkToShare && { backgroundColor: Colors.gold[600] }
                         ]}
                         onPress={handleSubmit(handleLinkGenerator)}
-                        disabled={
-                            errorHandler.description === "" ||
-                            errorHandler.name === "" ||
-                            errorHandler.value === "" ? true : false
-                        }
+                        disabled={isDisabled}
                     >
                         Gerar Link
                     </Button>
