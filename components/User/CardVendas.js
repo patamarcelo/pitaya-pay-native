@@ -57,21 +57,21 @@ const CardVendas = ({ data, handlePressUrl }) => {
 
 	const produtosText = (prods) => {
 		if (typeof prods === 'string') {
-			return prods
+			return prods.slice(0, 120);
 		}
+
+		let onlyprods;
+
 		if (prods[0]?.product_id_produto) {
-			const onlyprods = prods.map((data) => data.product_id_produto).map((data, i) => {
-				const sep = i + 1 < prods?.length ? " - " : "";
-				return data + sep;
-			})
-			return onlyprods
-
+			onlyprods = prods.map((data) => data.product_id_produto);
+		} else {
+			onlyprods = prods;
 		}
-		return newProd = prods?.map((data, i) => {
-			const sep = i + 1 < prods?.length ? " - " : "";
-			return data + sep;
-		});
 
+		// Join with " - " and limit to 120 characters
+		let finalText = onlyprods.join(" - ");
+
+		return finalText.length > 120 ? finalText.slice(0, 120) : finalText;
 	};
 
 	const paymentsArr = ['Confirmado', 'Pago']
@@ -103,8 +103,11 @@ const CardVendas = ({ data, handlePressUrl }) => {
 							<Text style={{ fontSize: 8 }}>{clientMail}</Text>
 						</View>
 						<View>
-							<Text style={{ fontSize: 8, fontWeight: 600 }}>
-								{produtosText(prodctsSell)}
+							<Text style={{ fontSize: 8, fontWeight: 600 }}
+								numberOfLines={3}
+								ellipsizeMode="tail"
+							>
+								{produtosText(prodctsSell.slice(0,50))}
 							</Text>
 						</View>
 					</View>

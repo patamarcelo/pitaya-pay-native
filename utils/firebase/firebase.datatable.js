@@ -84,24 +84,6 @@ export const addSign = async (name, mail, id, text) => {
 	return newSign;
 };
 
-// TRANSACTIONS DB GET
-
-export const getTransactionsQuery = async () => {
-	const q = await query(
-		collection(db, TABLES_FIREBASE.transactions),
-		orderBy("createdAt", "desc")
-	);
-
-	const querySnapshot = await getDocs(q);
-	// console.log(querySnapshot.docs.map((docSnapshot) => docSnapshot.data()));
-	return querySnapshot.docs.map((docSnapshot) => {
-		return {
-			...docSnapshot.data(),
-			id: docSnapshot.id
-		};
-	});
-};
-
 export const getContractsSign = async () => {
 	const q = await query(
 		collection(db, TABLES_FIREBASE.contract),
@@ -115,47 +97,3 @@ export const getContractsSign = async () => {
 	});
 };
 
-export const getTransactionsById = async (sellerId, superUser, allContent) => {
-	const today = new Date();
-	const priorDate = new Date(new Date().setDate(today.getDate() - 90));
-	console.log(priorDate);
-	let q = "";
-	console.log("superUSer", superUser);
-	if (!allContent) {
-		if (!superUser || superUser === null) {
-			console.log("pegando os dados menor que 90");
-			q = query(
-				collection(db, TABLES_FIREBASE.transactions),
-				where("sellerId", "==", sellerId),
-				where("createdAt", ">", priorDate)
-			);
-		} else {
-			console.log("pegando os dados menor que 90 else ");
-			q = query(
-				collection(db, TABLES_FIREBASE.transactions),
-				where("createdAt", ">", priorDate)
-			);
-		}
-	} else {
-		console.log("pegando os dados MAIOR que 90");
-		if (!superUser || superUser === null) {
-			q = query(
-				collection(db, TABLES_FIREBASE.transactions),
-				where("sellerId", "==", sellerId)
-			);
-		} else {
-			q = query(collection(db, TABLES_FIREBASE.transactions));
-		}
-	}
-	const querySnapshot = await getDocs(q);
-	let allData = [];
-	querySnapshot.forEach((doc) => {
-		const newData = {
-			id: doc.id,
-			...doc.data()
-		};
-		allData.push(newData);
-	});
-	console.table(allData);
-	return allData;
-};

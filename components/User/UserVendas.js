@@ -79,11 +79,16 @@ const UserVendas = ({ navigation }) => {
 	useEffect(() => {
 		const getSellerTransactions = async () => {
 			setIsLoading(true);
-			const sellerData = await getTransactionsById(
+			const valuesForm = {
+				user,
 				uid,
 				isSuperUser,
-				false
-			);
+				allContent: true
+			};
+			
+			const { data: { data: sellerData} }  = await createClient.post("list-transactions", valuesForm);
+			console.log('sellerData',sellerData)
+
 			setIsLoading(false);
 			setSellerData(sellerData);
 			setFilteredData(sellerData);
@@ -137,11 +142,14 @@ const UserVendas = ({ navigation }) => {
 		console.log("atualizando");
 		const getSellerTransactions = async () => {
 			setIsLoading(true);
-			const sellerData = await getTransactionsById(
+			const valuesForm = {
+				user,
 				uid,
 				isSuperUser,
-				false
-			);
+				allContent: true
+			};
+			const { data: { data: sellerData} }  = await createClient.post("list-transactions", valuesForm);
+
 			setIsLoading(false);
 			setSellerData(sellerData);
 			setFilteredData(sellerData);
@@ -172,41 +180,38 @@ const UserVendas = ({ navigation }) => {
 
 	useEffect(() => {
 		if (filterDays > 90) {
-			if (alreadyGotAll === false) {
+			if (!alreadyGotAll) {
 				setfilterQueryFireAll(true);
 				console.log("maior que 90");
+
 				const valuesForm = {
-					uid: uid,
-					isSuperUser: isSuperUser,
+					user,
+					uid,
+					isSuperUser,
 					allContent: true
 				};
+
 				const getSellerTransactions = async () => {
-					setIsLoading(true);
-					const sellerData = await createClient.post("list-transactions", null, {
-						params: JSON.stringify(valuesForm)
-					})
-					// const sellerData = await getTransactionsById(
-					// 	uid,
-					// 	isSuperUser,
-					// 	true
-					// );
-					setIsLoading(false);
-					setSellerData(sellerData);
-					setFilteredData(sellerData);
+					try {
+						setIsLoading(true);
+						const { data: { data: response} }  = await createClient.post("list-transactions", valuesForm);
+						setSellerData(response);
+						setFilteredData(response);
+					} catch (err) {
+						console.error("Erro ao pegar os dados:", err);
+					} finally {
+						setIsLoading(false);
+					}
 				};
-				try {
-					getSellerTransactions();
-				} catch (err) {
-					console.log("erro ao pegar os dados: ", err);
-				} finally {
-				}
-				setalreadyGotAll(true);
+
+				getSellerTransactions();
+				setalreadyGotAll(true); // ✅ State update after API call is initiated
 			}
 		} else {
 			setfilterQueryFireAll(false);
 		}
 		console.log("FilterDays", filterDays);
-	}, [filterDays]);
+	}, [filterDays]); // ✅ Dependencies are correct
 
 	const VendasList = (itemData) => {
 		return (
