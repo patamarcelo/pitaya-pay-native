@@ -104,9 +104,9 @@ const ProductsComp = (props) => {
 					console.log('\n')
 					if (kitProdsResp.data.length === 0) {
 						Alert.alert('Sem Kit Liberado!!', 'Sem produtos disponíveis, contatar a Administração.',
-						[
-							{ text: "OK", onPress: () => navigation.goBack() } // 👈 This goes back
-						]
+							[
+								{ text: "OK", onPress: () => navigation.goBack() } // 👈 This goes back
+							]
 						)
 					}
 					setProductsComp(formatedArr);
@@ -148,8 +148,8 @@ const ProductsComp = (props) => {
 		// navigation.push("ProdutosStack", { data: products })
 	}
 
-	if(productsComp.length === 0 && !isLoading){
-		return 
+	if (productsComp.length === 0 && !isLoading) {
+		return
 	}
 
 	return isLoading ? (
@@ -160,14 +160,14 @@ const ProductsComp = (props) => {
 		<View
 			style={[
 				styles.mainContainer,
-				{ paddingBottom: parcelasSelected.length > 0 ? 20 : 0 }
+				{ paddingBottom: parcelasSelected.length > 0 ? 20 : 0, flexShrink: 1 }
 			]}
 		>
 			{/* <View style={styles.mainContainer}> */}
 			<Pressable
 				onPress={handleSelect.bind(this, 'select-produtos')}
 				style={({ pressed }) => [
-					pressed && styles.pressed,
+					pressed && styles.pressedMain,
 					styles.selectContainer
 				]}>
 				<Text style={styles.selectTitle}>Selecionar Produtos</Text>
@@ -175,80 +175,84 @@ const ProductsComp = (props) => {
 			</Pressable>
 			{/* </View> */}
 
-			<View style={styles.mainDataViewContainer}>
-				{parcelasSelected &&
-					parcelasSelected.map((data, i) => {
-						return (
-							<View key={i} style={styles.productContainer}>
-								<View style={styles.productContainerInside}>
-									<FontAwesome
-										name="check-square-o"
-										size={20}
-										color={Colors.succes[300]}
-									/>
+			{
+				parcelasSelected && parcelasSelected?.length > 0 &&
+
+				<View style={styles.mainDataViewContainer}>
+					{parcelasSelected &&
+						parcelasSelected.map((data, i) => {
+							return (
+								<View key={i} style={styles.productContainer}>
+									<View style={styles.productContainerInside}>
+										<FontAwesome
+											name="check-square-o"
+											size={20}
+											color={Colors.succes[300]}
+										/>
+										<Pressable
+											onPress={handleDeleteProduct.bind(
+												this,
+												data
+											)}
+											style={({ pressed }) => [
+												pressed && styles.pressed,
+												{ justifyContent: 'space-between', flexDirection: 'row', width: '100%', paddingRight: 20 }
+											]}
+
+
+										>
+											<Text style={styles.dataContent}>
+												{getProduct(data.product_id_produto)?.name}
+											</Text>
+											<Text style={styles.dataContent}>
+												{getProduct(data.product_id_produto)?.model.charAt(0).toUpperCase() + getProduct(data.product_id_produto)?.model.slice(1)}
+											</Text>
+											<Text style={styles.dataContent}>
+												R$ {formatNumber(getProduct(data.product_id_produto)?.value)}
+											</Text>
+										</Pressable>
+									</View>
 									<Pressable
 										onPress={handleDeleteProduct.bind(
 											this,
 											data
 										)}
 										style={({ pressed }) => [
-											pressed && styles.pressed,
-											{ justifyContent: 'space-between', flexDirection: 'row', width: '100%', paddingRight: 20 }
+											pressed && styles.pressed
 										]}
-
-
 									>
-										<Text style={styles.dataContent}>
-											{getProduct(data.product_id_produto)?.name}
-										</Text>
-										<Text style={styles.dataContent}>
-											{getProduct(data.product_id_produto)?.model.charAt(0).toUpperCase() + getProduct(data.product_id_produto)?.model.slice(1)}
-										</Text>
-										<Text style={styles.dataContent}>
-											R$ {formatNumber(getProduct(data.product_id_produto)?.value)}
-										</Text>
+										<Ionicons
+											name="trash-bin"
+											size={20}
+											color={Colors.error[500]}
+										/>
 									</Pressable>
 								</View>
-								<Pressable
-									onPress={handleDeleteProduct.bind(
-										this,
-										data
-									)}
-									style={({ pressed }) => [
-										pressed && styles.pressed
-									]}
-								>
-									<Ionicons
-										name="trash-bin"
-										size={20}
-										color={Colors.error[500]}
-									/>
-								</Pressable>
+							);
+						})}
+					{parcelasSelected.length > 0 && (
+						<>
+							<Divider />
+							<View style={styles.resumContainer}>
+								<Text style={styles.itemText}>
+									{quantityProd > 1
+										? `Items: ${quantityProd}`
+										: `Item: ${quantityProd}`}
+								</Text>
+								<Text style={styles.valueText}>
+									R$ {" "}
+									{paymentValue && paymentValue > 0
+										? paymentValue.toLocaleString("pt-br", {
+											minimumFractionDigits: 2,
+											maximumFractionDigits: 2
+										})
+										: "0,00"}
+								</Text>
 							</View>
-						);
-					})}
-				{parcelasSelected.length > 0 && (
-					<>
-						<Divider />
-						<View style={styles.resumContainer}>
-							<Text style={styles.itemText}>
-								{quantityProd > 1
-									? `Items: ${quantityProd}`
-									: `Item: ${quantityProd}`}
-							</Text>
-							<Text style={styles.valueText}>
-								R$ {" "}
-								{paymentValue && paymentValue > 0
-									? paymentValue.toLocaleString("pt-br", {
-										minimumFractionDigits: 2,
-										maximumFractionDigits: 2
-									})
-									: "0,00"}
-							</Text>
-						</View>
-					</>
-				)}
-			</View>
+						</>
+					)}
+				</View>
+			}
 		</View>
 	);
 };
@@ -282,12 +286,13 @@ const styles = StyleSheet.create({
 	},
 	selectContainer: {
 		width: '100%',
-		paddingTop: 5,
-		paddingHorizontal: 10,
-		justifyContent: 'space-between',
+		paddingHorizontal: 20,
+		paddingVertical: 20, // Adjust for vertical centering
 		flexDirection: 'row',
-		alignItems: 'center',
-		
+		alignItems: 'center', // Centers items vertically
+		justifyContent: 'space-between', // Centers items horizontally
+		gap: 10, // Adds spacing between Text and Icon (Optional)
+		// backgroundColor: 'grey'
 	},
 	title: {
 		alignSelf: "center",
@@ -296,6 +301,10 @@ const styles = StyleSheet.create({
 	},
 	pressed: {
 		opacity: 0.5
+	},
+	pressedMain: {
+		opacity: 0.5,
+		backgroundColor: Colors.primary[700]
 	},
 	dataContent: {
 		marginLeft: 20,
@@ -321,14 +330,14 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: 'center',
 		borderRadius: 6,
-		paddingHorizontal: 10,
+		// paddingHorizontal: 10,
 		marginHorizontal: 10,
 	},
 	selectTitle: {
 		color: Colors.gold[100],
 		fontSize: 20,
 		fontWeight: 'bold',
-		paddingVertical: 20,
+		// paddingVertical: 20,
 		textAlign: 'left'
 	}
 });

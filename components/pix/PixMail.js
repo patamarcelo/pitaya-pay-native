@@ -36,6 +36,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import LoadingOverlay from "../ui/LoadingOverlay";
 
 import { addTransaction } from "../../utils/firebase/firebase.datatable";
+import { expo } from '../../app.json'
 
 // import AwesomeAlert from "react-native-awesome-alerts";
 
@@ -198,7 +199,7 @@ const MailForm = () => {
 					paymentParams.email,
 					paymentParams.produtos,
 					data.id,
-					`AppNative - ${disp}`,
+					`AppNative - ${disp} - version: ${expo.version}`,
 					"-"
 				);
 

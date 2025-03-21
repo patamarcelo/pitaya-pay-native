@@ -31,7 +31,8 @@ const CardVendas = ({ data, handlePressUrl }) => {
 	// 	console.log(typeof prodctsSell);
 	// }
 
-	console.log('icon type: ', ICON_URL[type])
+	// console.log('icon type: ', ICON_URL[type])
+	// console.log('created at: ', createdAt, '\n')
 	const getData = (dataVenda) => {
 		const todayDate = new Date();
 		const todayD = todayDate.toLocaleDateString("pt-BR");

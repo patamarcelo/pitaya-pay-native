@@ -45,6 +45,46 @@ export const addTransaction = async (
 	}
 	return newTransaction;
 };
+export const addTransactionLinkPay = async (
+	sellerName,
+	sellerMail,
+	sellerId,
+	type,
+	value,
+	quantityPayment,
+	clientMail,
+	prodctsSell,
+	idAsaas,
+	appVersion,
+	compUrl,
+	linkPay
+) => {
+	const createdAt = new Date();
+	let newTransaction;
+	try {
+		newTransaction = await addDoc(
+			collection(db, TABLES_FIREBASE.transactions),
+			{
+				createdAt,
+				sellerName,
+				sellerMail,
+				sellerId,
+				type,
+				value,
+				quantityPayment,
+				clientMail,
+				prodctsSell,
+				idAsaas,
+				appVersion,
+				compUrl,
+				linkPay
+			}
+		);
+	} catch (error) {
+		console.log("Error ao registrar a transação: ", error);
+	}
+	return newTransaction;
+};
 
 // ADD CUSTOMER CREDIT CARD FORM
 

@@ -351,7 +351,9 @@ const UserVendas = ({ navigation }) => {
 								// scrollEnabled={false}
 								showsVerticalScrollIndicator={false}
 								data={filteredData?.sort(
-									(a, b) => b.createdAt - a.createdAt
+									(a, b) => 
+										b.createdAt.seconds * 1000 + b.createdAt.nanoseconds / 1e6 - 
+										(a.createdAt.seconds * 1000 + a.createdAt.nanoseconds / 1e6)
 								)}
 								keyExtractor={(item, i) => item.id}
 								renderItem={VendasList}

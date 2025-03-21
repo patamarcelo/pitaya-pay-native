@@ -30,13 +30,15 @@ import { createClient } from "../../utils/axios/axios.utils";
 import LoadingOverlay from "../ui/LoadingOverlay";
 import { useNavigation } from "@react-navigation/native";
 
-import { addTransaction } from "../../utils/firebase/firebase.datatable";
+import { addTransactionLinkPay } from "../../utils/firebase/firebase.datatable";
 import { useSelector } from "react-redux";
 import { userSelector } from "../../store/redux/selector";
 
 import ProductsComp from "../ui/Payment/Products";
 import { Divider } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
+
+import { expo } from "../../app.json";
 
 
 
@@ -62,12 +64,15 @@ const schema = yup.object({
     // value: yup.number("Digite um número válido").required("Valor não pode ser zerado")
     value: yup
         .string()
-        .matches(/^\d{1,}(,\d{0,2})?$/, "valor inválido")
+        .default("") // ✅ Prevents initial validation error
+        .nullable() // ✅ Allows empty values
+        .notRequired() // ✅ Makes the field optional
+        .matches(/^\d{1,}(,\d{0,2})?$/, "Valor inválido") // ✅ Only checks format if filled
         .transform((value, originalValue) =>
             originalValue ? originalValue.replace(/\./g, ",") : ""
         )
-        .test("decimal-places", "Invalid decimal places", (value) => {
-            if (!value) return true;
+        .test("decimal-places", "Casas decimais inválidas", (value) => {
+            if (!value) return true; // ✅ Allows empty value
             const [, decimalPart] = value.split(",");
             return !decimalPart || decimalPart.length <= 2;
         })
@@ -101,31 +106,39 @@ const LinkForm = () => {
 
     const [linkToShare, setlinkToShare] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [linkGenerated, setLinkGenerated] = useState(false);
 
     const [valuesFormObj, setvaluesFormObj] = useState({});
     const [errorHandler, setErrorHandler] = useState({
         name: "",
         description: "",
-        value: ""
+        // value: ""
     });
 
-    const [altura, setAltura] = useState(new Animated.Value(120));
-    const [largura, setLargura] = useState(new Animated.Value(0));
-
+    const [altura] = useState(new Animated.Value(0)); // Start hidden
+    const [largura] = useState(new Animated.Value(0)); // Start at 0 width
+    const [opacity] = useState(new Animated.Value(0)); // Fade in effect
 
     useEffect(() => {
-        if (linkToShare && linkToShare.length > 0) {
-            Animated.sequence([
-                Animated.timing(largura, {
-                    toValue: windowWidth,
-                    duration: 180,
-                    useNativeDriver: false
-                })
-                // Animated.timing(altura, {
-                // 	toValue: 150,
-                // 	duration: 100
-                // 	// useNativeDriver: true
-                // })
+        if (linkToShare?.length > 0) {
+            Animated.parallel([
+                Animated.spring(largura, {
+                    toValue: windowWidth - 40, // Slight padding
+                    speed: 12,
+                    bounciness: 8,
+                    useNativeDriver: false,
+                }),
+                Animated.spring(altura, {
+                    toValue: 140, // Smooth height expansion
+                    speed: 12,
+                    bounciness: 8,
+                    useNativeDriver: false,
+                }),
+                Animated.timing(opacity, {
+                    toValue: 1, // Fade in
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
             ]).start();
         }
     }, [linkToShare]);
@@ -158,6 +171,8 @@ const LinkForm = () => {
         formState: { errors }
     } = useForm({
         resolver: yupResolver(schema),
+        mode: "onTouched", // ✅ Avoids validation on initial render
+        shouldUnregister: false, // ✅ Prevents errors from showing on first render
         defaultValues: {
             endDate: getFutureDate(),
             billingType: "CREDIT_CARD",
@@ -182,13 +197,14 @@ const LinkForm = () => {
         if (Number(paymentValue) > 0) {
             setValue("value", String(paymentValue), { shouldValidate: true, shouldDirty: true });
             console.log(getValues())
-            
+
             setErrorHandler((prev) => {
-                return {...prev, value: String(paymentValue)}
+                return { ...prev, value: String(paymentValue) }
             })
         } else {
             // setValue("value",'', { shouldValidate: true, shouldDirty: true });
-            
+            setValue("value",'');
+
             // setErrorHandler((prev) => {
             //     return {...prev, value: ''}
             // })
@@ -209,10 +225,11 @@ const LinkForm = () => {
         console.log("resetando o formilário");
         setParcelasSelected([])
         setlinkToShare(null);
+        setLinkGenerated(false)
         setErrorHandler({
             name: "",
             description: "",
-            value: ""
+            // value: ""
         });
         reset();
     };
@@ -271,7 +288,8 @@ const LinkForm = () => {
             const { data, status } = respPay;
             if (status === 200) {
                 console.log("link gerado com sucesso: ", data);
-                const newTrans = await addTransaction(
+
+                const newTrans = await addTransactionLinkPay(
                     user.displayName
                         ? user.displayName
                         : "Vendedor sem nome cadastrado",
@@ -281,12 +299,16 @@ const LinkForm = () => {
                     formData.value,
                     "1",
                     `Nome - ${formData.name}`,
-                    [{descricao: `descricao - ${formData.description}`}, ...parcelasSelected],
+                    [{ descricao: `descricao - ${formData.description}` }, ...parcelasSelected],
                     data.id,
-                    `AppNative - ${disp}`,
-                    "-"
+                    `AppNative - ${disp} - version: ${expo?.version}`,
+                    "-",
+                    data.url
                 );
+
                 setlinkToShare(data.url);
+                setLinkGenerated(true)
+                setParcelasSelected([])
                 reset()
             } else {
                 console.log("erro ao gerar o Link");
@@ -331,7 +353,8 @@ const LinkForm = () => {
         navigation.navigate("PagamentosTab");
     };
 
-    const isDisabled = Object.values(errorHandler).some((value) => value === "");
+    const isDisabled = Object.values(errorHandler).some((value) => value === "") || parcelasSelected.length === 0;
+    
     const isDisabledTeste = Object.values(errorHandler).some((value) => {
         console.log("Checking value:", value, "Result:", value === "");
         return value === "";
@@ -409,44 +432,56 @@ const LinkForm = () => {
 
                                     );
                                 })}
+                                {isLoading && (
+                                    <View style={{ width: "90%", marginTop: 10 }}>
+                                        <LoadingOverlay message={"Gerando Link...."} />
+                                    </View>
+                                )}
+                                {!isLoading && linkToShare && linkToShare !== null && (
+                                    <Animated.View
+                                        style={[{ marginTop: 60 }, styles.shareConatiner, { width: largura, minHeight: altura }]}
+                                    >
+                                        <Text style={styles.textLink}>
+                                            Link gerado no valor de R$ {valuesFormObj.value}
+                                        </Text>
+                                        <View style={{ width: "90%", marginTop: 30 }}>
+                                            <Button onPress={onShare}>
+                                                <Text>Compartilhar Link</Text>
+                                            </Button>
+                                        </View>
+                                    </Animated.View>
+                                )}
                                 {/* <View style={{ height: 1, backgroundColor: 'gray', marginVertical: 8 }} /> */}
-                                <View style={{ width: '100%' }}>
-                                    <Divider style={{ height: 0.5, opacity: 0.5, backgroundColor: 'whitesmoke', marginVertical: 8 }} />
-                                </View>
-                                <ProductsComp
-                                    products={products}
-                                    setProducts={setProducts}
-                                    productsComp={productsComp}
-                                    setProductsComp={setProductsComp}
-                                    parcelasSelected={parcelasSelected}
-                                    setParcelasSelected={setParcelasSelected}
-                                    handlerChangeParcelas={handlerChangeParcelas}
-                                    handleDeleteProduct={handleDeleteProduct}
-                                    paymentValue={paymentValue}
-                                    quantityProd={quantityProd}
-                                />
+                                {
+                                    linkGenerated === false &&
+                                    <>
+                                        <View style={{ width: '100%', marginBottom: 5 }}>
+                                            <Divider style={{ height: 0.5, opacity: 0.5, backgroundColor: 'whitesmoke', marginVertical: 8 }} />
+                                        </View>
+                                        <ScrollView
+                                            style={{ flex: 1 }}
+                                            contentContainerStyle={{ width: "100%", alignItems: "stretch" }}
+                                        // horizontal={false} // Ensures only vertical scrolling
+                                        // showsVerticalScrollIndicator={false} // Optional: Hide scrollbar for a cleaner look
+                                        >
+                                            <ProductsComp
+                                                products={products}
+                                                setProducts={setProducts}
+                                                productsComp={productsComp}
+                                                setProductsComp={setProductsComp}
+                                                parcelasSelected={parcelasSelected}
+                                                setParcelasSelected={setParcelasSelected}
+                                                handlerChangeParcelas={handlerChangeParcelas}
+                                                handleDeleteProduct={handleDeleteProduct}
+                                                paymentValue={paymentValue}
+                                                quantityProd={quantityProd}
+                                            />
+                                        </ScrollView>
+                                    </>
+                                }
                             </KeyboardAvoidingView>
                         </TouchableWithoutFeedback>
                     </View>
-                    {isLoading && (
-                        <View style={{ width: "90%", marginTop: 200 }}>
-                            <LoadingOverlay message={"Gerando Link...."} />
-                        </View>
-                    )}
-                    {!isLoading && linkToShare && linkToShare !== null && (
-                        <Animated.View
-                            style={[{ marginTop: 120 }, styles.shareConatiner, { width: largura, minHeight: altura }]}
-                        >
-                            <Text style={styles.textLink}>
-                                Link gerado no valor de R$ {valuesFormObj.value}
-                            </Text>
-                            <View style={{ width: "90%", marginTop: 30 }}>
-                                <Button onPress={onShare}>
-                                    <Text>Compartilhar Link</Text>
-                                </Button>
-                            </View>
-                        </Animated.View>
-                    )}
                     {/* </ScrollView> */}
                 </SafeAreaView>
             </ScrollView>
@@ -496,10 +531,14 @@ const styles = StyleSheet.create({
     },
     btnView: {
         // flex: 1,
-        width: "90%",
+        width: "100%",
         position: 'absolute',
         bottom: 0,
-        marginBottom: 50
+        paddingTop: 20,
+        paddingBottom: 50,
+        borderTopRightRadius: 12,
+        borderTopLeftRadius: 12,
+        backgroundColor: Colors.primary[500]
     },
     form: {
         flex: 1,
